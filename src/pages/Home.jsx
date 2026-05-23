@@ -53,7 +53,9 @@ export default function Home() {
 
     let videoDuration = 0
     let ticking = false
-    let lastScrubTime = -1
+    let lastScrubTime = 0
+    let targetScrubTime = 0
+    let scrubAnimId = null
     let videoReady = false
     let loadingFinished = false
 
@@ -106,6 +108,20 @@ export default function Home() {
       }, 500)
     }
 
+    function animateScrub() {
+      if (!video || !videoReady) { scrubAnimId = null; return }
+      const diff = targetScrubTime - lastScrubTime
+      if (Math.abs(diff) > 0.008) {
+        lastScrubTime += diff * 0.16
+        video.currentTime = lastScrubTime
+        scrubAnimId = requestAnimationFrame(animateScrub)
+      } else {
+        lastScrubTime = targetScrubTime
+        video.currentTime = lastScrubTime
+        scrubAnimId = null
+      }
+    }
+
     function updateScrub() {
       if (!videoReady || !scrubBlock) return
       const rect = scrubBlock.getBoundingClientRect()
@@ -115,11 +131,8 @@ export default function Home() {
       let progress = -rect.top / scrollable
       progress = Math.max(0, Math.min(1, progress))
 
-      const targetTime = progress * videoDuration
-      if (video && Math.abs(targetTime - lastScrubTime) > 0.01) {
-        video.currentTime = targetTime
-        lastScrubTime = targetTime
-      }
+      targetScrubTime = progress * videoDuration
+      if (!scrubAnimId && video) scrubAnimId = requestAnimationFrame(animateScrub)
 
       // Panel 3 at exactly 13s into the video, derived from actual duration
       const panel3Threshold = videoDuration > 0 ? 14 / videoDuration : 0.95
@@ -395,7 +408,7 @@ export default function Home() {
     const velSection = document.getElementById('velocityMarquee')
     if (velTrack && velSection) {
       let trackX = 0, lastY = window.scrollY, velocity = 0
-      const baseSpeed = 0.6
+      const baseSpeed = 1.2
       let halfWidth = 0
       function measureHalf() { halfWidth = velTrack.scrollWidth / 2 }
       requestAnimationFrame(() => requestAnimationFrame(measureHalf))
@@ -467,10 +480,6 @@ export default function Home() {
             disablePictureInPicture
           />
           <div className="scrub-vignette"></div>
-          <div className="scrub-corner sc-tl"></div>
-          <div className="scrub-corner sc-tr"></div>
-          <div className="scrub-corner sc-bl"></div>
-          <div className="scrub-corner sc-br"></div>
 
           {/* PANEL 1 — HERO */}
           <div className="panel panel-1 is-active" id="panel1">
@@ -482,12 +491,16 @@ export default function Home() {
             </h1>
             <div className="panel-1-actions">
               <button className="btn-primary" data-magnetic onClick={() => scrollTo('apply')}>
-                Apply <span className="arrow">→</span>
+                Apply for fellowship
+                <svg className="btn-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
-              <button className="btn-ghost" onClick={() => scrollTo('impact')}>See proof</button>
+              <button className="btn-ghost" onClick={() => scrollTo('impact')}>
+                See proof
+                <svg className="btn-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3l5 5-5 5M3 8h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
             </div>
             <div className="panel-1-status">
-              <span className="strong">Persist Foundry</span><br />
+              <span className="strong">Persist</span><br />
               Backed by founders of Tether
             </div>
           </div>
@@ -500,14 +513,18 @@ export default function Home() {
               <div className="panel-2-eyebrow">01 / The compound</div>
               <div className="panel-2-plate">
                 <h2 className="panel-2-headline">
-                  <span className="word" style={{'--i': 0}}><span>Bet</span></span>
-                  <span className="word" style={{'--i': 1}}><span>long</span></span>
-                  <span className="word" style={{'--i': 2}}><span>enough.</span></span><br />
-                  <span className="word" style={{'--i': 3}}><span><em>The</em></span></span>
-                  <span className="word" style={{'--i': 4}}><span><em>world</em></span></span>
-                  <span className="word" style={{'--i': 5}}><span><em>catches</em></span></span>
-                  <span className="word" style={{'--i': 6}}><span><em>up.</em></span></span>
+                  <span className="word" style={{'--i': 0}}><span>The</span></span>
+                  <span className="word" style={{'--i': 1}}><span>longer</span></span>
+                  <span className="word" style={{'--i': 2}}><span>you</span></span>
+                  <span className="word" style={{'--i': 3}}><span>hold,</span></span><br />
+                  <span className="word" style={{'--i': 4}}><span><em>the</em></span></span>
+                  <span className="word" style={{'--i': 5}}><span><em>more</em></span></span>
+                  <span className="word" style={{'--i': 6}}><span><em>the</em></span></span>
+                  <span className="word" style={{'--i': 7}}><span><em>world</em></span></span>
+                  <span className="word" style={{'--i': 8}}><span><em>owes</em></span></span>
+                  <span className="word" style={{'--i': 9}}><span><em>you.</em></span></span>
                 </h2>
+                <p className="panel-2-subline">Most people quit one year before it compounds.</p>
               </div>
             </div>
           </div>
@@ -516,19 +533,27 @@ export default function Home() {
           <div className="panel panel-3" id="panel3">
             <div className="panel-3-eyebrow">02 / The offer</div>
             <h2 className="panel-3-headline">
-              <span className="word" style={{'--i': 0}}><span>We</span></span>
-              <span className="word" style={{'--i': 1}}><span>back</span></span>
-              <span className="word" style={{'--i': 2}}><span>the</span></span>
-              <span className="word" style={{'--i': 3}}><span>bet</span></span><br />
-              <span className="word" style={{'--i': 4}}><span><em>you</em></span></span>
-              <span className="word" style={{'--i': 5}}><span><em>already</em></span></span>
-              <span className="word" style={{'--i': 6}}><span><em>made.</em></span></span>
+              <span className="word" style={{'--i': 0}}><span>You've</span></span>
+              <span className="word" style={{'--i': 1}}><span>already</span></span>
+              <span className="word" style={{'--i': 2}}><span>made</span></span>
+              <span className="word" style={{'--i': 3}}><span>the</span></span>
+              <span className="word" style={{'--i': 4}}><span>bet.</span></span><br />
+              <span className="word" style={{'--i': 5}}><span><em>We're</em></span></span>
+              <span className="word" style={{'--i': 6}}><span><em>just</em></span></span>
+              <span className="word" style={{'--i': 7}}><span><em>here</em></span></span>
+              <span className="word" style={{'--i': 8}}><span><em>to</em></span></span>
+              <span className="word" style={{'--i': 9}}><span><em>match</em></span></span>
+              <span className="word" style={{'--i': 10}}><span><em>it.</em></span></span>
             </h2>
             <div className="panel-3-actions">
               <button className="btn-primary" data-magnetic onClick={() => scrollTo('apply')}>
-                Apply <span className="arrow">→</span>
+                Apply for fellowship
+                <svg className="btn-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
-              <button className="btn-ghost" onClick={() => scrollTo('filter')}>See if you fit</button>
+              <button className="btn-ghost" onClick={() => scrollTo('filter')}>
+                See if you fit
+                <svg className="btn-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3l5 5-5 5M3 8h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
             </div>
           </div>
         </div>
@@ -563,11 +588,12 @@ export default function Home() {
       <section className="backed-v2" id="backed">
         <div className="backed-v2-inner">
           <div className="backed-v2-header">
-            <div className="backed-v2-eyebrow">Who's behind us</div>
+            <div className="backed-v2-eyebrow">Forged at the Foundry · Who's behind us</div>
             <h3 className="backed-v2-statement">
-              The same people who bet on <em>Tether</em><br />
-              before anyone could spell "stablecoin."
-              <span className="small">They wrote the cheque to us. We write the cheque to you. The chain stays unbroken.</span>
+              The same people who backed <em>Tether</em><br />
+              when stablecoin wasn't even a word yet —<br />
+              they wrote the cheque to us.
+              <span className="small">We write the cheque to you. The chain stays unbroken.</span>
             </h3>
           </div>
           <div className="backed-v2-list">
@@ -602,7 +628,7 @@ export default function Home() {
           <div className="impact-grid">
             <div className="impact-stat">
               <div className="impact-num" data-target="30">0<span className="symbol">+</span></div>
-              <div className="impact-label">Companies forged</div>
+              <div className="impact-label">Companies built</div>
             </div>
             <div className="impact-stat">
               <div className="impact-num" data-target="117" data-prefix="$">0<span className="symbol">M</span></div>
@@ -610,7 +636,7 @@ export default function Home() {
             </div>
             <div className="impact-stat">
               <div className="impact-num" data-target="400">0<span className="symbol">+</span></div>
-              <div className="impact-label">Allies, operators, advisors</div>
+              <div className="impact-label">Operators &amp; allies</div>
             </div>
             <div className="impact-stat">
               <div className="impact-num" data-target="67">0<span className="symbol">B</span></div>
@@ -620,16 +646,143 @@ export default function Home() {
         </div>
       </section>
 
+      {/* PORTFOLIO v2 */}
+      <section className="portfolio-v2" id="portfolio">
+        <div className="portfolio-v2-inner">
+          <div className="portfolio-v2-header">
+            <div>
+              <h2 className="portfolio-v2-title"><em>They bet.</em><br />We backed it.</h2>
+              <div className="portfolio-v2-meta">Three of thirty.</div>
+            </div>
+            <div className="portfolio-v2-sub">
+              We don't pick winners. We pick people who can't stop. Here's what nine years of that looks like.
+            </div>
+          </div>
+
+          <div className="portfolio-row" data-row="0">
+            <div className="portfolio-row-left">
+              <div className="portfolio-row-tag">Robotics</div>
+              <h3 className="portfolio-row-name"><em>Open Droids</em></h3>
+              <p className="portfolio-row-desc">
+                Home robots that earn their keep. Built by someone who got tired of waiting for the future to arrive.
+              </p>
+              <div className="portfolio-row-stats">
+                <div>
+                  <div className="portfolio-row-stat-num">Pre-seed</div>
+                  <div className="portfolio-row-stat-label">Where they started</div>
+                </div>
+                <div>
+                  <div className="portfolio-row-stat-num">Series A<em>→</em></div>
+                  <div className="portfolio-row-stat-label">Where they're going</div>
+                </div>
+              </div>
+            </div>
+            <div className="portfolio-row-right">
+              <img src="/assets/opendroid-thumbnail.webp" alt="Open Droids" className="portfolio-row-thumb" />
+              <div className="portfolio-row-thumb-overlay"></div>
+              <div className="portfolio-row-meta">Case 01 / 03</div>
+              <div className="portfolio-row-visual-corner tl"></div>
+              <div className="portfolio-row-visual-corner tr"></div>
+              <div className="portfolio-row-visual-corner bl"></div>
+              <div className="portfolio-row-visual-corner br"></div>
+            </div>
+          </div>
+
+          <div className="portfolio-row is-reversed" data-row="1">
+            <div className="portfolio-row-left">
+              <div className="portfolio-row-tag">AI Privacy</div>
+              <h3 className="portfolio-row-name"><em>Face Search</em></h3>
+              <p className="portfolio-row-desc">
+                Find every place your face lives online. Built by someone who couldn't sleep until the problem was solved.
+              </p>
+              <div className="portfolio-row-stats">
+                <div>
+                  <div className="portfolio-row-stat-num">400K</div>
+                  <div className="portfolio-row-stat-label">Users</div>
+                </div>
+                <div>
+                  <div className="portfolio-row-stat-num">$8K<em>mrr</em></div>
+                  <div className="portfolio-row-stat-label">Climbing</div>
+                </div>
+              </div>
+            </div>
+            <div className="portfolio-row-right">
+              <img src="/assets/facesearch-ai-thumbnail.webp" alt="Face Search AI" className="portfolio-row-thumb" />
+              <div className="portfolio-row-thumb-overlay"></div>
+              <div className="portfolio-row-meta">Case 02 / 03</div>
+              <div className="portfolio-row-visual-corner tl"></div>
+              <div className="portfolio-row-visual-corner tr"></div>
+              <div className="portfolio-row-visual-corner bl"></div>
+              <div className="portfolio-row-visual-corner br"></div>
+            </div>
+          </div>
+
+          <div className="portfolio-row" data-row="2">
+            <div className="portfolio-row-left">
+              <div className="portfolio-row-tag">Talent</div>
+              <h3 className="portfolio-row-name"><em>Swissmote</em></h3>
+              <p className="portfolio-row-desc">
+                Hiring the world's most overlooked builders. Built by someone who heard "no" so many times he rewrote the rules.
+              </p>
+              <div className="portfolio-row-stats">
+                <div>
+                  <div className="portfolio-row-stat-num">Profitable</div>
+                  <div className="portfolio-row-stat-label">No outside capital</div>
+                </div>
+                <div>
+                  <div className="portfolio-row-stat-num">Global</div>
+                  <div className="portfolio-row-stat-label">Day one</div>
+                </div>
+              </div>
+            </div>
+            <div className="portfolio-row-right">
+              <img src="/assets/swissmote-thimbnaail.webp" alt="Swissmote" className="portfolio-row-thumb" />
+              <div className="portfolio-row-thumb-overlay"></div>
+              <div className="portfolio-row-meta">Case 03 / 03</div>
+              <div className="portfolio-row-visual-corner tl"></div>
+              <div className="portfolio-row-visual-corner tr"></div>
+              <div className="portfolio-row-visual-corner bl"></div>
+              <div className="portfolio-row-visual-corner br"></div>
+            </div>
+          </div>
+
+          <div className="portfolio-v2-cta">
+            <p className="portfolio-v2-cta-label">Three of thirty. <em>The rest are just as relentless.</em></p>
+            <a href="#" className="portfolio-v2-cta-link" data-magnetic>
+              See all thirty <span className="arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* VELOCITY MARQUEE */}
+      <section className="velocity-marquee" id="velocityMarquee">
+        <div className="velocity-marquee-track" id="velocityTrack">
+          <span className="velocity-marquee-item">You made the bet. We matched it.</span>
+          <span className="velocity-marquee-star" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
+          </span>
+          <span className="velocity-marquee-item is-outline">You made the bet. We matched it.</span>
+          <span className="velocity-marquee-star" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
+          </span>
+          <span className="velocity-marquee-item">You made the bet. We matched it.</span>
+          <span className="velocity-marquee-star" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
+          </span>
+          <span className="velocity-marquee-item is-outline">You made the bet. We matched it.</span>
+          <span className="velocity-marquee-star" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
+          </span>
+        </div>
+      </section>
+
       {/* OFFER — DIAGONAL STAIRCASE */}
       <section className="offer" id="offer">
         <div className="offer-header">
           <div className="offer-header-left">
             <div className="offer-eyebrow">What you get</div>
-            <h2 className="offer-title">Six things.<br /><em>No questions asked.</em></h2>
-          </div>
-          <div className="offer-progress">
-            <span><span className="offer-progress-num" id="offerProgressNum">01</span> / 06</span>
-            <div className="offer-progress-bar"><div className="offer-progress-fill" id="offerProgressFill"></div></div>
+            <h2 className="offer-title">Six things.<br /><em>Nothing extra. Nothing missing.</em></h2>
           </div>
         </div>
 
@@ -648,16 +801,16 @@ export default function Home() {
             <div className="offer-card">
               <div className="offer-card-num">01</div>
               <div className="offer-card-top">
-                <span className="offer-card-label">The bet</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <path d="M12 2v20M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/>
                   </svg>
                 </span>
+                <span className="offer-card-label">The runway.</span>
               </div>
               <div className="offer-card-bottom">
-                <div className="offer-card-name">Your <em>stake.</em></div>
-                <p className="offer-card-proof">Monthly capital so you can leave the job, tell the family, and stop apologizing for the work.</p>
+                <div className="offer-card-name">Your <em>move.</em></div>
+                <p className="offer-card-proof">Monthly capital so you can leave the job, stop explaining yourself, and start. Full-time or nothing.</p>
               </div>
               <div className="offer-card-step-of">Step 01 / 06</div>
             </div>
@@ -667,17 +820,17 @@ export default function Home() {
             <div className="offer-card">
               <div className="offer-card-num">02</div>
               <div className="offer-card-top">
-                <span className="offer-card-label">The people</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <circle cx="9" cy="8" r="4"/><circle cx="17" cy="10" r="3"/>
                     <path d="M3 20v-1.5a4 4 0 014-4h4a4 4 0 014 4V20M22 20v-1a3 3 0 00-2-2.83"/>
                   </svg>
                 </span>
+                <span className="offer-card-label">The team.</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">Your <em>team.</em></div>
-                <p className="offer-card-proof">Designers, engineers, growth operators. From day one. No hiring, no founder loneliness.</p>
+                <p className="offer-card-proof">Designers, engineers, growth operators from day one. No hiring lag. No founder isolation.</p>
               </div>
               <div className="offer-card-step-of">Step 02 / 06</div>
             </div>
@@ -687,17 +840,17 @@ export default function Home() {
             <div className="offer-card">
               <div className="offer-card-num">03</div>
               <div className="offer-card-top">
-                <span className="offer-card-label">The fuel</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <rect x="2" y="6" width="20" height="13" rx="2"/>
                     <path d="M2 11h20M6 15h2M11 15h3"/>
                   </svg>
                 </span>
+                <span className="offer-card-label">The investment.</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">The <em>capital.</em></div>
-                <p className="offer-card-proof">Pre-seed in. Follow-on capital ready when you hit the next inflection.</p>
+                <p className="offer-card-proof">Pre-seed in at signing. Follow-on ready when you hit the next inflection point.</p>
               </div>
               <div className="offer-card-step-of">Step 03 / 06</div>
             </div>
@@ -707,7 +860,6 @@ export default function Home() {
             <div className="offer-card">
               <div className="offer-card-num">04</div>
               <div className="offer-card-top">
-                <span className="offer-card-label">The room</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/>
@@ -715,10 +867,11 @@ export default function Home() {
                     <path d="M6 7l4 3M18 7l-4 3M6 17l4-3M18 17l-4-3"/>
                   </svg>
                 </span>
+                <span className="offer-card-label">The room.</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">The <em>network.</em></div>
-                <p className="offer-card-proof">400+ advisors, operators, allies. The room you were never invited into.</p>
+                <p className="offer-card-proof">400+ operators, advisors, allies. The conversations that usually take a decade to get access to.</p>
               </div>
               <div className="offer-card-step-of">Step 04 / 06</div>
             </div>
@@ -728,16 +881,16 @@ export default function Home() {
             <div className="offer-card">
               <div className="offer-card-num">05</div>
               <div className="offer-card-top">
-                <span className="offer-card-label">The shortcuts</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <path d="M4 4h13a3 3 0 013 3v13M4 4v16h16M4 4l8 8 4-4 4 4"/>
                   </svg>
                 </span>
+                <span className="offer-card-label">The shortcut.</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">The <em>playbook.</em></div>
-                <p className="offer-card-proof">Nine years of frameworks, mistakes, shortcuts. So you stop repeating ours.</p>
+                <p className="offer-card-proof">Nine years of frameworks, dead ends, and hard-won calls — so you skip the mistakes we already made.</p>
               </div>
               <div className="offer-card-step-of">Step 05 / 06</div>
             </div>
@@ -747,16 +900,16 @@ export default function Home() {
             <div className="offer-card">
               <div className="offer-card-num">06</div>
               <div className="offer-card-top">
-                <span className="offer-card-label">The ownership</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <path d="M3 12l9-9 9 9M5 10v10h14V10M9 20v-6h6v6"/>
                   </svg>
                 </span>
+                <span className="offer-card-label">The ownership.</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">The <em>company.</em></div>
-                <p className="offer-card-proof">Yours. We back the bet. You make the call. The work is yours to own.</p>
+                <p className="offer-card-proof">Yours. We back the bet. You run the company. The work belongs to you.</p>
               </div>
               <div className="offer-card-step-of">Step 06 / 06</div>
             </div>
@@ -779,36 +932,36 @@ export default function Home() {
             <div className="manifesto-line is-active" data-step="0">
               <span>
                 <span className="manifesto-line-num">i.</span>
-                You've been thinking about this <em>for years.</em>
+                You've been sitting on this for years.
               </span>
             </div>
             <div className="manifesto-line" data-step="1">
               <span>
                 <span className="manifesto-line-num">ii.</span>
-                Building it quietly. <em>In your head.</em> On napkins.
+                Building it quietly. In your head. On whatever's nearby.
               </span>
             </div>
             <div className="manifesto-line" data-step="2">
               <span>
                 <span className="manifesto-line-num">iii.</span>
-                Choosing the harder thing. <em>Over and over.</em>
+                Choosing the harder thing. Every single time.
               </span>
             </div>
             <div className="manifesto-line" data-step="3">
               <span>
                 <span className="manifesto-line-num">iv.</span>
-                We've watched founders like you <em>for nine years.</em>
+                We've watched founders like you for nine years.
               </span>
             </div>
             <div className="manifesto-line" data-step="4">
               <span>
                 <span className="manifesto-line-num">v.</span>
-                It's <em>your turn.</em>
+                We know what this looks like. <em>It looks like you.</em>
               </span>
             </div>
           </div>
           <div className="manifesto-cta" id="manifestoCta">
-            <span className="pulse"></span>Keep scrolling to see if you fit
+            <span className="pulse"></span>If that's you — keep reading. →
           </div>
         </div>
       </section>
@@ -830,150 +983,20 @@ export default function Home() {
             <div className="filter-col yes">
               <div className="filter-col-label"><span className="filter-col-icon">✓</span> Apply if</div>
               <ul className="filter-list">
-                <li>You think about it the second you stop talking.</li>
-                <li>You'll out-work your safer self this year.</li>
-                <li>Comfort makes you twitchy.</li>
-                <li>You stopped saying "someday" out loud.</li>
+                <li>You're thinking about it the second you stop talking.</li>
+                <li>You'll outwork the version of yourself that plays it safe.</li>
+                <li>Comfort makes you restless, not reassured.</li>
+                <li>You stopped saying "someday" out loud a while ago.</li>
               </ul>
             </div>
             <div className="filter-col no">
               <div className="filter-col-label"><span className="filter-col-icon">✕</span> Don't apply if</div>
               <ul className="filter-list">
                 <li>You're here for the cheque, not the work.</li>
-                <li>You haven't picked what to build yet.</li>
-                <li>Honest feedback ruins your week.</li>
-                <li>You love the title more than the job.</li>
+                <li>You haven't decided what to build yet.</li>
+                <li>Honest feedback derails your week.</li>
+                <li>The title matters more to you than the job does.</li>
               </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* VELOCITY MARQUEE */}
-      <section className="velocity-marquee" id="velocityMarquee">
-        <div className="velocity-marquee-track" id="velocityTrack">
-          <span className="velocity-marquee-item">We back the bet you already made.</span>
-          <span className="velocity-marquee-star" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
-          </span>
-          <span className="velocity-marquee-item is-outline">Bet on yourself.</span>
-          <span className="velocity-marquee-star" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
-          </span>
-          <span className="velocity-marquee-item">We back the bet you already made.</span>
-          <span className="velocity-marquee-star" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
-          </span>
-          <span className="velocity-marquee-item is-outline">Bet on yourself.</span>
-          <span className="velocity-marquee-star" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
-          </span>
-        </div>
-      </section>
-
-      {/* PORTFOLIO v2 */}
-      <section className="portfolio-v2" id="portfolio">
-        <div className="portfolio-v2-inner">
-          <div className="portfolio-v2-header">
-            <div>
-              <h2 className="portfolio-v2-title"><em>They bet.</em><br />We backed it.</h2>
-              <div className="portfolio-v2-meta">Three out of thirty / Built 2017 → today</div>
-            </div>
-            <div className="portfolio-v2-sub">
-              We don't pick winners. We pick people who can't quit. Here's what that looked like for three of them.
-            </div>
-          </div>
-
-          <div className="portfolio-row" data-row="0">
-            <div className="portfolio-row-left">
-              <div className="portfolio-row-tag">Robotics</div>
-              <h3 className="portfolio-row-name"><em>Open Droids</em></h3>
-              <p className="portfolio-row-desc">
-                Home robots that actually earn their place. Built by someone who got tired of waiting for the future to show up.
-              </p>
-              <div className="portfolio-row-stats">
-                <div>
-                  <div className="portfolio-row-stat-num">Pre-seed</div>
-                  <div className="portfolio-row-stat-label">Where they started</div>
-                </div>
-                <div>
-                  <div className="portfolio-row-stat-num">Series A<em>→</em></div>
-                  <div className="portfolio-row-stat-label">Where they're going</div>
-                </div>
-              </div>
-            </div>
-            <div className="portfolio-row-right">
-              <div className="portfolio-row-meta">Case 01 / 03</div>
-              <div className="portfolio-row-visual">
-                <div className="portfolio-row-visual-corner tl"></div>
-                <div className="portfolio-row-visual-corner tr"></div>
-                <div className="portfolio-row-visual-corner bl"></div>
-                <div className="portfolio-row-visual-corner br"></div>
-                <span className="portfolio-row-visual-mark">droids.</span>
-                <span className="portfolio-row-visual-tag">in your home</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="portfolio-row is-reversed" data-row="1">
-            <div className="portfolio-row-left">
-              <div className="portfolio-row-tag">Talent</div>
-              <h3 className="portfolio-row-name"><em>Swissmote</em></h3>
-              <p className="portfolio-row-desc">
-                Hiring the world's most underestimated builders. Built by someone who got told "no" so many times he started writing his own rules.
-              </p>
-              <div className="portfolio-row-stats">
-                <div>
-                  <div className="portfolio-row-stat-num">Profitable</div>
-                  <div className="portfolio-row-stat-label">No outside capital</div>
-                </div>
-                <div>
-                  <div className="portfolio-row-stat-num">Global</div>
-                  <div className="portfolio-row-stat-label">Reach, day one</div>
-                </div>
-              </div>
-            </div>
-            <div className="portfolio-row-right">
-              <div className="portfolio-row-meta">Case 02 / 03</div>
-              <div className="portfolio-row-visual">
-                <div className="portfolio-row-visual-corner tl"></div>
-                <div className="portfolio-row-visual-corner tr"></div>
-                <div className="portfolio-row-visual-corner bl"></div>
-                <div className="portfolio-row-visual-corner br"></div>
-                <span className="portfolio-row-visual-mark">hire.</span>
-                <span className="portfolio-row-visual-tag">remote, global</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="portfolio-row" data-row="2">
-            <div className="portfolio-row-left">
-              <div className="portfolio-row-tag">AI Privacy</div>
-              <h3 className="portfolio-row-name"><em>Face Search</em></h3>
-              <p className="portfolio-row-desc">
-                Show people exactly where their face lives online. Built by someone who couldn't sleep until the problem was solved.
-              </p>
-              <div className="portfolio-row-stats">
-                <div>
-                  <div className="portfolio-row-stat-num">400K</div>
-                  <div className="portfolio-row-stat-label">Users</div>
-                </div>
-                <div>
-                  <div className="portfolio-row-stat-num">$8K<em>mrr</em></div>
-                  <div className="portfolio-row-stat-label">Climbing</div>
-                </div>
-              </div>
-            </div>
-            <div className="portfolio-row-right">
-              <div className="portfolio-row-meta">Case 03 / 03</div>
-              <div className="portfolio-row-visual">
-                <div className="portfolio-row-visual-corner tl"></div>
-                <div className="portfolio-row-visual-corner tr"></div>
-                <div className="portfolio-row-visual-corner bl"></div>
-                <div className="portfolio-row-visual-corner br"></div>
-                <span className="portfolio-row-visual-mark">find.</span>
-                <span className="portfolio-row-visual-tag">your digital face</span>
-              </div>
             </div>
           </div>
         </div>
@@ -988,7 +1011,7 @@ export default function Home() {
             You've made this bet a thousand times in your head.
           </p>
           <h2 className="final-cta-headline-v2" id="finalHeadline">
-            Make it <em>once</em><br />on paper.
+            Once on paper<br /><em>changes everything.</em>
           </h2>
           <div className="final-cta-divider"></div>
           <div className="final-cta-button-wrap">
