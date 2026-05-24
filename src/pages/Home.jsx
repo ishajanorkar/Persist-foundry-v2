@@ -577,6 +577,39 @@ export default function Home() {
     }, { threshold: 0.2, rootMargin: '0px 0px -8% 0px' })
     pfRows.forEach(r => pfRowObs.observe(r))
 
+    /* ── PORTFOLIO THUMBNAIL CURSOR TOOLTIP ─────────────────── */
+    ;(() => {
+      const cursor = document.getElementById('pfCursor')
+      if (!cursor) return
+
+      const thumbs = Array.from(document.querySelectorAll('.portfolio-row-right[data-url]'))
+      let mx = 0, my = 0, cx = 0, cy = 0
+      let loopId = null
+
+      document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY }, { passive: true })
+
+      thumbs.forEach(thumb => {
+        thumb.addEventListener('mouseenter', () => {
+          cursor.classList.add('is-visible')
+        })
+        thumb.addEventListener('mouseleave', () => {
+          cursor.classList.remove('is-visible')
+        })
+        thumb.addEventListener('click', () => {
+          const url = thumb.dataset.url
+          if (url) window.open(url, '_blank', 'noopener,noreferrer')
+        })
+      })
+
+      function loop() {
+        cx += (mx - cx) * 0.14
+        cy += (my - cy) * 0.14
+        cursor.style.transform = `translate(${(cx).toFixed(1)}px, ${(cy).toFixed(1)}px) translate(-50%, -50%)`
+        loopId = requestAnimationFrame(loop)
+      }
+      loop()
+    })()
+
     /* ── HERO MOUSE-MOVE PARALLAX (depth layers via CSS vars) ── */
     ;(() => {
       if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
@@ -944,7 +977,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="portfolio-row-right">
+            <div className="portfolio-row-right" data-url="https://opendroids.com/">
               <img src="/assets/opendroid-thumbnail.webp" alt="Open Droids" className="portfolio-row-thumb" />
               <div className="portfolio-row-thumb-overlay"></div>
               <div className="portfolio-row-meta">Case 01 / 03</div>
@@ -973,7 +1006,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="portfolio-row-right">
+            <div className="portfolio-row-right" data-url="https://facesearchai.com/">
               <img src="/assets/facesearch-ai-thumbnail.webp" alt="Face Search AI" className="portfolio-row-thumb" />
               <div className="portfolio-row-thumb-overlay"></div>
               <div className="portfolio-row-meta">Case 02 / 03</div>
@@ -1002,7 +1035,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="portfolio-row-right">
+            <div className="portfolio-row-right" data-url="https://swissmote.com/">
               <img src="/assets/swissmote-thimbnaail.webp" alt="Swissmote" className="portfolio-row-thumb" />
               <div className="portfolio-row-thumb-overlay"></div>
               <div className="portfolio-row-meta">Case 03 / 03</div>
@@ -1021,6 +1054,16 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Portfolio custom cursor tooltip — fixed, follows mouse over thumbnails */}
+      <div className="pf-cursor" id="pfCursor" aria-hidden="true">
+        <span className="pf-cursor-label">Visit Website</span>
+        <span className="pf-cursor-icon">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+            <path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </span>
+      </div>
 
       {/* VELOCITY MARQUEE */}
       <section className="velocity-marquee" id="velocityMarquee">
