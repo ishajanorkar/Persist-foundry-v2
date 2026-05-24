@@ -582,21 +582,21 @@ export default function Home() {
       const cursor = document.getElementById('pfCursor')
       if (!cursor) return
 
-      const thumbs = Array.from(document.querySelectorAll('.portfolio-row-right[data-url]'))
+      const rows = Array.from(document.querySelectorAll('.portfolio-row[data-url]'))
       let mx = 0, my = 0, cx = 0, cy = 0
       let loopId = null
 
       document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY }, { passive: true })
 
-      thumbs.forEach(thumb => {
-        thumb.addEventListener('mouseenter', () => {
+      rows.forEach(row => {
+        row.addEventListener('mouseenter', () => {
           cursor.classList.add('is-visible')
         })
-        thumb.addEventListener('mouseleave', () => {
+        row.addEventListener('mouseleave', () => {
           cursor.classList.remove('is-visible')
         })
-        thumb.addEventListener('click', () => {
-          const url = thumb.dataset.url
+        row.addEventListener('click', () => {
+          const url = row.dataset.url
           if (url) window.open(url, '_blank', 'noopener,noreferrer')
         })
       })
@@ -959,7 +959,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="portfolio-row" data-row="0">
+          <div className="portfolio-row" data-row="0" data-url="https://opendroids.com/">
             <div className="portfolio-row-left">
               <div className="portfolio-row-tag">Robotics</div>
               <h3 className="portfolio-row-name"><em>Open Droids</em></h3>
@@ -977,7 +977,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="portfolio-row-right" data-url="https://opendroids.com/">
+            <div className="portfolio-row-right">
               <img src="/assets/opendroid-thumbnail.webp" alt="Open Droids" className="portfolio-row-thumb" />
               <div className="portfolio-row-thumb-overlay"></div>
               <div className="portfolio-row-meta">Case 01 / 03</div>
@@ -988,7 +988,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="portfolio-row is-reversed" data-row="1">
+          <div className="portfolio-row is-reversed" data-row="1" data-url="https://facesearchai.com/">
             <div className="portfolio-row-left">
               <div className="portfolio-row-tag">AI Privacy</div>
               <h3 className="portfolio-row-name"><em>Face Search</em></h3>
@@ -1006,7 +1006,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="portfolio-row-right" data-url="https://facesearchai.com/">
+            <div className="portfolio-row-right">
               <img src="/assets/facesearch-ai-thumbnail.webp" alt="Face Search AI" className="portfolio-row-thumb" />
               <div className="portfolio-row-thumb-overlay"></div>
               <div className="portfolio-row-meta">Case 02 / 03</div>
@@ -1017,7 +1017,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="portfolio-row" data-row="2">
+          <div className="portfolio-row" data-row="2" data-url="https://swissmote.com/">
             <div className="portfolio-row-left">
               <div className="portfolio-row-tag">Talent</div>
               <h3 className="portfolio-row-name"><em>Swissmote</em></h3>
@@ -1035,7 +1035,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="portfolio-row-right" data-url="https://swissmote.com/">
+            <div className="portfolio-row-right">
               <img src="/assets/swissmote-thimbnaail.webp" alt="Swissmote" className="portfolio-row-thumb" />
               <div className="portfolio-row-thumb-overlay"></div>
               <div className="portfolio-row-meta">Case 03 / 03</div>

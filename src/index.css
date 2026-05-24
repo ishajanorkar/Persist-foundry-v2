@@ -1726,8 +1726,9 @@ body::before {
 }
 .portfolio-v2-cta-link:hover .arrow { transform: translateX(6px); }
 
-/* portfolio thumbnail — hide system cursor so our tooltip takes over */
-.portfolio-row-right[data-url] { cursor: none; }
+/* hide system cursor over the entire project row so tooltip takes over */
+.portfolio-row[data-url],
+.portfolio-row[data-url] * { cursor: none; }
 
 /* ── Portfolio custom cursor tooltip ── */
 .pf-cursor {
