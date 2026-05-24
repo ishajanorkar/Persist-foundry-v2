@@ -577,136 +577,45 @@ export default function Home() {
     }, { threshold: 0.2, rootMargin: '0px 0px -8% 0px' })
     pfRows.forEach(r => pfRowObs.observe(r))
 
-    /* ── HERO THREE.JS DEPTH SCENE + UI PARALLAX ────────────── */
-    ;(async () => {
+    /* ── HERO MOUSE-MOVE PARALLAX (depth layers via CSS vars) ── */
+    ;(() => {
       if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
       const stage = document.querySelector('.scrub-sticky')
-      const heroCanvas = document.getElementById('heroCanvas')
-      if (!stage || !heroCanvas) return
+      if (!stage) return
 
-      // Shared mouse state (pixels from center)
       const mouse = { x: 0, y: 0 }
       stage.addEventListener('mousemove', e => {
         const r = stage.getBoundingClientRect()
         mouse.x =  e.clientX - r.left - r.width  * 0.5
         mouse.y =  e.clientY - r.top  - r.height * 0.5
-      })
+      }, { passive: true })
       stage.addEventListener('mouseleave', () => { mouse.x = 0; mouse.y = 0 })
 
-      // Dynamic Three.js import (desktop only — keeps mobile bundle lean)
-      const THREE = await import('three')
-      let W = window.innerWidth, H = window.innerHeight
-
-      const renderer = new THREE.WebGLRenderer({ canvas: heroCanvas, alpha: true, antialias: false, powerPreference: 'low-power' })
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
-      renderer.setSize(W, H)
-
-      const scene = new THREE.Scene()
-      const camera = new THREE.PerspectiveCamera(62, W / H, 0.1, 200)
-      camera.position.z = 12
-
-      const rnd = (a, b) => a + Math.random() * (b - a)
-
-      // Helper — creates a Points layer and adds to scene
-      function makeLayer(count, zMin, zMax, size, color, opacity) {
-        const pos = new Float32Array(count * 3)
-        for (let i = 0; i < count; i++) {
-          pos[i*3]   = rnd(-38, 38)
-          pos[i*3+1] = rnd(-20, 20)
-          pos[i*3+2] = rnd(zMin, zMax)
-        }
-        const geo = new THREE.BufferGeometry()
-        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3))
-        const pts = new THREE.Points(geo, new THREE.PointsMaterial({ size, color, transparent: true, opacity, sizeAttenuation: true }))
-        scene.add(pts)
-        return pts
-      }
-
-      // ── LAYER 1: Deep galaxy stars (Z -20 → -13) ── tiny, dense
-      makeLayer(2200, -20, -13, 0.055, 0xD8C8F2, 0.70)
-
-      // ── LAYER 2: Mid nebula stars (Z -10 → -6) ─── slightly larger
-      makeLayer(500,  -10,  -6, 0.10,  0xE8D8FF, 0.48)
-
-      // ── LAYER 3: Warm bokeh / field glow (Z -6 → -2)
-      makeLayer(45,    -6,  -2, 0.55,  0xF3AA62, 0.26)
-
-      // ── LAYER 4: Violet brand bokeh (Z -4 → -1)
-      makeLayer(30,    -4,  -1, 0.42,  0x9B71FF, 0.28)
-
-      // ── LAYER 5: Floating embers (Z -1 → +1) — drift upward
-      const EMBER_N = 70
-      const ePos = new Float32Array(EMBER_N * 3)
-      const eVY  = new Float32Array(EMBER_N)
-      for (let i = 0; i < EMBER_N; i++) {
-        ePos[i*3]   = rnd(-14, 14)
-        ePos[i*3+1] = rnd(-11, 8)
-        ePos[i*3+2] = rnd(-1, 1)
-        eVY[i]      = rnd(0.005, 0.016)
-      }
-      const eGeo = new THREE.BufferGeometry()
-      eGeo.setAttribute('position', new THREE.BufferAttribute(ePos, 3))
-      const embers = new THREE.Points(eGeo, new THREE.PointsMaterial({ size: 0.15, color: 0xFFD49A, transparent: true, opacity: 0.58, sizeAttenuation: true }))
-      scene.add(embers)
-
-      // Resize handler
-      window.addEventListener('resize', () => {
-        W = window.innerWidth; H = window.innerHeight
-        renderer.setSize(W, H)
-        camera.aspect = W / H
-        camera.updateProjectionMatrix()
-      }, { passive: true })
-
-      // Camera lerp state
-      const cam = { x: 0, y: 0 }
-      let tick = 0
-
-      function threeLoop() {
-        tick += 0.012
-
-        // Camera follows mouse — the key: layers at different Z shift by different amounts
-        cam.x += ( mouse.x / (W * 0.5) * 0.55 - cam.x) * 0.055
-        cam.y += (-mouse.y / (H * 0.5) * 0.38 - cam.y) * 0.055
-        camera.position.x = cam.x
-        camera.position.y = cam.y
-        camera.lookAt(0, 0, 0)
-
-        // Ember upward drift + wrap
-        const ep = embers.geometry.attributes.position.array
-        for (let i = 0; i < EMBER_N; i++) {
-          ep[i*3+1] += eVY[i]
-          if (ep[i*3+1] > 12) ep[i*3+1] = rnd(-11, -8)
-        }
-        embers.geometry.attributes.position.needsUpdate = true
-        embers.material.opacity = 0.48 + 0.12 * Math.sin(tick * 1.1)
-
-        renderer.render(scene, camera)
-        requestAnimationFrame(threeLoop)
-      }
-      threeLoop()
-
-      // ── CSS-var parallax for UI elements at matching depths ──
-      const UI = [
-        { el: document.getElementById('scrubVideo'),        xD: -0.008, yD: -0.005 },
-        { el: document.querySelector('.panel-1-meta'),      xD:  0.020, yD:  0.014 },
-        { el: document.querySelector('.panel-1-headline'),  xD:  0.013, yD:  0.009 },
-        { el: document.querySelector('.panel-1-actions'),   xD:  0.017, yD:  0.012 },
-        { el: document.querySelector('.panel-1-status'),    xD:  0.028, yD:  0.019 },
-        { el: document.getElementById('scrollCue'),         xD:  0.007, yD:  0.004 },
+      // Each element gets its own depth multiplier.
+      // Negative xD on the video makes it counter-shift (feels like it recedes).
+      // Progressively larger multipliers on foreground UI = stronger shift = closer feel.
+      const layers = [
+        { el: document.getElementById('scrubVideo'),        xD: -0.006, yD: -0.004 },
+        { el: document.querySelector('.panel-1-meta'),      xD:  0.018, yD:  0.012 },
+        { el: document.querySelector('.panel-1-headline'),  xD:  0.012, yD:  0.008 },
+        { el: document.querySelector('.panel-1-actions'),   xD:  0.016, yD:  0.011 },
+        { el: document.querySelector('.panel-1-status'),    xD:  0.026, yD:  0.017 },
+        { el: document.getElementById('scrollCue'),         xD:  0.006, yD:  0.004 },
       ].filter(l => l.el)
-      const uiL = UI.map(() => ({ x: 0, y: 0 }))
 
-      function uiLoop() {
-        UI.forEach((l, i) => {
-          const s = uiL[i]
+      const smooth = layers.map(() => ({ x: 0, y: 0 }))
+
+      function loop() {
+        layers.forEach((l, i) => {
+          const s = smooth[i]
           s.x += (mouse.x * l.xD - s.x) * 0.07
           s.y += (mouse.y * l.yD - s.y) * 0.07
           l.el.style.setProperty('--prl-x', s.x.toFixed(2) + 'px')
           l.el.style.setProperty('--prl-y', s.y.toFixed(2) + 'px')
         })
-        requestAnimationFrame(uiLoop)
+        requestAnimationFrame(loop)
       }
-      uiLoop()
+      loop()
     })()
 
     /* ── FINAL CTA MOUSE PARALLAX ────────────────────────────── */
@@ -837,7 +746,6 @@ export default function Home() {
             disablePictureInPicture
           />
           {/* Three.js depth scene — sits above video, below UI panels */}
-          <canvas className="hero-three-canvas" id="heroCanvas" aria-hidden="true"></canvas>
           <div className="scrub-vignette"></div>
 
           {/* PANEL 1 — HERO */}
