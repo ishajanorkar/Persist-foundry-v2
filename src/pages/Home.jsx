@@ -162,7 +162,7 @@ export default function Home() {
     window.addEventListener('resize', onScroll, { passive: true })
 
     /* ── SECTION DOTS ────────────────────────────────────────── */
-    const sectionIds = ['scrubBlock', 'impact', 'offer', 'manifesto', 'filter', 'portfolio', 'apply']
+    const sectionIds = ['scrubBlock', 'impact', 'offer', 'manifestoScroll', 'filter', 'portfolio', 'apply']
     const dots = document.querySelectorAll('.section-dot')
     function updateSectionDots() {
       const center = window.innerHeight / 2
@@ -304,62 +304,258 @@ export default function Home() {
     }, { threshold: 0.3 })
     filterItems.forEach(li => filterRevealObs.observe(li))
 
-    /* ── MANIFESTO PINNED CROSSFADE ──────────────────────────── */
-    const manifestoEl = document.getElementById('manifesto')
-    const manifestoLines = document.querySelectorAll('.manifesto-line')
-    const manifestoCountNum = document.getElementById('manifestoCounterNum')
-    const manifestoCountFill = document.getElementById('manifestoCounterFill')
-    const manifestoGrid = document.getElementById('manifestoGrid')
-    const manifestoAura = document.getElementById('manifestoAura')
-    const manifestoCta = document.getElementById('manifestoCta')
-    const romanNums = ['i', 'ii', 'iii', 'iv', 'v']
+    /* ── MANIFESTO — CONVERGING CANVAS ──────────────────────── */
+    ;(() => {
+      const mCanvas  = document.getElementById('manifestoBg')
+      const mScroll  = document.getElementById('manifestoScroll')
+      const mHint    = document.getElementById('manifestoHint')
+      const mSteps   = document.querySelectorAll('.manifesto-step')
+      const mNumEl   = document.getElementById('manifestoCounterNum')
+      const mFillEl  = document.getElementById('manifestoCounterFill')
+      const ROMAN    = ['I','II','III','IV','V']
+      if (!mCanvas || !mScroll) return
 
-    function updateManifesto() {
-      if (!manifestoEl || !manifestoLines.length) return
-      const rect = manifestoEl.getBoundingClientRect()
-      const vh = window.innerHeight
-      const scrollable = manifestoEl.offsetHeight - vh
-      if (scrollable <= 0) return
-      let progress = -rect.top / scrollable
-      progress = Math.max(0, Math.min(1, progress))
+      const ctx = mCanvas.getContext('2d')
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const ACCENT = '#8B5CF6'
+      const V_COLOR = '#6145A9'
+      const SPD = 1, DENS = 90, INTEN = 0.9
+      let W = 0, H = 0, mProg = 0, mCompletedCount = 0
 
-      const stepCount = manifestoLines.length
-      let activeStep = Math.floor(progress * stepCount)
-      if (activeStep >= stepCount) activeStep = stepCount - 1
+      // ── helpers ──────────────────────────────────────────────
+      function cHex(hex, a) {
+        const h = hex.replace('#','')
+        const n = parseInt(h, 16)
+        return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`
+      }
+      function ss(e0, e1, x) {
+        const t = Math.max(0, Math.min(1, (x-e0)/(e1-e0)))
+        return t*t*(3-2*t)
+      }
+      function bezAt(p0, p1, p2, t) {
+        const u = 1-t
+        return { x: u*u*p0.x+2*u*t*p1.x+t*t*p2.x, y: u*u*p0.y+2*u*t*p1.y+t*t*p2.y }
+      }
+      function midCtrl(a, b, curl) {
+        const mx=(a.x+b.x)/2, my=(a.y+b.y)/2
+        const dx=b.x-a.x, dy=b.y-a.y
+        const len=Math.sqrt(dx*dx+dy*dy)||1
+        return { x: mx+(-dy/len)*len*curl, y: my+(dx/len)*len*curl }
+      }
+      function doughnut(cx, cy, midR, thick, peakA, col) {
+        const c = col || ACCENT
+        const inner=Math.max(0, midR-thick), outer=midR+thick
+        const g = ctx.createRadialGradient(cx,cy,0,cx,cy,outer)
+        g.addColorStop(0, cHex(c,0))
+        g.addColorStop(Math.max(0.0001, inner/outer), cHex(c,0))
+        g.addColorStop(midR/outer, cHex(c,peakA))
+        g.addColorStop(1, cHex(c,0))
+        ctx.fillStyle = g
+        ctx.beginPath(); ctx.arc(cx,cy,outer,0,6.283); ctx.fill()
+      }
 
-      manifestoLines.forEach((line, idx) => {
-        if (idx === activeStep) {
-          line.classList.add('is-active'); line.classList.remove('is-past')
-        } else if (idx < activeStep) {
-          line.classList.remove('is-active'); line.classList.add('is-past')
-        } else {
-          line.classList.remove('is-active'); line.classList.remove('is-past')
+      // ── state ─────────────────────────────────────────────────
+      let anchors, Vpt, lines, starsBack, starsFront, shockwaves
+
+      function initState() {
+        anchors = [
+          {x:W*0.18, y:H*0.18}, {x:W*0.82, y:H*0.18},
+          {x:W*0.18, y:H*0.82}, {x:W*0.82, y:H*0.82},
+          {x:W*0.50, y:H*0.50},
+        ]
+        Vpt = anchors[4]
+        const curls = [0.10,-0.10,-0.12,0.12]
+        lines = curls.map((curl,i) => ({
+          A: anchors[i], V: Vpt, baseCurl: curl,
+          seed: i*1.7+Math.random()*6,
+          pulses: [], lastPulseT: 0, completedAt: null,
+        }))
+        const Nb=Math.round(DENS*1.0), Nf=Math.round(DENS*0.45)
+        starsBack  = Array.from({length:Nb},()=>({ x:Math.random()*W, y:Math.random()*H, z:0.15+Math.random()*0.5, vx:(Math.random()-.5)*0.03, vy:(Math.random()-.5)*0.02, phase:Math.random()*Math.PI*2 }))
+        starsFront = Array.from({length:Nf},()=>({ x:Math.random()*W, y:Math.random()*H, z:0.5+Math.random()*0.5,  vx:(Math.random()-.5)*0.07, vy:(Math.random()-.5)*0.04, phase:Math.random()*Math.PI*2 }))
+        shockwaves = []
+        mCompletedCount = 0
+      }
+
+      function resizeCanvas() {
+        W = window.innerWidth
+        H = window.innerHeight
+        mCanvas.width  = Math.floor(W*dpr)
+        mCanvas.height = Math.floor(H*dpr)
+        mCanvas.style.width  = W + 'px'
+        mCanvas.style.height = H + 'px'
+        ctx.setTransform(dpr,0,0,dpr,0,0)
+        initState()
+      }
+      resizeCanvas()
+      window.addEventListener('resize', resizeCanvas, {passive:true})
+
+      // ── draw ──────────────────────────────────────────────────
+      function drawFrame(t) {
+        ctx.clearRect(0,0,W,H)
+        const a = INTEN
+
+        // back stars
+        for (const st of starsBack) {
+          st.x+=st.vx*SPD; st.y+=st.vy*SPD
+          if(st.x<-4)st.x=W+4; if(st.x>W+4)st.x=-4
+          if(st.y<-4)st.y=H+4; if(st.y>H+4)st.y=-4
+          ctx.fillStyle=cHex('#B7A7CE', 0.08*a*st.z*(0.5+0.5*Math.sin(t*0.0008+st.phase)))
+          ctx.beginPath(); ctx.arc(st.x,st.y,st.z*0.95,0,6.283); ctx.fill()
         }
-      })
+        // front stars
+        for (const st of starsFront) {
+          st.x+=st.vx*SPD; st.y+=st.vy*SPD
+          if(st.x<-4)st.x=W+4; if(st.x>W+4)st.x=-4
+          if(st.y<-4)st.y=H+4; if(st.y>H+4)st.y=-4
+          ctx.fillStyle=cHex('#D7C8F2', 0.13*a*st.z*(0.55+0.45*Math.sin(t*0.0012+st.phase)))
+          ctx.beginPath(); ctx.arc(st.x,st.y,st.z*1.35,0,6.283); ctx.fill()
+        }
+        // neighbor links
+        const stride=Math.max(2,Math.round(starsFront.length/60))
+        for(let i=0;i<starsFront.length;i+=stride){
+          const A=starsFront[i]
+          for(let k=1;k<4;k++){
+            const B=starsFront[(i+k*11)%starsFront.length]
+            const d2=(A.x-B.x)**2+(A.y-B.y)**2
+            if(d2<11000){ ctx.strokeStyle=cHex(ACCENT,(1-d2/11000)*0.022*a); ctx.lineWidth=0.5; ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke() }
+          }
+        }
 
-      if (manifestoCountNum) manifestoCountNum.textContent = romanNums[activeStep] || 'i'
-      if (manifestoCountFill) manifestoCountFill.style.width = ((activeStep + 1) / stepCount * 100) + '%'
-      if (manifestoGrid) {
-        manifestoGrid.style.transform = `scale(${1 + progress * 0.35}) rotate(${progress * 6}deg)`
-      }
-      if (manifestoAura) {
-        const s = 0.9 + Math.sin(progress * Math.PI) * 0.35
-        manifestoAura.style.transform = `translate(-50%, -50%) scale(${s})`
-        manifestoAura.style.opacity = String(0.55 + Math.sin(progress * Math.PI) * 0.45)
-      }
-      if (manifestoCta) manifestoCta.classList.toggle('is-visible', progress > 0.01 && progress < 0.96)
-    }
+        // per-line progress
+        const stepF = mProg*5
+        const drawP = lines.map((_,i)=>ss(i+0.05, i+0.75, stepF))
+        const vFill = (drawP[0]+drawP[1]+drawP[2]+drawP[3])/4
+        const vStep5 = ss(4.0, 4.6, stepF)
 
-    let mTicking = false
-    function onManifestoScroll() {
-      if (!mTicking) {
-        requestAnimationFrame(() => { updateManifesto(); mTicking = false })
-        mTicking = true
+        // shockwave triggers
+        let nowDone=0
+        drawP.forEach((dp,i)=>{
+          if(dp>0.92){ nowDone++; if(!lines[i].completedAt) lines[i].completedAt=t }
+          if(dp<0.5) lines[i].completedAt=null
+        })
+        if(nowDone>mCompletedCount){
+          for(let k=0;k<nowDone-mCompletedCount;k++) shockwaves.push({t0:t+k*60})
+        }
+        mCompletedCount=nowDone
+
+        // draw lines
+        for(let i=0;i<4;i++){
+          const L=lines[i], dp=drawP[i]
+          const ctrl=midCtrl(L.A, L.V, L.baseCurl+Math.sin(t*0.0009+L.seed)*0.025)
+          // ghost full path
+          ctx.lineWidth=0.8; ctx.strokeStyle=cHex(ACCENT,0.018*a)
+          ctx.beginPath(); ctx.moveTo(L.A.x,L.A.y); ctx.quadraticCurveTo(ctrl.x,ctrl.y,L.V.x,L.V.y); ctx.stroke()
+          if(dp<=0) continue
+          // drawn portion
+          const segs=48, k=Math.max(2,Math.floor(segs*dp))
+          ctx.lineWidth=1.2; ctx.strokeStyle=cHex(ACCENT,0.28*a)
+          ctx.shadowColor=ACCENT; ctx.shadowBlur=5*a
+          ctx.beginPath(); ctx.moveTo(L.A.x,L.A.y)
+          for(let j=1;j<=k;j++){ const pt=bezAt(L.A,ctrl,L.V,(j/segs)*dp); ctx.lineTo(pt.x,pt.y) }
+          ctx.stroke(); ctx.shadowBlur=0
+          // drawing head
+          if(dp<0.99){
+            const hd=bezAt(L.A,ctrl,L.V,dp), rg=12*a
+            const g=ctx.createRadialGradient(hd.x,hd.y,0,hd.x,hd.y,rg)
+            g.addColorStop(0,cHex(ACCENT,0.38*a)); g.addColorStop(1,cHex(ACCENT,0))
+            ctx.fillStyle=g; ctx.beginPath(); ctx.arc(hd.x,hd.y,rg,0,6.283); ctx.fill()
+            ctx.fillStyle=cHex('#FFF',0.55*a); ctx.beginPath(); ctx.arc(hd.x,hd.y,1.8,0,6.283); ctx.fill()
+          }
+          // traveling pulses
+          if(dp>0.95 && t-L.lastPulseT>2400/Math.max(0.3,SPD)){ L.pulses.push({u:0}); L.lastPulseT=t }
+          for(let q=L.pulses.length-1;q>=0;q--){
+            const pu=L.pulses[q]; pu.u+=0.006*SPD
+            if(pu.u>=1){ L.pulses.splice(q,1); continue }
+            const pt=bezAt(L.A,ctrl,L.V,pu.u)
+            for(let tt=1;tt<=6;tt++){
+              const u2=pu.u-tt*0.012; if(u2<=0) break
+              const pt2=bezAt(L.A,ctrl,L.V,u2)
+              ctx.fillStyle=cHex(ACCENT,(1-tt/6)*0.14*a)
+              ctx.beginPath(); ctx.arc(pt2.x,pt2.y,1.4-tt*0.16,0,6.283); ctx.fill()
+            }
+            const rg=7*a, g=ctx.createRadialGradient(pt.x,pt.y,0,pt.x,pt.y,rg)
+            g.addColorStop(0,cHex(ACCENT,0.38*a)); g.addColorStop(1,cHex(ACCENT,0))
+            ctx.fillStyle=g; ctx.beginPath(); ctx.arc(pt.x,pt.y,rg,0,6.283); ctx.fill()
+            ctx.fillStyle=cHex('#FFF',0.5*a); ctx.beginPath(); ctx.arc(pt.x,pt.y,1.2,0,6.283); ctx.fill()
+          }
+        }
+
+        // shockwaves — purple, dim
+        for(let i=shockwaves.length-1;i>=0;i--){
+          const sw=shockwaves[i], age=(t-sw.t0)/1000
+          if(age<0) continue
+          if(age>2.4){ shockwaves.splice(i,1); continue }
+          ctx.strokeStyle=cHex(V_COLOR,(1-age/2.4)*0.14*a)
+          ctx.lineWidth=1*(1-age/2.4)+0.3
+          ctx.beginPath(); ctx.arc(Vpt.x,Vpt.y,30+age*240,0,6.283); ctx.stroke()
+        }
+        if(vStep5>0.4){
+          const phase=((t/1000)%3.8)/3.8
+          ctx.strokeStyle=cHex(V_COLOR,(1-phase)*0.07*a*vStep5)
+          ctx.lineWidth=0.8
+          ctx.beginPath(); ctx.arc(Vpt.x,Vpt.y,60+phase*320,0,6.283); ctx.stroke()
+        }
+
+        // outer anchors — slightly bigger
+        const sc=Math.max(0.6,Math.min(1.1,Math.min(W,H)/820))
+        for(let i=0;i<4;i++){
+          const an=anchors[i], lit=stepF>=i?1:ss(i-0.4,i+0.1,stepF)*0.7
+          const breath=0.92+0.08*Math.sin(t*0.002+i*1.3), R=50*(0.55+lit*1.0)*breath*sc
+          const gr=ctx.createRadialGradient(an.x,an.y,0,an.x,an.y,R)
+          gr.addColorStop(0,cHex(ACCENT,0.28*lit*a)); gr.addColorStop(1,cHex(ACCENT,0))
+          ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(an.x,an.y,R,0,6.283); ctx.fill()
+          ctx.fillStyle=cHex(ACCENT,(0.55*lit+0.12)*a)
+          ctx.beginPath(); ctx.arc(an.x,an.y,(3+lit*1.8)*sc,0,6.283); ctx.fill()
+        }
+
+        // V bloom — brand purple (#6145A9), bigger + stronger glow at step 5
+        const vBreath=0.92+0.08*Math.sin(t*0.0028), vsc=Math.max(0.6,Math.min(1.1,Math.min(W,H)/820))
+        const fill=Math.max(vFill,0.12), bloom=vStep5
+        doughnut(Vpt.x,Vpt.y,(180+bloom*80)*vBreath*vsc,(75+bloom*35)*vsc,(0.11+bloom*0.22)*a*(0.4+fill*0.6), V_COLOR)
+        doughnut(Vpt.x,Vpt.y,75*vBreath*vsc,28*vsc,(0.16+bloom*0.20)*a*(0.4+fill*0.6), V_COLOR)
+        ctx.fillStyle=cHex(V_COLOR,(0.55+bloom*0.25)*a)
+        ctx.beginPath(); ctx.arc(Vpt.x,Vpt.y,3.5+fill*1.4+bloom*2,0,6.283); ctx.fill()
+        // step-5 rays — longer and more visible
+        if(bloom>0.08){
+          for(let r=0;r<12;r++){
+            const ang=(r/12)*Math.PI*2, osc=0.5+0.5*Math.sin(t*0.0018+r*0.7)
+            const len=(200+osc*80)*bloom*vBreath*vsc, inn=(28+osc*8)*vsc
+            const x1=Vpt.x+Math.cos(ang)*inn, y1=Vpt.y+Math.sin(ang)*inn
+            const x2=Vpt.x+Math.cos(ang)*(inn+len), y2=Vpt.y+Math.sin(ang)*(inn+len)
+            const g=ctx.createLinearGradient(x1,y1,x2,y2)
+            g.addColorStop(0,cHex(V_COLOR,0.24*a*bloom)); g.addColorStop(1,cHex(V_COLOR,0))
+            ctx.strokeStyle=g; ctx.lineWidth=1
+            ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke()
+          }
+        }
+
+        requestAnimationFrame(drawFrame)
       }
-    }
-    window.addEventListener('scroll', onManifestoScroll, { passive: true })
-    window.addEventListener('resize', onManifestoScroll, { passive: true })
-    updateManifesto()
+      requestAnimationFrame(drawFrame)
+
+      // ── scroll → steps ────────────────────────────────────────
+      function updateMScroll() {
+        const rect  = mScroll.getBoundingClientRect()
+        const total = mScroll.offsetHeight - window.innerHeight
+        if(total<=0) return
+        mProg = Math.max(0, Math.min(1, -rect.top/total))
+        const idx = Math.min(4, Math.floor(mProg*5+0.0001))
+        if(mNumEl)  mNumEl.textContent  = ROMAN[idx]
+        if(mFillEl) mFillEl.style.width = `${(idx/4)*100}%`
+        if(mHint)   mHint.style.opacity = mProg>0.02 ? '0' : '1'
+        mSteps.forEach((el,i)=>{
+          el.classList.remove('is-active','is-before','is-after')
+          if(i===idx)       el.classList.add('is-active')
+          else if(i<idx)    el.classList.add('is-before')
+          else              el.classList.add('is-after')
+        })
+      }
+      let mTick=false
+      window.addEventListener('scroll',()=>{ if(!mTick){ requestAnimationFrame(()=>{ updateMScroll(); mTick=false }); mTick=true } },{passive:true})
+      window.addEventListener('resize', updateMScroll, {passive:true})
+      updateMScroll()
+    })()
 
     /* ── FILTER DIVIDER DRAW-IN ──────────────────────────────── */
     const filterSec = document.querySelector('.filter-section')
@@ -383,7 +579,6 @@ export default function Home() {
 
     /* ── FINAL CTA MOUSE PARALLAX ────────────────────────────── */
     const finalHeadline = document.getElementById('finalHeadline')
-    const finalOrb = document.getElementById('finalOrb')
     const finalCta = document.getElementById('apply')
     if (finalCta && finalHeadline) {
       let fX = 0, fY = 0, tX = 0, tY = 0
@@ -396,8 +591,7 @@ export default function Home() {
       function animateFinal() {
         fX += (tX - fX) * 0.08
         fY += (tY - fY) * 0.08
-        finalHeadline.style.transform = `translate(${fX * 22}px, ${fY * 14}px)`
-        if (finalOrb) finalOrb.style.transform = `translate(${-50 + fX * 8}%, ${-50 + fY * 6}%)`
+        finalHeadline.style.transform = `translate(${fX * 18}px, ${fY * 10}px)`
         requestAnimationFrame(animateFinal)
       }
       animateFinal()
@@ -430,12 +624,43 @@ export default function Home() {
       tickMarquee()
     }
 
-    /* ── APPLY BUTTON MAILTO ─────────────────────────────────── */
-    document.querySelectorAll('.final-cta-massive-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        window.open('mailto:apply@persist.foundry?subject=Foundry%20Cohort%202026', '_blank')
-      })
-    })
+    /* ── FINAL CTA STATS COUNT-UP ────────────────────────────── */
+    ;(() => {
+      const statsEl = document.getElementById('finalStats')
+      if (!statsEl) return
+      const items = Array.from(statsEl.querySelectorAll('.final-cta-stat'))
+
+      function animateCount(el, from, to, dur = 1100) {
+        const valEl = el.querySelector('.final-cta-stat-val')
+        if (!valEl) return
+        const t0 = performance.now()
+        function tick(now) {
+          const k = Math.min(1, (now - t0) / dur)
+          const e = 1 - Math.pow(1 - k, 3)
+          valEl.textContent = String(Math.round(from + (to - from) * e))
+          if (k < 1) requestAnimationFrame(tick)
+          else valEl.textContent = String(to)
+        }
+        requestAnimationFrame(tick)
+      }
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return
+          const el = entry.target
+          const idx = items.indexOf(el)
+          setTimeout(() => {
+            el.classList.add('is-in')
+            if (el.dataset.type === 'count') {
+              animateCount(el, parseFloat(el.dataset.from || '0'), parseFloat(el.dataset.to || '0'))
+            }
+          }, idx * 180)
+          io.unobserve(el)
+        })
+      }, { threshold: 0.35 })
+
+      items.forEach(el => io.observe(el))
+    })()
 
   }, [])
 
@@ -917,51 +1142,47 @@ export default function Home() {
         </div>
       </section>
 
-      {/* MANIFESTO — PINNED KINETIC NARRATIVE */}
+      {/* MANIFESTO — CONVERGING DOTS NARRATIVE */}
       <section className="manifesto" id="manifesto">
-        <div className="manifesto-sticky">
-          <div className="manifesto-grid" id="manifestoGrid"></div>
-          <div className="manifesto-aura" id="manifestoAura"></div>
-          <div className="manifesto-corner-label">A note. Read slowly.</div>
-          <div className="manifesto-counter">
-            <span className="manifesto-counter-num" id="manifestoCounterNum">i</span>
-            <span>/ v</span>
-            <div className="manifesto-counter-bar"><div className="manifesto-counter-fill" id="manifestoCounterFill"></div></div>
-          </div>
-          <div className="manifesto-stage">
-            <div className="manifesto-line is-active" data-step="0">
-              <span>
-                <span className="manifesto-line-num">i.</span>
-                You've been sitting on this for years.
-              </span>
+        <div className="manifesto-scroll" id="manifestoScroll">
+          <div className="manifesto-stage" id="manifestoStage">
+            <div className="manifesto-grid-bg"></div>
+            <canvas className="manifesto-canvas" id="manifestoBg"></canvas>
+            <div className="manifesto-vignette"></div>
+            <div className="manifesto-inner">
+              <div className="manifesto-top">
+                <div className="manifesto-label">
+                  <span className="manifesto-label-dash"></span>
+                  A note. Read slowly.
+                </div>
+                <div className="manifesto-counter">
+                  <span className="manifesto-counter-num" id="manifestoCounterNum">I</span>
+                  <span className="manifesto-counter-of">/ V</span>
+                  <div className="manifesto-counter-bar">
+                    <div className="manifesto-counter-fill" id="manifestoCounterFill"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="manifesto-headline-wrap">
+                <div className="manifesto-headlines">
+                  {[
+                    { roman: 'I',   text: <>You've been sitting on this for years.</> },
+                    { roman: 'II',  text: <>Building it quietly. In your head. On whatever's nearby.</> },
+                    { roman: 'III', text: <>Choosing the harder thing. <em>Every single time.</em></> },
+                    { roman: 'IV',  text: <>We've watched founders like you for nine years.</> },
+                    { roman: 'V',   text: <>We know what this looks like. <em>It looks like you.</em></> },
+                  ].map((step, i) => (
+                    <div key={i} className={`manifesto-step${i === 0 ? ' is-active' : ' is-after'}`} data-step={i}>
+                      <h2 className="manifesto-step-headline">{step.text}</h2>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="manifesto-hint" id="manifestoHint">
+                Scroll
+                <div className="manifesto-hint-arr"></div>
+              </div>
             </div>
-            <div className="manifesto-line" data-step="1">
-              <span>
-                <span className="manifesto-line-num">ii.</span>
-                Building it quietly. In your head. On whatever's nearby.
-              </span>
-            </div>
-            <div className="manifesto-line" data-step="2">
-              <span>
-                <span className="manifesto-line-num">iii.</span>
-                Choosing the harder thing. Every single time.
-              </span>
-            </div>
-            <div className="manifesto-line" data-step="3">
-              <span>
-                <span className="manifesto-line-num">iv.</span>
-                We've watched founders like you for nine years.
-              </span>
-            </div>
-            <div className="manifesto-line" data-step="4">
-              <span>
-                <span className="manifesto-line-num">v.</span>
-                We know what this looks like. <em>It looks like you.</em>
-              </span>
-            </div>
-          </div>
-          <div className="manifesto-cta" id="manifestoCta">
-            <span className="pulse"></span>If that's you — keep reading. →
           </div>
         </div>
       </section>
@@ -1002,36 +1223,61 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FINAL CTA v2 */}
+      {/* FINAL CTA */}
       <section className="final-cta" id="apply">
-        <div className="final-cta-orb" id="finalOrb"></div>
-        <div className="final-cta-inner">
-          <div className="final-cta-eyebrow"><span className="live-dot"></span>Cohort 2026 / Open / 12 seats</div>
-          <p className="final-cta-preline">
-            You've made this bet a thousand times in your head.
-          </p>
-          <h2 className="final-cta-headline-v2" id="finalHeadline">
-            Once on paper<br /><em>changes everything.</em>
-          </h2>
-          <div className="final-cta-divider"></div>
-          <div className="final-cta-button-wrap">
-            <button className="final-cta-massive-btn" data-magnetic>
-              Apply <span className="arrow">→</span>
-            </button>
-            <a href="#" className="final-cta-secondary">Or talk to a partner first</a>
+        <div className="final-cta-grid-bg"></div>
+        <div className="final-cta-watermark">begin.</div>
+        <div className="final-cta-noise"></div>
+        <div className="final-cta-vignette"></div>
+
+        <div className="final-cta-content">
+          {/* cohort meta */}
+          <div className="final-cta-cohort">
+            <span className="final-cta-cohort-pip"></span>
+            <span>Cohort 2026</span>
+            <span className="final-cta-cohort-sep">/</span>
+            <span>Open</span>
+            <span className="final-cta-cohort-sep">/</span>
+            <span>12 Seats</span>
           </div>
-          <div className="final-cta-meta-v2">
-            <div className="final-cta-meta-item">
-              <div className="final-cta-meta-num">20<em>min</em></div>
-              <div className="final-cta-meta-label">To apply</div>
+
+          {/* eyebrow */}
+          <p className="final-cta-eyebrow">You've made this bet a thousand times in your head.</p>
+
+          {/* hero headline */}
+          <h2 className="final-cta-hero" id="finalHeadline">
+            <span className="final-cta-hero-line1">Once on paper</span>
+            <span className="final-cta-hero-line2">changes everything.</span>
+          </h2>
+
+          {/* hairline drop */}
+          <div className="final-cta-drop" aria-hidden="true"></div>
+
+          {/* apply button */}
+          <button className="final-cta-apply-btn" data-magnetic onClick={() => window.open('mailto:apply@persist.foundry?subject=Foundry%20Cohort%202026', '_blank')}>
+            Apply
+            <span className="final-cta-apply-arr" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6h8M6 2l4 4-4 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+          </button>
+
+          <a href="#" className="final-cta-partner">Or talk to a partner first</a>
+
+          {/* stats */}
+          <div className="final-cta-stats" id="finalStats">
+            <div className="final-cta-stat" data-from="0" data-to="20" data-type="count">
+              <span className="final-cta-stat-num"><span className="final-cta-stat-val">20</span><em>min</em></span>
+              <span className="final-cta-stat-cap"><span className="final-cta-stat-pip"></span>To apply</span>
             </div>
-            <div className="final-cta-meta-item">
-              <div className="final-cta-meta-num">2<em>wks</em></div>
-              <div className="final-cta-meta-label">To hear back</div>
+            <div className="final-cta-stat" data-from="0" data-to="2" data-type="count">
+              <span className="final-cta-stat-num"><span className="final-cta-stat-val">2</span><em>wks</em></span>
+              <span className="final-cta-stat-cap"><span className="final-cta-stat-pip"></span>To hear back</span>
             </div>
-            <div className="final-cta-meta-item">
-              <div className="final-cta-meta-num">Day<em>one</em></div>
-              <div className="final-cta-meta-label">After we say yes</div>
+            <div className="final-cta-stat" data-type="text">
+              <span className="final-cta-stat-num"><span className="final-cta-stat-val">Day</span><em>one</em></span>
+              <span className="final-cta-stat-cap"><span className="final-cta-stat-pip"></span>After we say yes</span>
             </div>
           </div>
         </div>
