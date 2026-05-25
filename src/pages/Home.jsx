@@ -801,11 +801,6 @@ export default function Home() {
 
           <div className="scrub-vignette"></div>
 
-          <div className="scrub-corner sc-tl"></div>
-          <div className="scrub-corner sc-tr"></div>
-          <div className="scrub-corner sc-bl"></div>
-          <div className="scrub-corner sc-br"></div>
-
           {/* PANEL 1 — HERO */}
           <div className="panel panel-1 is-active" id="panel1">
             <div className="panel-1-meta"><span className="dot"></span>Cohort 2026 / Open</div>
