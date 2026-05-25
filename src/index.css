@@ -391,31 +391,6 @@ body::before {
   backface-visibility: hidden;
   filter: contrast(1.03) saturate(1.08);
 }
-/* ── Hero foreground parallax layer (person + ground PNG) ── */
-.hero-fg {
-  position: absolute;
-  /* same overscan as the video — gives room to shift without exposing edges */
-  inset: -2.5%;
-  width: 105%; height: 105%;
-  object-fit: cover;
-  /* anchor the bottom so the ground stays grounded when scaling */
-  object-position: center bottom;
-  z-index: 2;                       /* above video (1), below vignette (3) */
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-drag: none;
-  will-change: transform;
-  transform: translate(var(--prl-x, 0px), var(--prl-y, 0px));
-  /* multiply blend: white background becomes invisible, coloured
-     elements (person, ground, flowers) composite over the video */
-  mix-blend-mode: multiply;
-  /* smooth fade-out when scroll begins */
-  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-}
-/* hide on mobile — parallax doesn't run there */
-@media (hover: none), (pointer: coarse) {
-  .hero-fg { display: none; }
-}
 
 .scrub-vignette {
   position: absolute; inset: 0;

@@ -53,9 +53,7 @@ export default function Home() {
 
     let videoDuration = 0
     let ticking = false
-    let lastScrubTime = 0
-    let targetScrubTime = 0
-    let scrubAnimId = null
+    let lastScrubTime = -1
     let videoReady = false
     let loadingFinished = false
 
@@ -108,20 +106,6 @@ export default function Home() {
       }, 500)
     }
 
-    function animateScrub() {
-      if (!video || !videoReady) { scrubAnimId = null; return }
-      const diff = targetScrubTime - lastScrubTime
-      if (Math.abs(diff) > 0.008) {
-        lastScrubTime += diff * 0.16
-        video.currentTime = lastScrubTime
-        scrubAnimId = requestAnimationFrame(animateScrub)
-      } else {
-        lastScrubTime = targetScrubTime
-        video.currentTime = lastScrubTime
-        scrubAnimId = null
-      }
-    }
-
     function updateScrub() {
       if (!videoReady || !scrubBlock) return
       const rect = scrubBlock.getBoundingClientRect()
@@ -131,24 +115,20 @@ export default function Home() {
       let progress = -rect.top / scrollable
       progress = Math.max(0, Math.min(1, progress))
 
-      targetScrubTime = progress * videoDuration
-      if (!scrubAnimId && video) scrubAnimId = requestAnimationFrame(animateScrub)
+      const targetTime = progress * videoDuration
+      if (Math.abs(targetTime - lastScrubTime) > 0.01) {
+        video.currentTime = targetTime
+        lastScrubTime = targetTime
+      }
 
-      // Panel 3 at exactly 13s into the video, derived from actual duration
-      const panel3Threshold = videoDuration > 0 ? 14 / videoDuration : 0.95
       let active = 1
-      if (progress > panel3Threshold) active = 3
+      if (progress > 0.900) active = 3
       else if (progress > 0.28) active = 2
       if (panel1) panel1.classList.toggle('is-active', active === 1)
       if (panel2) panel2.classList.toggle('is-active', active === 2)
       if (panel3) panel3.classList.toggle('is-active', active === 3)
 
       if (scrollCue) scrollCue.style.opacity = progress > 0.04 ? '0' : '1'
-
-      // Fade the foreground PNG out as soon as scrolling begins,
-      // handing control to the video scroll-scrub animation.
-      const heroFgEl = document.getElementById('heroFg')
-      if (heroFgEl) heroFgEl.style.opacity = progress > 0.03 ? '0' : '1'
 
       const totalScroll = document.documentElement.scrollHeight - viewportHeight
       const pageProgress = (window.scrollY / totalScroll) * 100
@@ -645,12 +625,8 @@ export default function Home() {
 
       const videoEl = document.getElementById('scrubVideo')
 
-      // Depth layers — xMax/yMax = max pixel travel at screen edges.
-      // Video (far background) moves least; hero-fg foreground moves most,
-      // creating genuine depth separation between the two image planes.
       const layers = [
-        { el: videoEl,                                        xMax: 16, yMax: 10 },  // bg — furthest
-        { el: document.getElementById('heroFg'),             xMax: 40, yMax: 24 },  // fg — closest visual layer
+        { el: videoEl,                                        xMax: 16, yMax: 10 },
         { el: document.querySelector('.panel-1-headline'),   xMax: 22, yMax: 13 },
         { el: document.querySelector('.panel-1-meta'),       xMax: 28, yMax: 17 },
         { el: document.querySelector('.panel-1-actions'),    xMax: 26, yMax: 15 },
@@ -820,23 +796,15 @@ export default function Home() {
             preload="auto"
             disablePictureInPicture
           >
-            <source src="/assets/scrub-video.webm" type="video/webm" />
             <source src="/assets/scrub-video.mp4"  type="video/mp4"  />
           </video>
 
-          {/* Foreground parallax layer — person + ground PNG on transparent bg.
-              Moves more than the video on mouse-move → genuine depth separation. */}
-          <img
-            className="hero-fg"
-            id="heroFg"
-            src="/assets/hero-foreground.png"
-            alt=""
-            aria-hidden="true"
-            draggable="false"
-          />
-
-          {/* Vignette sits above both video and foreground so edges darken equally */}
           <div className="scrub-vignette"></div>
+
+          <div className="scrub-corner sc-tl"></div>
+          <div className="scrub-corner sc-tr"></div>
+          <div className="scrub-corner sc-bl"></div>
+          <div className="scrub-corner sc-br"></div>
 
           {/* PANEL 1 — HERO */}
           <div className="panel panel-1 is-active" id="panel1">
