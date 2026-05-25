@@ -2240,6 +2240,44 @@ body::before {
 
 /* ================== RESPONSIVE ================== */
 
+/*
+ * ── MacBook / short-landscape laptops ──────────────────────────────────
+ * The hero headline is 3 block lines tall; on MacBook screens where 100vh
+ * is ~800–900 px (even shorter when browser chrome is visible), the action
+ * buttons creep close to the scroll-cue at the bottom.
+ * This query fires for desktops that are HEIGHT-constrained — it won't
+ * affect phones (caught by the width-based queries below).
+ */
+@media (max-height: 860px) and (min-width: 1024px) {
+  /* Shrink top padding so the whole content block sits higher */
+  .panel-1 { padding-top: 88px; }
+
+  /* Smaller headline — saves ~50 px across three stacked lines */
+  .panel-1-headline { font-size: clamp(44px, 6.4vw, 96px); }
+
+  /* Tighten the gap between headline and buttons */
+  .panel-1-actions { margin-top: 28px; }
+
+  /* Slightly leaner buttons */
+  .btn-primary { padding: 14px 28px; font-size: 13px; }
+  .btn-ghost   { padding: 13px 24px; font-size: 13px; }
+
+  /* Pull scroll-cue and status card a little lower so they don't eat
+     into the space freed above — keeps them clearly below the content */
+  .scroll-cue     { bottom: 24px; }
+  .panel-1-status { bottom: 24px; right: 48px; }
+}
+
+/* Extra tight — very short viewport (e.g. 13" MacBook with dev tools open) */
+@media (max-height: 720px) and (min-width: 1024px) {
+  .panel-1 { padding-top: 78px; }
+  .panel-1-headline { font-size: clamp(40px, 5.8vw, 80px); }
+  .panel-1-meta { margin-bottom: 20px; }
+  .panel-1-actions { margin-top: 20px; }
+  .scroll-cue { bottom: 18px; font-size: 9px; }
+  .panel-1-status { bottom: 18px; }
+}
+
 /* Tablet — tighten pill before it gets too close to edges */
 @media (max-width: 1100px) {
   .nav { padding: 18px 28px; }
