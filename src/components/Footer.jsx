@@ -9,10 +9,8 @@ export default function Footer() {
         {/* col 1 — brand + newsletter + socials */}
         <div className="footer-brand-col">
           <Link to="/" className="footer-logo">
-            <img src="/assets/persist-p-mark.png" alt="Persist Foundry" />
-            <span className="footer-logo-name">
-              Persist<br /><em>Foundry</em>
-            </span>
+            <img src="/pv-favicon.png" alt="Persist" />
+            <span className="footer-logo-name">Persist</span>
           </Link>
 
           <p className="footer-tagline">Forged in persistence.</p>
