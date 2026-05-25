@@ -808,12 +808,14 @@ export default function Home() {
           <video
             className="scrub-video"
             id="scrubVideo"
-            src="/assets/scrub-video.mp4"
             muted
             playsInline
             preload="auto"
             disablePictureInPicture
-          />
+          >
+            <source src="/assets/scrub-video.webm" type="video/webm" />
+            <source src="/assets/scrub-video.mp4"  type="video/mp4"  />
+          </video>
           {/* Three.js depth scene — sits above video, below UI panels */}
           <div className="scrub-vignette"></div>
 
