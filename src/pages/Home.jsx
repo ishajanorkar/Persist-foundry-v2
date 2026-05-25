@@ -582,21 +582,19 @@ export default function Home() {
       const cursor = document.getElementById('pfCursor')
       if (!cursor) return
 
-      const rows = Array.from(document.querySelectorAll('.portfolio-row[data-url]'))
+      // Target only the thumbnail/right side — left text panel keeps normal cursor
+      const thumbs = Array.from(document.querySelectorAll('.portfolio-row[data-url] .portfolio-row-right'))
       let mx = 0, my = 0, cx = 0, cy = 0
-      let loopId = null
 
       document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY }, { passive: true })
 
-      rows.forEach(row => {
-        row.addEventListener('mouseenter', () => {
-          cursor.classList.add('is-visible')
-        })
-        row.addEventListener('mouseleave', () => {
-          cursor.classList.remove('is-visible')
-        })
-        row.addEventListener('click', () => {
-          const url = row.dataset.url
+      thumbs.forEach(thumb => {
+        const row = thumb.closest('.portfolio-row[data-url]')
+        const url = row ? row.dataset.url : null
+
+        thumb.addEventListener('mouseenter', () => cursor.classList.add('is-visible'))
+        thumb.addEventListener('mouseleave', () => cursor.classList.remove('is-visible'))
+        thumb.addEventListener('click', () => {
           if (url) window.open(url, '_blank', 'noopener,noreferrer')
         })
       })
@@ -604,8 +602,8 @@ export default function Home() {
       function loop() {
         cx += (mx - cx) * 0.14
         cy += (my - cy) * 0.14
-        cursor.style.transform = `translate(${(cx).toFixed(1)}px, ${(cy).toFixed(1)}px) translate(-50%, -50%)`
-        loopId = requestAnimationFrame(loop)
+        cursor.style.transform = `translate(${cx.toFixed(1)}px, ${cy.toFixed(1)}px) translate(-50%, -50%)`
+        requestAnimationFrame(loop)
       }
       loop()
     })()
@@ -1057,10 +1055,11 @@ export default function Home() {
 
       {/* Portfolio custom cursor tooltip — fixed, follows mouse over thumbnails */}
       <div className="pf-cursor" id="pfCursor" aria-hidden="true">
+        <span className="pf-cursor-pip"></span>
         <span className="pf-cursor-label">Visit Website</span>
         <span className="pf-cursor-icon">
-          <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-            <path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M2 10L10 2M10 2H4.5M10 2V7.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </span>
       </div>
