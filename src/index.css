@@ -1085,34 +1085,34 @@ body::before {
 .offer-card:hover .offer-card-icon { color: var(--paper); }
 .offer-card:hover .offer-card-num { color: rgba(155,127,228,0.22); }
 
-/* scroll-into-view glow — fires after the card reveal animation (~0.6s) */
-.offer-step.is-revealed .offer-card {
+/* scroll-into-view glow — on while card is in viewport, off when it leaves */
+.offer-step.is-in-view .offer-card {
   border-color: rgba(120, 84, 213, 0.55);
   box-shadow: 0 0 0 1px rgba(120,84,213,0.12), 0 8px 40px rgba(97,69,169,0.28), 0 0 70px rgba(97,69,169,0.12);
   transition: transform 0.5s cubic-bezier(0.2,0.8,0.2,1), border-color 0.9s ease 0.55s, box-shadow 0.9s ease 0.55s;
 }
-.offer-step.is-revealed .offer-card .offer-card-icon-wrap {
+.offer-step.is-in-view .offer-card .offer-card-icon-wrap {
   background: rgba(97,69,169,0.18);
   border-color: rgba(120,84,213,0.45);
   transition: background 0.9s ease 0.55s, border-color 0.9s ease 0.55s, transform 0.5s ease;
 }
-.offer-step.is-revealed .offer-card .offer-card-num {
+.offer-step.is-in-view .offer-card .offer-card-num {
   color: rgba(155,127,228,0.14);
   transition: color 0.9s ease 0.55s;
 }
 /* hover still overrides the in-view glow */
-.offer-step.is-revealed .offer-card:hover {
+.offer-step.is-in-view .offer-card:hover {
   border-color: var(--violet);
   transform: translateY(-6px);
   box-shadow: 0 24px 60px rgba(74,46,159,0.35);
   transition: transform 0.5s cubic-bezier(0.2,0.8,0.2,1), border-color 0.5s ease, box-shadow 0.5s ease;
 }
-.offer-step.is-revealed .offer-card:hover .offer-card-icon-wrap {
+.offer-step.is-in-view .offer-card:hover .offer-card-icon-wrap {
   background: var(--violet);
   border-color: var(--violet);
   transition: background 0.5s ease, border-color 0.5s ease, transform 0.5s ease;
 }
-.offer-step.is-revealed .offer-card:hover .offer-card-num {
+.offer-step.is-in-view .offer-card:hover .offer-card-num {
   color: rgba(155,127,228,0.22);
   transition: color 0.5s ease;
 }

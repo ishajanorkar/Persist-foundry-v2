@@ -239,6 +239,13 @@ export default function Home() {
     }, { threshold: 0.25, rootMargin: '0px 0px -10% 0px' })
     offerSteps.forEach(step => stepRevealObs.observe(step))
 
+    const stepGlowObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        entry.target.classList.toggle('is-in-view', entry.isIntersecting)
+      })
+    }, { threshold: 0.25, rootMargin: '0px 0px -10% 0px' })
+    offerSteps.forEach(step => stepGlowObs.observe(step))
+
     const stepProgressObs = new IntersectionObserver(() => {
       let mostVisible = null, highestRatio = 0
       offerSteps.forEach(step => {
