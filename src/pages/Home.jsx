@@ -612,58 +612,67 @@ export default function Home() {
     ;(() => {
       if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
 
-      // ── shared lerped state — one position drives every layer in sync ──
+      // Exact same normalisation as vital-ventures/useMouseParallax.js:
+      //   x = (clientX / W) * 2 - 1        → -1 left … +1 right
+      //   y = -((clientY / H) * 2 - 1)     → +1 top  … -1 bottom (Y inverted)
       let W = window.innerWidth, H = window.innerHeight
-      const tgt = { x: 0, y: 0 }  // target  — normalised -1 → +1
-      const cur = { x: 0, y: 0 }  // current — interpolated each frame
+      const tgt = { x: 0, y: 0 }
+      const cur = { x: 0, y: 0 }
 
-      // Global window tracking — smooth even when entering from any edge
-      window.addEventListener('mousemove', e => {
-        tgt.x = (e.clientX / W - 0.5) * 2
-        tgt.y = (e.clientY / H - 0.5) * 2
+      // pointermove — matches vital-ventures; works for mouse and stylus
+      window.addEventListener('pointermove', e => {
+        if (e.pointerType !== 'mouse') return   // skip touch/stylus
+        tgt.x =  (e.clientX / W) * 2 - 1
+        tgt.y = -((e.clientY / H) * 2 - 1)
       }, { passive: true })
       window.addEventListener('resize', () => {
         W = window.innerWidth; H = window.innerHeight
       }, { passive: true })
 
-      // ── depth layers — xMax/yMax = max pixel travel at screen edge ──
-      // All positive: everything drifts WITH the mouse.
-      // Background (video) moves least → feels furthest away.
-      // Foreground UI moves most → feels closest.
+      const videoEl = document.getElementById('scrubVideo')
+
+      // Depth layers — xMax/yMax = max pixel travel at screen edges.
+      // Video moves least (distant), status card moves most (closest).
       const layers = [
-        { el: document.getElementById('scrubVideo'),        xMax: 14, yMax:  9 },
-        { el: document.querySelector('.panel-1-headline'),  xMax: 22, yMax: 13 },
-        { el: document.querySelector('.panel-1-meta'),      xMax: 28, yMax: 17 },
-        { el: document.querySelector('.panel-1-actions'),   xMax: 26, yMax: 15 },
-        { el: document.querySelector('.panel-1-status'),    xMax: 38, yMax: 22 },
-        { el: document.getElementById('scrollCue'),         xMax: 10, yMax:  6 },
+        { el: videoEl,                                        xMax: 20, yMax: 12 },
+        { el: document.querySelector('.panel-1-headline'),   xMax: 22, yMax: 13 },
+        { el: document.querySelector('.panel-1-meta'),       xMax: 28, yMax: 17 },
+        { el: document.querySelector('.panel-1-actions'),    xMax: 26, yMax: 15 },
+        { el: document.querySelector('.panel-1-status'),     xMax: 38, yMax: 22 },
+        { el: document.getElementById('scrollCue'),          xMax: 10, yMax:  6 },
       ].filter(l => l.el)
 
-      // Promote all layers to GPU compositor layer
       layers.forEach(l => { l.el.style.willChange = 'transform' })
 
-      // Strip CSS transition on transform after entrance animations complete
-      // (prevents the 0.7s transition rule from fighting the 60fps rAF loop)
+      // After entrance animations finish, strip the transform transition so the
+      // CSS 0.7 s ease doesn't add lag on top of the rAF loop.
       setTimeout(() => {
-        const prlEls = [
-          document.querySelector('.panel-1-meta'),
-          document.querySelector('.panel-1-actions'),
-          document.querySelector('.panel-1-status'),
-        ]
-        prlEls.forEach(el => {
+        ['.panel-1-meta', '.panel-1-actions', '.panel-1-status'].forEach(sel => {
+          const el = document.querySelector(sel)
           if (el) el.style.transition = 'opacity 0.7s ease'
         })
       }, 2200)
 
       function loop() {
-        // Factor 0.048 → ~20 frames to reach target → ultra-smooth buttery feel
-        cur.x += (tgt.x - cur.x) * 0.048
-        cur.y += (tgt.y - cur.y) * 0.048
+        // friction = 0.05 — identical to vital-ventures/useMouseParallax.js
+        cur.x += (tgt.x - cur.x) * 0.05
+        cur.y += (tgt.y - cur.y) * 0.05
 
+        // Translate all layers (depth by speed)
         for (const l of layers) {
           l.el.style.setProperty('--prl-x', (cur.x * l.xMax).toFixed(2) + 'px')
           l.el.style.setProperty('--prl-y', (cur.y * l.yMax).toFixed(2) + 'px')
         }
+
+        // 3-D lens-tilt on the video — closest CSS approximation of the
+        // vital-ventures UV-warp + barrel-distortion shader effect.
+        // At mouse edge: ±1.4° rotateY, ±0.9° rotateX — imperceptible as
+        // distortion but adds the "looking through a shifting lens" depth.
+        if (videoEl) {
+          videoEl.style.setProperty('--prl-rx',  (cur.x * 1.4).toFixed(3) + 'deg')
+          videoEl.style.setProperty('--prl-ry', (-cur.y * 0.9).toFixed(3) + 'deg')
+        }
+
         requestAnimationFrame(loop)
       }
       loop()

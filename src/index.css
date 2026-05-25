@@ -368,13 +368,25 @@ body::before {
 }
 .scrub-video {
   position: absolute;
-  /* 4% overscan so ±parallax-shift never exposes edges */
-  inset: -2%;
-  width: 104%; height: 104%;
+  /* 5% overscan — covers ±translate AND the slight 3-D tilt edge bleed */
+  inset: -2.5%;
+  width: 105%; height: 105%;
   object-fit: cover;
   z-index: 1;
   will-change: transform;
-  transform: translateZ(0) translate(var(--prl-x, 0px), var(--prl-y, 0px));
+  /*
+   * Transform chain (order matters):
+   *  1. perspective()  — local 3-D context for the rotates below
+   *  2. rotateY/X      — subtle lens-tilt (UV-warp approximation)
+   *  3. translateZ(0)  — force GPU compositing layer
+   *  4. translate()    — depth-parallax shift driven by --prl-x/y
+   */
+  transform:
+    perspective(1400px)
+    rotateY(var(--prl-rx, 0deg))
+    rotateX(var(--prl-ry, 0deg))
+    translateZ(0)
+    translate(var(--prl-x, 0px), var(--prl-y, 0px));
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   filter: contrast(1.03) saturate(1.08);
