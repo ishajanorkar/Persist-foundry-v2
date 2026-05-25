@@ -582,6 +582,9 @@ export default function Home() {
       const cursor = document.getElementById('pfCursor')
       if (!cursor) return
 
+      // The global dot cursor — hide it while the pill tooltip is active
+      const globalCursor = document.getElementById('cursor')
+
       // Target only the thumbnail/right side — left text panel keeps normal cursor
       const thumbs = Array.from(document.querySelectorAll('.portfolio-row[data-url] .portfolio-row-right'))
       let mx = 0, my = 0, cx = 0, cy = 0
@@ -592,8 +595,14 @@ export default function Home() {
         const row = thumb.closest('.portfolio-row[data-url]')
         const url = row ? row.dataset.url : null
 
-        thumb.addEventListener('mouseenter', () => cursor.classList.add('is-visible'))
-        thumb.addEventListener('mouseleave', () => cursor.classList.remove('is-visible'))
+        thumb.addEventListener('mouseenter', () => {
+          cursor.classList.add('is-visible')
+          if (globalCursor) globalCursor.style.opacity = '0'
+        })
+        thumb.addEventListener('mouseleave', () => {
+          cursor.classList.remove('is-visible')
+          if (globalCursor) globalCursor.style.opacity = '1'
+        })
         thumb.addEventListener('click', () => {
           if (url) window.open(url, '_blank', 'noopener,noreferrer')
         })
