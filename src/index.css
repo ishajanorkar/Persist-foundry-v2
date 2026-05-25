@@ -406,8 +406,13 @@ body::before {
   -webkit-user-drag: none;
   will-change: transform;
   transform: translate(var(--prl-x, 0px), var(--prl-y, 0px));
+  /* multiply blend: white background becomes invisible, coloured
+     elements (person, ground, flowers) composite over the video */
+  mix-blend-mode: multiply;
+  /* smooth fade-out when scroll begins */
+  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
 }
-/* hide on mobile — parallax doesn't run, layer would just sit static */
+/* hide on mobile — parallax doesn't run there */
 @media (hover: none), (pointer: coarse) {
   .hero-fg { display: none; }
 }

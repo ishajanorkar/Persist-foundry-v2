@@ -145,6 +145,11 @@ export default function Home() {
 
       if (scrollCue) scrollCue.style.opacity = progress > 0.04 ? '0' : '1'
 
+      // Fade the foreground PNG out as soon as scrolling begins,
+      // handing control to the video scroll-scrub animation.
+      const heroFgEl = document.getElementById('heroFg')
+      if (heroFgEl) heroFgEl.style.opacity = progress > 0.03 ? '0' : '1'
+
       const totalScroll = document.documentElement.scrollHeight - viewportHeight
       const pageProgress = (window.scrollY / totalScroll) * 100
       if (progressBar) progressBar.style.width = pageProgress + '%'
