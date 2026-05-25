@@ -641,9 +641,11 @@ export default function Home() {
       const videoEl = document.getElementById('scrubVideo')
 
       // Depth layers — xMax/yMax = max pixel travel at screen edges.
-      // Video moves least (distant), status card moves most (closest).
+      // Video (far background) moves least; hero-fg foreground moves most,
+      // creating genuine depth separation between the two image planes.
       const layers = [
-        { el: videoEl,                                        xMax: 20, yMax: 12 },
+        { el: videoEl,                                        xMax: 16, yMax: 10 },  // bg — furthest
+        { el: document.getElementById('heroFg'),             xMax: 40, yMax: 24 },  // fg — closest visual layer
         { el: document.querySelector('.panel-1-headline'),   xMax: 22, yMax: 13 },
         { el: document.querySelector('.panel-1-meta'),       xMax: 28, yMax: 17 },
         { el: document.querySelector('.panel-1-actions'),    xMax: 26, yMax: 15 },
@@ -816,7 +818,19 @@ export default function Home() {
             <source src="/assets/scrub-video.webm" type="video/webm" />
             <source src="/assets/scrub-video.mp4"  type="video/mp4"  />
           </video>
-          {/* Three.js depth scene — sits above video, below UI panels */}
+
+          {/* Foreground parallax layer — person + ground PNG on transparent bg.
+              Moves more than the video on mouse-move → genuine depth separation. */}
+          <img
+            className="hero-fg"
+            id="heroFg"
+            src="/assets/hero-foreground.png"
+            alt=""
+            aria-hidden="true"
+            draggable="false"
+          />
+
+          {/* Vignette sits above both video and foreground so edges darken equally */}
           <div className="scrub-vignette"></div>
 
           {/* PANEL 1 — HERO */}
