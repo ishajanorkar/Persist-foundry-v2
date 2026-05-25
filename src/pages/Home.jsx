@@ -608,42 +608,62 @@ export default function Home() {
       loop()
     })()
 
-    /* ── HERO MOUSE-MOVE PARALLAX (depth layers via CSS vars) ── */
+    /* ── HERO MOUSE-MOVE PARALLAX ───────────────────────────── */
     ;(() => {
       if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
-      const stage = document.querySelector('.scrub-sticky')
-      if (!stage) return
 
-      const mouse = { x: 0, y: 0 }
-      stage.addEventListener('mousemove', e => {
-        const r = stage.getBoundingClientRect()
-        mouse.x =  e.clientX - r.left - r.width  * 0.5
-        mouse.y =  e.clientY - r.top  - r.height * 0.5
+      // ── shared lerped state — one position drives every layer in sync ──
+      let W = window.innerWidth, H = window.innerHeight
+      const tgt = { x: 0, y: 0 }  // target  — normalised -1 → +1
+      const cur = { x: 0, y: 0 }  // current — interpolated each frame
+
+      // Global window tracking — smooth even when entering from any edge
+      window.addEventListener('mousemove', e => {
+        tgt.x = (e.clientX / W - 0.5) * 2
+        tgt.y = (e.clientY / H - 0.5) * 2
       }, { passive: true })
-      stage.addEventListener('mouseleave', () => { mouse.x = 0; mouse.y = 0 })
+      window.addEventListener('resize', () => {
+        W = window.innerWidth; H = window.innerHeight
+      }, { passive: true })
 
-      // Each element gets its own depth multiplier.
-      // Negative xD on the video makes it counter-shift (feels like it recedes).
-      // Progressively larger multipliers on foreground UI = stronger shift = closer feel.
+      // ── depth layers — xMax/yMax = max pixel travel at screen edge ──
+      // All positive: everything drifts WITH the mouse.
+      // Background (video) moves least → feels furthest away.
+      // Foreground UI moves most → feels closest.
       const layers = [
-        { el: document.getElementById('scrubVideo'),        xD: -0.006, yD: -0.004 },
-        { el: document.querySelector('.panel-1-meta'),      xD:  0.018, yD:  0.012 },
-        { el: document.querySelector('.panel-1-headline'),  xD:  0.012, yD:  0.008 },
-        { el: document.querySelector('.panel-1-actions'),   xD:  0.016, yD:  0.011 },
-        { el: document.querySelector('.panel-1-status'),    xD:  0.026, yD:  0.017 },
-        { el: document.getElementById('scrollCue'),         xD:  0.006, yD:  0.004 },
+        { el: document.getElementById('scrubVideo'),        xMax: 14, yMax:  9 },
+        { el: document.querySelector('.panel-1-headline'),  xMax: 22, yMax: 13 },
+        { el: document.querySelector('.panel-1-meta'),      xMax: 28, yMax: 17 },
+        { el: document.querySelector('.panel-1-actions'),   xMax: 26, yMax: 15 },
+        { el: document.querySelector('.panel-1-status'),    xMax: 38, yMax: 22 },
+        { el: document.getElementById('scrollCue'),         xMax: 10, yMax:  6 },
       ].filter(l => l.el)
 
-      const smooth = layers.map(() => ({ x: 0, y: 0 }))
+      // Promote all layers to GPU compositor layer
+      layers.forEach(l => { l.el.style.willChange = 'transform' })
+
+      // Strip CSS transition on transform after entrance animations complete
+      // (prevents the 0.7s transition rule from fighting the 60fps rAF loop)
+      setTimeout(() => {
+        const prlEls = [
+          document.querySelector('.panel-1-meta'),
+          document.querySelector('.panel-1-actions'),
+          document.querySelector('.panel-1-status'),
+        ]
+        prlEls.forEach(el => {
+          if (el) el.style.transition = 'opacity 0.7s ease'
+        })
+      }, 2200)
 
       function loop() {
-        layers.forEach((l, i) => {
-          const s = smooth[i]
-          s.x += (mouse.x * l.xD - s.x) * 0.07
-          s.y += (mouse.y * l.yD - s.y) * 0.07
-          l.el.style.setProperty('--prl-x', s.x.toFixed(2) + 'px')
-          l.el.style.setProperty('--prl-y', s.y.toFixed(2) + 'px')
-        })
+        // Factor 0.048 → ~20 frames to reach target → ultra-smooth buttery feel
+        cur.x += (tgt.x - cur.x) * 0.048
+        cur.y += (tgt.y - cur.y) * 0.048
+
+        for (const l of layers) {
+          l.el.style.setProperty('--prl-x', (cur.x * l.xMax).toFixed(2) + 'px')
+          l.el.style.setProperty('--prl-y', (cur.y * l.yMax).toFixed(2) + 'px')
+        }
         requestAnimationFrame(loop)
       }
       loop()
