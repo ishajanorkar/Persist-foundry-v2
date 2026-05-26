@@ -16,7 +16,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled,   setScrolled]   = useState(false)
   const [hidden,     setHidden]     = useState(false)
-  const [active,     setActive]     = useState('')
+  const [active,     setActive]     = useState('home')
   const location = useLocation()
   const isHome = location.pathname === '/'
 
@@ -37,15 +37,8 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => {
-    if (!isHome) return
-    const obs = new IntersectionObserver(
-      (entries) => entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id) }),
-      { rootMargin: '-30% 0px -60% 0px', threshold: 0 }
-    )
-    LINKS.forEach(({ id }) => { const el = document.getElementById(id); if (el) obs.observe(el) })
-    return () => obs.disconnect()
-  }, [isHome])
+  // Section-tracking disabled — "Home" stays active until other pages are wired up
+  useEffect(() => { setActive(isHome ? 'home' : '') }, [isHome])
 
   const go = (id) => {
     setMobileOpen(false)
@@ -72,7 +65,7 @@ export default function Navbar() {
             <a
               key={label}
               href={id ? (isHome ? `#${id}` : `/#${id}`) : href}
-              className={`nav-pill-link${active === id ? ' is-active' : ''}`}
+              className={`nav-pill-link${(label === 'Home' && active === 'home') ? ' is-active' : ''}`}
               onClick={id ? (e) => { e.preventDefault(); go(id) } : undefined}
             >
               {label}
