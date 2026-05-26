@@ -1465,16 +1465,13 @@ body::before {
 .filter-list li.is-revealed::before { width: 16px !important; }
 .filter-col.yes .filter-list li::before { background: var(--violet); }
 .filter-col.no .filter-list li::before { background: var(--stone-soft); }
-.filter-col.no .filter-list li::after {
-  content: "";
-  position: absolute;
-  top: 50%; left: 36px; right: 0;
-  height: 1px; background: var(--stone-soft);
-  transform: scaleX(0); transform-origin: left center;
-  transition: transform 0.6s cubic-bezier(0.2,0.8,0.2,1) 0.4s;
+.filter-col.no .filter-list li::after { display: none; } /* replaced by text-decoration */
+/* Real strikethrough — works on single and multi-line text */
+.filter-col.no .filter-list li.is-revealed {
+  text-decoration: line-through;
+  text-decoration-color: var(--stone-soft);
+  text-decoration-thickness: 1.5px;
 }
-.filter-col.no .filter-list li.is-revealed::after { transform: scaleX(0.78); }
-.filter-col.no .filter-list li:hover::after { transform: scaleX(1); }
 
 /* ================== VELOCITY MARQUEE ================== */
 .velocity-marquee {
@@ -2626,10 +2623,7 @@ body::before {
 
   /* ── 3. "W" last logo centred in 2-col grid ── */
   .backed-v2-cell:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
-    max-width: 50%;
-    margin: 0 auto;
-    width: 100%;
+    grid-column: 1 / -1; /* span full row; flex centering in cell handles logo */
   }
 
   /* ── 4. Impact numbers: centred layout ── */
@@ -2637,10 +2631,12 @@ body::before {
   .impact-stat { text-align: center; padding: 28px 0 !important; }
   .impact-num { justify-content: center; font-size: clamp(64px, 18vw, 100px); }
 
-  /* ── 5. Portfolio row 2 (is-reversed): same layout as rows 1 & 3 ── */
-  .portfolio-row.is-reversed .portfolio-row-desc { margin-left: 0; text-align: left; }
-  .portfolio-row.is-reversed .portfolio-row-name { text-align: left; }
-  .portfolio-row.is-reversed .portfolio-row-tag { text-align: left; }
+  /* ── 5. Portfolio row 2 (is-reversed): match layout of rows 1 & 3 on mobile ── */
+  .portfolio-row.is-reversed .portfolio-row-tag   { margin-left: 0 !important; text-align: left !important; }
+  .portfolio-row.is-reversed .portfolio-row-name  { text-align: left !important; }
+  .portfolio-row.is-reversed .portfolio-row-desc  { margin-left: 0 !important; text-align: left !important; }
+  .portfolio-row.is-reversed .portfolio-row-stats { justify-content: flex-start !important; }
+  .portfolio-row.is-reversed .portfolio-row-left  { text-align: left !important; }
 
   /* ── 6. Filter cards: tighter padding + fix strikethrough width ── */
   .filter-col { padding: 28px 20px; }
