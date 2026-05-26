@@ -242,7 +242,7 @@ body::before {
 /* MOBILE FULLSCREEN MENU */
 .nav-mobile {
   position: fixed; inset: 0;
-  z-index: 98;
+  z-index: 102; /* above nav (100) so it fully covers it — no doubled logo */
   background: rgba(7, 5, 15, 0.97);
   backdrop-filter: blur(40px) saturate(140%);
   -webkit-backdrop-filter: blur(40px) saturate(140%);
@@ -267,8 +267,12 @@ body::before {
   flex: 1;
   display: flex; flex-direction: column;
   padding: 8px 0;
-  overflow: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* hide scrollbar visually but keep it functional */
+  scrollbar-width: none;
 }
+.nav-mobile-links::-webkit-scrollbar { display: none; }
 .nav-mobile-link {
   display: flex; align-items: center; gap: 18px;
   font-family: var(--serif);
@@ -2437,22 +2441,21 @@ body::before {
   .panel-1-status { bottom: 18px; }
 }
 
-/* Tablet — tighten pill before it gets too close to edges */
-@media (max-width: 1100px) {
-  .nav { padding: 18px 28px; }
-  .nav.is-scrolled { padding: 12px 28px; }
-  .nav-pill-link { padding: 6px 12px; font-size: 12px; }
-}
-
-/* ── Large tablet / small laptop ── */
-@media (max-width: 968px) {
-  .nav { padding: 16px 22px; }
-  .nav.is-scrolled { padding: 12px 22px; }
+/* ── Small laptop + tablet + phone: switch to hamburger ── */
+@media (max-width: 1200px) {
+  .nav { padding: 16px 24px; }
+  .nav.is-scrolled { padding: 12px 24px; }
   .nav-pill { display: none; }
   .nav-cta { display: none; }
   .nav-hamburger { display: flex; }
   .nav-logo img { width: 26px; height: 26px; }
   .nav-logo span { font-size: 18px; }
+}
+
+/* ── Large tablet / phone ── */
+@media (max-width: 968px) {
+  .nav { padding: 16px 22px; }
+  .nav.is-scrolled { padding: 12px 22px; }
 
   /* Hero panels */
   .scrub-block { height: 280vh; }
@@ -2621,6 +2624,15 @@ body::before {
   .panel-3-headline { font-size: clamp(36px, 15vw, 54px); }
   .nav-logo img { width: 24px; height: 24px; }
   .nav-logo span { font-size: 16px; }
+}
+
+/* ── Short-viewport phones: shrink mobile menu links so all fit + scroll ── */
+@media (max-height: 700px) {
+  .nav-mobile-link {
+    font-size: clamp(22px, 5.5vw, 34px);
+    padding: 9px 0;
+  }
+  .nav-mobile-cta { margin-top: 16px; padding: 13px 20px; font-size: 13px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

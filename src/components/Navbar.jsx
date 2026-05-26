@@ -40,6 +40,12 @@ export default function Navbar() {
   // Section-tracking disabled — "Home" stays active until other pages are wired up
   useEffect(() => { setActive(isHome ? 'home' : '') }, [isHome])
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [mobileOpen])
+
   const go = (id) => {
     setMobileOpen(false)
     if (isHome) {
