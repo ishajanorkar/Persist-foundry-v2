@@ -3228,6 +3228,94 @@ body::before {
 @media (max-width: 968px) { .ab-cta-btn { cursor: pointer; } }
 
 /* ─────────────────────────────────────────────────────
+   LIGHT SECTION BACKGROUNDS
+   Alternates: dark hero → light Who We Are → dark Purpose
+   → light Methodology → dark How It Works → light Story → dark CTA
+   ───────────────────────────────────────────────────── */
+
+/* WHO WE ARE — bone / cream lavender */
+.ab-about {
+  background: var(--bone);
+  border-bottom-color: rgba(120,84,213,0.14);
+}
+.ab-about .ab-eyebrow             { color: var(--violet); }
+.ab-about .ab-eyebrow::before     { background: var(--violet); }
+.ab-about .ab-about-headline      { color: var(--ink); }
+.ab-about .ab-about-body          { color: var(--ink-soft); }
+.ab-about .ab-about-bold {
+  color: var(--violet-deep);
+  border-top-color:    rgba(120,84,213,0.18);
+  border-bottom-color: rgba(120,84,213,0.18);
+}
+
+/* OUR METHODOLOGY — paper / clean white */
+.ab-method {
+  background: var(--paper);
+  border-bottom-color: rgba(120,84,213,0.14);
+}
+.ab-method .ab-eyebrow            { color: var(--violet); }
+.ab-method .ab-eyebrow::before    { background: var(--violet); }
+.ab-method .ab-method-headline    { color: var(--ink); }
+.ab-method .ab-method-headline em { color: var(--violet); }
+.ab-method .ab-method-sub         { color: var(--ink-soft); }
+.ab-method .ab-method-body        { color: var(--ink-soft); }
+.ab-method .ab-method-card {
+  background: #fff;
+  border-color: rgba(120,84,213,0.13);
+  box-shadow: 0 2px 20px rgba(120,84,213,0.07);
+}
+.ab-method .ab-method-card:hover {
+  background: #fff;
+  border-color: rgba(120,84,213,0.38);
+  box-shadow: 0 8px 40px rgba(120,84,213,0.14);
+}
+.ab-method .ab-method-card-num    { color: var(--violet); }
+.ab-method .ab-method-card-title  { color: var(--ink); }
+.ab-method .ab-method-card-desc   { color: var(--ink-soft); }
+
+/* OUR STORY — soft lavender */
+.ab-story {
+  background: #F7F4FD;
+  border-bottom-color: rgba(120,84,213,0.14);
+}
+.ab-story .ab-eyebrow             { color: var(--violet); }
+.ab-story .ab-eyebrow::before     { background: var(--violet); }
+.ab-story .ab-story-headline      { color: var(--ink); }
+.ab-story .ab-story-headline em   { color: var(--violet); }
+.ab-story .ab-founder {
+  background: #fff;
+  border-color: rgba(120,84,213,0.16);
+}
+.ab-story .ab-founder-name        { color: var(--ink); }
+.ab-story .ab-founder-role        { color: var(--stone); }
+.ab-story .ab-founder-quote {
+  color: var(--ink-soft);
+  border-left-color: rgba(120,84,213,0.28);
+}
+.ab-story .ab-story-body > p       { color: var(--ink-soft); }
+.ab-story .ab-story-question       { color: var(--violet) !important; }
+.ab-story .ab-story-quote          { color: var(--ink); }
+.ab-story .ab-story-quote cite      { color: var(--violet); }
+.ab-story .ab-story-quote--warm     { color: var(--ink-soft); }
+.ab-story .ab-story-list li         { color: var(--ink-soft); }
+.ab-story .ab-list-num              { color: var(--violet); }
+.ab-story .ab-story-stat {
+  border-top-color:    rgba(120,84,213,0.14);
+  border-bottom-color: rgba(120,84,213,0.14);
+}
+.ab-story .ab-story-stat-num        { color: var(--violet-deep); }
+.ab-story .ab-story-stat-num span   { color: var(--violet); }
+.ab-story .ab-story-stat-label      { color: var(--ink-soft); }
+.ab-story .ab-story-closing {
+  color: var(--violet-deep) !important;
+  border-top-color: rgba(120,84,213,0.14);
+}
+/* founder-quote border on tablet (overrides hairline with visible tone) */
+@media (max-width: 968px) {
+  .ab-story .ab-founder-quote { border-top-color: rgba(120,84,213,0.18); }
+}
+
+/* ─────────────────────────────────────────────────────
    RESPONSIVE — tablet ≤ 968px
    ───────────────────────────────────────────────────── */
 @media (max-width: 968px) {
