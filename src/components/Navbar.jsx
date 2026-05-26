@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 const LINKS = [
-  { label: 'Home',         href: '/' },
-  { label: 'About',        id: 'impact' },
+  { label: 'Home',         to: '/' },
+  { label: 'About',        to: '/about' },
   { label: 'Our Team',     id: 'backed' },
   { label: 'Portfolio',    id: 'portfolio' },
   { label: 'Careers',      id: 'offer' },
@@ -16,7 +16,6 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled,   setScrolled]   = useState(false)
   const [hidden,     setHidden]     = useState(false)
-  const [active,     setActive]     = useState('home')
   const location = useLocation()
   const isHome = location.pathname === '/'
 
@@ -37,9 +36,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Section-tracking disabled — "Home" stays active until other pages are wired up
-  useEffect(() => { setActive(isHome ? 'home' : '') }, [isHome])
-
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
@@ -55,6 +51,11 @@ export default function Navbar() {
     }
   }
 
+  const isActive = (link) => {
+    if (link.to) return location.pathname === link.to
+    return false
+  }
+
   return (
     <>
       <nav className={`nav${scrolled ? ' is-scrolled' : ''}${hidden && !mobileOpen ? ' is-hidden' : ''}`} id="nav">
@@ -67,21 +68,37 @@ export default function Navbar() {
 
         {/* CENTER PILL — desktop only */}
         <div className="nav-pill" aria-label="Navigation">
-          {LINKS.map(({ label, id, href, dropdown }) => (
-            <a
-              key={label}
-              href={id ? (isHome ? `#${id}` : `/#${id}`) : href}
-              className={`nav-pill-link${(label === 'Home' && active === 'home') ? ' is-active' : ''}`}
-              onClick={id ? (e) => { e.preventDefault(); go(id) } : undefined}
-            >
-              {label}
-              {dropdown && (
-                <svg className="nav-pill-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-                  <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              )}
-            </a>
-          ))}
+          {LINKS.map((link) => {
+            const { label, id, href, to, dropdown } = link
+            const active = isActive(link)
+            if (to) {
+              return (
+                <Link
+                  key={label}
+                  to={to}
+                  className={`nav-pill-link${active ? ' is-active' : ''}`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {label}
+                </Link>
+              )
+            }
+            return (
+              <a
+                key={label}
+                href={id ? (isHome ? `#${id}` : `/#${id}`) : href}
+                className={`nav-pill-link${active ? ' is-active' : ''}`}
+                onClick={id ? (e) => { e.preventDefault(); go(id) } : undefined}
+              >
+                {label}
+                {dropdown && (
+                  <svg className="nav-pill-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                    <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </a>
+            )
+          })}
         </div>
 
         {/* RIGHT SIDE */}
@@ -120,23 +137,39 @@ export default function Navbar() {
         </div>
 
         <nav className="nav-mobile-links">
-          {LINKS.map(({ label, id, href, dropdown }, i) => (
-            <a
-              key={label}
-              href={id ? (isHome ? `#${id}` : `/#${id}`) : href}
-              className={`nav-mobile-link${mobileOpen ? ' is-visible' : ''}`}
-              style={{ transitionDelay: mobileOpen ? `${80 + i * 55}ms` : '0ms' }}
-              onClick={() => { if (id) go(id); else setMobileOpen(false) }}
-            >
-              <span className="nav-mobile-num">{String(i + 1).padStart(2, '0')}</span>
-              {label}
-              {dropdown && (
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true" style={{marginLeft: '6px', opacity: 0.6}}>
-                  <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              )}
-            </a>
-          ))}
+          {LINKS.map(({ label, id, href, to, dropdown }, i) => {
+            if (to) {
+              return (
+                <Link
+                  key={label}
+                  to={to}
+                  className={`nav-mobile-link${mobileOpen ? ' is-visible' : ''}`}
+                  style={{ transitionDelay: mobileOpen ? `${80 + i * 55}ms` : '0ms' }}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <span className="nav-mobile-num">{String(i + 1).padStart(2, '0')}</span>
+                  {label}
+                </Link>
+              )
+            }
+            return (
+              <a
+                key={label}
+                href={id ? (isHome ? `#${id}` : `/#${id}`) : href}
+                className={`nav-mobile-link${mobileOpen ? ' is-visible' : ''}`}
+                style={{ transitionDelay: mobileOpen ? `${80 + i * 55}ms` : '0ms' }}
+                onClick={() => { if (id) go(id); else setMobileOpen(false) }}
+              >
+                <span className="nav-mobile-num">{String(i + 1).padStart(2, '0')}</span>
+                {label}
+                {dropdown && (
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true" style={{marginLeft: '6px', opacity: 0.6}}>
+                    <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </a>
+            )
+          })}
         </nav>
 
         <button
