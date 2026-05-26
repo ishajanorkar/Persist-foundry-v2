@@ -2,13 +2,6 @@ import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
 /* ── static data ──────────────────────────────────────────── */
-const HERO_STATS = [
-  { num: '30',  suf: '+',   label: 'Companies built'    },
-  { num: '$117',suf: 'M',   label: 'Net asset value'    },
-  { num: '400', suf: '+',   label: 'Operators & allies' },
-  { num: '9',   suf: ' yrs',label: 'Building ventures'  },
-]
-
 const METHOD_CARDS = [
   {
     num: '01',
@@ -242,33 +235,10 @@ export default function About() {
           <div className="ab-hero-actions ab-reveal" data-delay="320">
             <Link to="/#apply" className="ab-hero-cta" data-magnetic>
               Apply For Fellowship
-              <svg viewBox="0 0 16 16" fill="none" width="13" height="13" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14" aria-hidden="true">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </Link>
-            <Link to="/#impact" className="ab-hero-ghost">
-              See our impact
-              <svg viewBox="0 0 16 16" fill="none" width="13" height="13" aria-hidden="true">
-                <path d="M8 3l5 5-5 5M3 8h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </Link>
-          </div>
-
-          {/* stats strip */}
-          <div className="ab-hero-stats">
-            {HERO_STATS.map((s, i) => (
-              <div className="ab-hero-stat ab-reveal" key={s.label} data-delay={String(440 + i * 70)}>
-                <div className="ab-hero-stat-num">
-                  <span
-                    className="ab-hero-stat-val"
-                    data-target={s.num.replace('$', '')}
-                    data-prefix={s.num.startsWith('$') ? '$' : ''}
-                  >{s.num}</span>
-                  <em>{s.suf}</em>
-                </div>
-                <div className="ab-hero-stat-label">{s.label}</div>
-              </div>
-            ))}
           </div>
         </div>
 
