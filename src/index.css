@@ -2243,17 +2243,76 @@ body::before {
 .footer-newsletter-btn:hover { background: var(--violet-soft); }
 .footer-newsletter-btn:disabled { opacity: 0.55; cursor: default; }
 
-/* newsletter feedback */
-.footer-newsletter-msg {
-  display: flex; align-items: center; gap: 7px;
-  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.04em;
-  margin-top: 10px;
-  animation: msgFadeIn 0.35s ease;
+/* spinner inside button */
+.footer-newsletter-spinner {
+  display: inline-block;
+  width: 11px; height: 11px;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
 }
-.footer-newsletter-msg.is-success { color: #7bc87e; }
-.footer-newsletter-msg.is-error   { color: #e07070; }
-@keyframes msgFadeIn {
-  from { opacity: 0; transform: translateY(4px); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* newsletter wrap — positions form and card in the same space */
+.footer-newsletter-wrap {
+  position: relative;
+  margin-bottom: 32px;
+}
+.footer-newsletter {
+  margin-bottom: 0;          /* wrap owns the bottom gap now */
+  transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.25s ease;
+}
+.footer-newsletter.is-gone {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+}
+
+/* result card — same height/width as the form */
+.footer-newsletter-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 13px 18px;
+  border-radius: 6px;
+  border: 1px solid;
+  font-family: var(--mono);
+  animation: cardIn 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: absolute; inset: 0;
+}
+.footer-newsletter-card.is-success {
+  background: rgba(100, 200, 110, 0.07);
+  border-color: rgba(100, 200, 110, 0.28);
+  color: #7bc87e;
+}
+.footer-newsletter-card.is-error {
+  background: rgba(220, 90, 90, 0.07);
+  border-color: rgba(220, 90, 90, 0.28);
+  color: #e07878;
+}
+.fnc-icon { flex-shrink: 0; display: flex; }
+.fnc-text {
+  display: flex; flex-direction: column; gap: 2px; flex: 1;
+}
+.fnc-text strong {
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  font-weight: 600;
+}
+.fnc-text span {
+  font-size: 10px; letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+.fnc-retry {
+  background: transparent; border: 1px solid currentColor;
+  color: inherit; border-radius: 4px;
+  padding: 5px 12px;
+  font-family: var(--mono); font-size: 9.5px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  cursor: pointer; flex-shrink: 0;
+  opacity: 0.8; transition: opacity 0.2s ease;
+}
+.fnc-retry:hover { opacity: 1; }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 

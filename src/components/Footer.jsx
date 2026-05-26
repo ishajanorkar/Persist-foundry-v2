@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-const SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL
+const SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL?.trim()
 
 export default function Footer() {
   const [email,  setEmail]  = useState('')
@@ -24,9 +24,6 @@ export default function Footer() {
       }
     } catch {
       setStatus('error')
-    } finally {
-      // reset back to idle after 4 s
-      setTimeout(() => setStatus('idle'), 4000)
     }
   }
 
@@ -44,45 +41,66 @@ export default function Footer() {
 
           <p className="footer-tagline">Forged in persistence.</p>
 
-          <form className="footer-newsletter" onSubmit={handleSubscribe}>
-            <input
-              className="footer-newsletter-input"
-              type="email"
-              placeholder="Your email"
-              aria-label="Subscribe to newsletter"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              disabled={status === 'loading' || status === 'success'}
-              required
-            />
-            <button
-              className="footer-newsletter-btn"
-              type="submit"
-              disabled={status === 'loading' || status === 'success'}
+          <div className="footer-newsletter-wrap">
+            {/* ── form state ── */}
+            <form
+              className={`footer-newsletter${status === 'success' || status === 'error' ? ' is-gone' : ''}`}
+              onSubmit={handleSubscribe}
             >
-              {status === 'loading' ? '...' : 'Subscribe'}
-            </button>
-          </form>
+              <input
+                className="footer-newsletter-input"
+                type="email"
+                placeholder="Your email"
+                aria-label="Subscribe to newsletter"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                disabled={status === 'loading'}
+                required
+              />
+              <button
+                className="footer-newsletter-btn"
+                type="submit"
+                disabled={status === 'loading'}
+              >
+                {status === 'loading' ? (
+                  <span className="footer-newsletter-spinner" aria-hidden="true" />
+                ) : 'Subscribe'}
+              </button>
+            </form>
 
-          {/* feedback message */}
-          {status === 'success' && (
-            <p className="footer-newsletter-msg is-success">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                <circle cx="6.5" cy="6.5" r="6" stroke="currentColor" strokeWidth="1.1"/>
-                <path d="M4 6.5l1.8 1.8L9 4.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              You're in — welcome to the circle.
-            </p>
-          )}
-          {status === 'error' && (
-            <p className="footer-newsletter-msg is-error">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                <circle cx="6.5" cy="6.5" r="6" stroke="currentColor" strokeWidth="1.1"/>
-                <path d="M6.5 4v3M6.5 8.5v.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-              </svg>
-              Something went wrong. Try again.
-            </p>
-          )}
+            {/* ── success card ── */}
+            {status === 'success' && (
+              <div className="footer-newsletter-card is-success">
+                <span className="fnc-icon">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <circle cx="9" cy="9" r="8.25" stroke="currentColor" strokeWidth="1.3"/>
+                    <path d="M5.5 9l2.5 2.5L12.5 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </span>
+                <div className="fnc-text">
+                  <strong>You're in.</strong>
+                  <span>Welcome to the circle — we'll be in touch.</span>
+                </div>
+              </div>
+            )}
+
+            {/* ── error card ── */}
+            {status === 'error' && (
+              <div className="footer-newsletter-card is-error">
+                <span className="fnc-icon">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <circle cx="9" cy="9" r="8.25" stroke="currentColor" strokeWidth="1.3"/>
+                    <path d="M9 5.5v4M9 11.5v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                </span>
+                <div className="fnc-text">
+                  <strong>Something went wrong.</strong>
+                  <span>Check your connection and try again.</span>
+                </div>
+                <button className="fnc-retry" onClick={() => setStatus('idle')}>Retry</button>
+              </div>
+            )}
+          </div>
 
           <div className="footer-socials">
             <a href="https://www.linkedin.com/company/persist-ventures/" target="_blank" rel="noopener noreferrer" className="footer-social-link" aria-label="LinkedIn">
