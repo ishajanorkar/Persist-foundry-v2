@@ -3102,16 +3102,14 @@ body::before {
 }
 .ab-founder-avatar-link { flex-shrink: 0; display: block; }
 .ab-founder-avatar {
-  width: 68px; height: 68px; border-radius: 50%;
+  width: 80px; height: 80px; border-radius: 14px;
   object-fit: cover; object-position: top center; display: block;
-  box-shadow: 0 0 0 2px rgba(120,84,213,0.35), 0 4px 20px rgba(0,0,0,0.25);
+  box-shadow: 0 0 0 2px rgba(120,84,213,0.3), 0 4px 20px rgba(0,0,0,0.18);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
-  filter: grayscale(15%);
 }
 .ab-founder-avatar-link:hover .ab-founder-avatar {
-  box-shadow: 0 0 0 3px var(--violet), 0 6px 28px rgba(120,84,213,0.4);
+  box-shadow: 0 0 0 3px var(--violet), 0 6px 28px rgba(120,84,213,0.38);
   transform: scale(1.04);
-  filter: grayscale(0%);
 }
 .ab-founder-info { flex: 1; min-width: 0; }
 .ab-founder-name {

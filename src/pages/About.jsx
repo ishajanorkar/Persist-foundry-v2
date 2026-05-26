@@ -449,7 +449,7 @@ export default function About() {
               className="ab-founder-avatar-link"
               aria-label="Jack Jay on LinkedIn"
             >
-              <img src="/jack-jay.jpg" alt="Jack Jay, Founder & CEO" className="ab-founder-avatar" />
+              <img src="/assets/jackjay.jpg" alt="Jack Jay, Founder & CEO" className="ab-founder-avatar" />
             </a>
             <div className="ab-founder-info">
               <a
