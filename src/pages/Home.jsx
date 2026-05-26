@@ -202,9 +202,19 @@ export default function Home() {
 
     function positionVPips() {
       const rail = document.getElementById('offerVRail')
-      if (!rail || !offerVPips.length) return
-      const railTop = rail.getBoundingClientRect().top + window.scrollY
-      const railH = rail.offsetHeight
+      if (!rail || !offerVPips.length || !offerSteps.length) return
+
+      // Clip rail to end exactly at the bottom of the last card
+      const railRect = rail.getBoundingClientRect()
+      const lastStep = offerSteps[offerSteps.length - 1]
+      const newHeight = lastStep.getBoundingClientRect().bottom - railRect.top
+      if (newHeight > 0) {
+        rail.style.height = newHeight + 'px'
+        rail.style.bottom = 'auto'
+      }
+
+      const railTop = railRect.top + window.scrollY
+      const railH = newHeight > 0 ? newHeight : rail.offsetHeight
       offerSteps.forEach((step, i) => {
         if (!offerVPips[i]) return
         const stepTop = step.getBoundingClientRect().top + window.scrollY
