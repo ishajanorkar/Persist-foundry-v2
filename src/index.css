@@ -2241,6 +2241,21 @@ body::before {
   white-space: nowrap;
 }
 .footer-newsletter-btn:hover { background: var(--violet-soft); }
+.footer-newsletter-btn:disabled { opacity: 0.55; cursor: default; }
+
+/* newsletter feedback */
+.footer-newsletter-msg {
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.04em;
+  margin-top: 10px;
+  animation: msgFadeIn 0.35s ease;
+}
+.footer-newsletter-msg.is-success { color: #7bc87e; }
+.footer-newsletter-msg.is-error   { color: #e07070; }
+@keyframes msgFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
 /* socials */
 .footer-socials { display: flex; gap: 10px; }

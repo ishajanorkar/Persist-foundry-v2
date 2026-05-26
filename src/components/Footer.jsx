@@ -1,6 +1,35 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+const SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL
+
 export default function Footer() {
+  const [email,  setEmail]  = useState('')
+  const [status, setStatus] = useState('idle') // idle | loading | success | error
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault()
+    if (!email.trim() || !email.includes('@')) return
+    if (!SCRIPT_URL) { console.warn('VITE_GOOGLE_SCRIPT_URL not set'); setStatus('error'); return }
+
+    setStatus('loading')
+    try {
+      const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email.trim())}`)
+      const json = await res.json()
+      if (json.success) {
+        setStatus('success')
+        setEmail('')
+      } else {
+        setStatus('error')
+      }
+    } catch {
+      setStatus('error')
+    } finally {
+      // reset back to idle after 4 s
+      setTimeout(() => setStatus('idle'), 4000)
+    }
+  }
+
   return (
     <footer className="footer">
       {/* ── top grid ── */}
@@ -15,15 +44,45 @@ export default function Footer() {
 
           <p className="footer-tagline">Forged in persistence.</p>
 
-          <form className="footer-newsletter" onSubmit={e => e.preventDefault()}>
+          <form className="footer-newsletter" onSubmit={handleSubscribe}>
             <input
               className="footer-newsletter-input"
               type="email"
               placeholder="Your email"
               aria-label="Subscribe to newsletter"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              disabled={status === 'loading' || status === 'success'}
+              required
             />
-            <button className="footer-newsletter-btn" type="submit">Subscribe</button>
+            <button
+              className="footer-newsletter-btn"
+              type="submit"
+              disabled={status === 'loading' || status === 'success'}
+            >
+              {status === 'loading' ? '...' : 'Subscribe'}
+            </button>
           </form>
+
+          {/* feedback message */}
+          {status === 'success' && (
+            <p className="footer-newsletter-msg is-success">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <circle cx="6.5" cy="6.5" r="6" stroke="currentColor" strokeWidth="1.1"/>
+                <path d="M4 6.5l1.8 1.8L9 4.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              You're in — welcome to the circle.
+            </p>
+          )}
+          {status === 'error' && (
+            <p className="footer-newsletter-msg is-error">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <circle cx="6.5" cy="6.5" r="6" stroke="currentColor" strokeWidth="1.1"/>
+                <path d="M6.5 4v3M6.5 8.5v.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+              </svg>
+              Something went wrong. Try again.
+            </p>
+          )}
 
           <div className="footer-socials">
             <a href="https://www.linkedin.com/company/persist-ventures/" target="_blank" rel="noopener noreferrer" className="footer-social-link" aria-label="LinkedIn">
