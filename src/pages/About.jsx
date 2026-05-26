@@ -1,6 +1,14 @@
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
+/* ── static data ──────────────────────────────────────────── */
+const HERO_STATS = [
+  { num: '30',  suf: '+',   label: 'Companies built'    },
+  { num: '$117',suf: 'M',   label: 'Net asset value'    },
+  { num: '400', suf: '+',   label: 'Operators & allies' },
+  { num: '9',   suf: ' yrs',label: 'Building ventures'  },
+]
+
 const METHOD_CARDS = [
   {
     num: '01',
@@ -18,8 +26,9 @@ const METHOD_CARDS = [
     desc: 'Resources and expertise for everything from startups to skill acquisition.',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-        <circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/>
-        <circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/>
+        <circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/>
+        <circle cx="20" cy="6" r="2"/><circle cx="4" cy="18" r="2"/>
+        <circle cx="20" cy="18" r="2"/>
         <path d="M6 7l4 3M18 7l-4 3M6 17l4-3M18 17l-4-3"/>
       </svg>
     ),
@@ -52,82 +61,151 @@ const HOW_STEPS = [
     num: '01',
     title: 'Select Your Startup Idea',
     desc: 'Start with a curated list of startup ideas, choose your top three, or pitch an original idea inspired by or beyond the list for a personalized journey.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M8 12h8M12 8v8"/>
+      </svg>
+    ),
   },
   {
     num: '02',
     title: 'Idea Approval and Course Material',
     desc: "After selecting or pitching your idea, receive team's approval, then get comprehensive course materials to navigate your entrepreneurial journey effectively.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true">
+        <path d="M9 12l2 2 4-4M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9a12.02 12.02 0 00-.382-3.016z"/>
+      </svg>
+    ),
   },
   {
     num: '03',
     title: 'Progress Updates and Community Engagement',
     desc: 'Document your entrepreneurial venture with daily videos, sharing your progress, obstacles, and breakthroughs. This practice cultivates a supportive community atmosphere, encouraging feedback and insights from peers and mentors.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true">
+        <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+    ),
   },
 ]
 
+/* ── component ────────────────────────────────────────────── */
 export default function About() {
-  const initialized = useRef(false)
+  const cursorRafRef = useRef(null)
+  const marqueeRafRef = useRef(null)
 
   useEffect(() => {
-    if (initialized.current) return
-    initialized.current = true
-
-    // Mark body as loaded (no loader on this page)
     document.body.classList.add('is-loaded')
 
-    /* ── CUSTOM CURSOR ─────────────────────────────────── */
+    /* ── CUSTOM CURSOR — StrictMode-safe ─────────────── */
     const cursor = document.getElementById('cursor')
     let cursorX = 0, cursorY = 0, targetX = 0, targetY = 0
-    const onMouseMove = (e) => { targetX = e.clientX; targetY = e.clientY }
-    document.addEventListener('mousemove', onMouseMove)
-    function animateCursor() {
+
+    const trackMouse = (e) => { targetX = e.clientX; targetY = e.clientY }
+    document.addEventListener('mousemove', trackMouse)
+
+    const tickCursor = () => {
       cursorX += (targetX - cursorX) * 0.18
       cursorY += (targetY - cursorY) * 0.18
       if (cursor) cursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`
-      requestAnimationFrame(animateCursor)
+      cursorRafRef.current = requestAnimationFrame(tickCursor)
     }
-    animateCursor()
+    cursorRafRef.current = requestAnimationFrame(tickCursor)
+
+    // Hover enlargement
     document.querySelectorAll('a, button, .ab-method-card').forEach(el => {
       el.addEventListener('mouseenter', () => cursor?.classList.add('is-hover'))
       el.addEventListener('mouseleave', () => cursor?.classList.remove('is-hover'))
     })
 
-    /* ── MAGNETIC BUTTONS ──────────────────────────────── */
+    /* ── MAGNETIC BUTTONS ──────────────────────────── */
     document.querySelectorAll('[data-magnetic]').forEach(btn => {
       btn.addEventListener('mousemove', (e) => {
-        const rect = btn.getBoundingClientRect()
-        const x = e.clientX - rect.left - rect.width / 2
-        const y = e.clientY - rect.top - rect.height / 2
-        btn.style.transform = `translate(${x * 0.18}px, ${y * 0.25}px)`
+        const r = btn.getBoundingClientRect()
+        btn.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.18}px, ${(e.clientY - r.top - r.height / 2) * 0.25}px)`
       })
       btn.addEventListener('mouseleave', () => { btn.style.transform = '' })
     })
 
-    /* ── SCROLL REVEAL ─────────────────────────────────── */
+    /* ── SCROLL REVEAL ──────────────────────────────── */
     const revealEls = document.querySelectorAll('.ab-reveal')
     const revealObs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const delay = parseInt(entry.target.dataset.delay || '0')
-          setTimeout(() => entry.target.classList.add('is-visible'), delay)
-          revealObs.unobserve(entry.target)
-        }
+        if (!entry.isIntersecting) return
+        const delay = parseInt(entry.target.dataset.delay || '0')
+        setTimeout(() => entry.target.classList.add('is-visible'), delay)
+        revealObs.unobserve(entry.target)
       })
-    }, { threshold: 0.12, rootMargin: '0px 0px -4% 0px' })
+    }, { threshold: 0.1, rootMargin: '0px 0px -4% 0px' })
     revealEls.forEach(el => revealObs.observe(el))
 
-    /* ── PROGRESS BAR ──────────────────────────────────── */
+    /* ── PROGRESS BAR ───────────────────────────────── */
     const progressBar = document.getElementById('progress')
-    function updateProgress() {
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight
-      if (progressBar) progressBar.style.width = (window.scrollY / totalScroll) * 100 + '%'
+    const updateProgress = () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight
+      if (progressBar && total > 0) progressBar.style.width = (window.scrollY / total) * 100 + '%'
     }
     window.addEventListener('scroll', updateProgress, { passive: true })
     updateProgress()
 
+    /* ── VELOCITY MARQUEE ───────────────────────────── */
+    const track = document.getElementById('abVelocityTrack')
+    const section = document.getElementById('abVelocitySection')
+    if (track && section) {
+      let trackX = 0, lastY = window.scrollY, velocity = 0
+      const baseSpeed = 1.2
+      let halfWidth = 0
+
+      const originals = Array.from(track.children)
+      originals.forEach(node => track.appendChild(node.cloneNode(true)))
+
+      const measureHalf = () => { halfWidth = track.scrollWidth / 2 }
+      requestAnimationFrame(() => requestAnimationFrame(measureHalf))
+
+      const tickMarquee = () => {
+        const y = window.scrollY
+        velocity = velocity * 0.88 + (y - lastY) * 0.6
+        lastY = y
+        trackX -= baseSpeed + Math.abs(velocity) * 0.35
+        if (halfWidth > 0 && trackX <= -halfWidth) trackX += halfWidth
+        track.style.transform = `translate3d(${trackX}px, 0, 0)`
+        section.classList.toggle('is-fast', Math.abs(velocity) > 6)
+        marqueeRafRef.current = requestAnimationFrame(tickMarquee)
+      }
+      marqueeRafRef.current = requestAnimationFrame(tickMarquee)
+    }
+
+    /* ── COUNT-UP for hero stats ────────────────────── */
+    const statEls = document.querySelectorAll('.ab-hero-stat-val[data-target]')
+    const statObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return
+        const el = entry.target
+        const target = parseFloat(el.dataset.target)
+        const dur = 1400
+        const t0 = performance.now()
+        const tick = (now) => {
+          const k = Math.min(1, (now - t0) / dur)
+          const ease = 1 - Math.pow(1 - k, 3)
+          el.textContent = el.dataset.prefix
+            ? el.dataset.prefix + Math.round(target * ease)
+            : Math.round(target * ease)
+          if (k < 1) requestAnimationFrame(tick)
+        }
+        requestAnimationFrame(tick)
+        statObs.unobserve(el)
+      })
+    }, { threshold: 0.5 })
+    statEls.forEach(el => statObs.observe(el))
+
     return () => {
-      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mousemove', trackMouse)
       window.removeEventListener('scroll', updateProgress)
+      if (cursorRafRef.current) cancelAnimationFrame(cursorRafRef.current)
+      if (marqueeRafRef.current) cancelAnimationFrame(marqueeRafRef.current)
+      revealObs.disconnect()
+      statObs.disconnect()
     }
   }, [])
 
@@ -136,10 +214,15 @@ export default function About() {
       <div className="cursor" id="cursor"></div>
       <div className="progress" id="progress"></div>
 
-      {/* ── HERO ── */}
+      {/* ════════════════════════════════════════════
+          HERO
+          ════════════════════════════════════════════ */}
       <section className="ab-hero">
         <div className="ab-hero-grid-bg"></div>
-        <div className="ab-hero-glow"></div>
+        {/* animated blobs */}
+        <div className="ab-blob ab-blob-1"></div>
+        <div className="ab-blob ab-blob-2"></div>
+        <div className="ab-blob ab-blob-3"></div>
         <div className="ab-hero-vignette"></div>
 
         <div className="ab-hero-inner">
@@ -149,31 +232,82 @@ export default function About() {
           </div>
           <h1 className="ab-hero-headline ab-reveal" data-delay="100">
             We help convert startup visions into{' '}
-            <em>constructed, deployed,<br className="ab-hero-br" />and funded actualities.</em>
+            <em>constructed, deployed,<br className="ab-hero-br" />
+            and funded actualities.</em>
           </h1>
           <p className="ab-hero-sub ab-reveal" data-delay="230">
             Persist Ventures is a conglomerate with teams and services that efficiently
             meet business needs from A to Z.
           </p>
-          <div className="ab-hero-actions ab-reveal" data-delay="340">
+          <div className="ab-hero-actions ab-reveal" data-delay="320">
             <Link to="/#apply" className="ab-hero-cta" data-magnetic>
               Apply For Fellowship
-              <svg viewBox="0 0 16 16" fill="none" width="14" height="14" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" width="13" height="13" aria-hidden="true">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </Link>
+            <Link to="/#impact" className="ab-hero-ghost">
+              See our impact
+              <svg viewBox="0 0 16 16" fill="none" width="13" height="13" aria-hidden="true">
+                <path d="M8 3l5 5-5 5M3 8h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </Link>
+          </div>
+
+          {/* stats strip */}
+          <div className="ab-hero-stats">
+            {HERO_STATS.map((s, i) => (
+              <div className="ab-hero-stat ab-reveal" key={s.label} data-delay={String(440 + i * 70)}>
+                <div className="ab-hero-stat-num">
+                  <span
+                    className="ab-hero-stat-val"
+                    data-target={s.num.replace('$', '')}
+                    data-prefix={s.num.startsWith('$') ? '$' : ''}
+                  >{s.num}</span>
+                  <em>{s.suf}</em>
+                </div>
+                <div className="ab-hero-stat-label">{s.label}</div>
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* scroll cue — right side */}
         <div className="ab-hero-scroll">
           Scroll
           <div className="ab-hero-scroll-line"></div>
         </div>
       </section>
 
-      {/* ── WHO WE ARE ── */}
+      {/* ════════════════════════════════════════════
+          MARQUEE STRIP
+          ════════════════════════════════════════════ */}
+      <section className="velocity-marquee ab-marquee-strip" id="abVelocitySection">
+        <div className="velocity-marquee-track" id="abVelocityTrack">
+          <span className="velocity-marquee-item">Built for founders who refuse to stop.</span>
+          <span className="velocity-marquee-star" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
+          </span>
+          <span className="velocity-marquee-item is-outline">From ideas to funded realities.</span>
+          <span className="velocity-marquee-star" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
+          </span>
+          <span className="velocity-marquee-item">Persist towards infinity.</span>
+          <span className="velocity-marquee-star" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
+          </span>
+          <span className="velocity-marquee-item is-outline">Nine years of building.</span>
+          <span className="velocity-marquee-star" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
+          </span>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════
+          WHO WE ARE
+          ════════════════════════════════════════════ */}
       <section className="ab-about">
-        <div className="ab-about-inner">
+        <div className="ab-inner">
           <div className="ab-about-left">
             <div className="ab-eyebrow ab-reveal" data-delay="0">01 / Who we are</div>
             <h2 className="ab-about-headline ab-reveal" data-delay="80">
@@ -209,8 +343,11 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── OUR PURPOSE ── */}
+      {/* ════════════════════════════════════════════
+          OUR PURPOSE
+          ════════════════════════════════════════════ */}
       <section className="ab-purpose">
+        <span className="ab-purpose-wm" aria-hidden="true">for all</span>
         <div className="ab-purpose-inner">
           <div className="ab-eyebrow ab-eyebrow--center ab-reveal" data-delay="0">02 / Our Purpose</div>
           <h2 className="ab-purpose-headline ab-reveal" data-delay="100">
@@ -245,9 +382,11 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── OUR METHODOLOGY ── */}
+      {/* ════════════════════════════════════════════
+          OUR METHODOLOGY
+          ════════════════════════════════════════════ */}
       <section className="ab-method">
-        <div className="ab-method-inner">
+        <div className="ab-inner">
           <div className="ab-method-header">
             <div className="ab-eyebrow ab-reveal" data-delay="0">03 / Our Methodology</div>
             <h2 className="ab-method-headline ab-reveal" data-delay="80">
@@ -280,9 +419,11 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
+      {/* ════════════════════════════════════════════
+          HOW IT WORKS
+          ════════════════════════════════════════════ */}
       <section className="ab-how">
-        <div className="ab-how-inner">
+        <div className="ab-inner">
           <div className="ab-how-header">
             <div className="ab-eyebrow ab-reveal" data-delay="0">04 / How It Works</div>
             <h2 className="ab-how-headline ab-reveal" data-delay="80">
@@ -300,8 +441,14 @@ export default function About() {
           <div className="ab-how-steps">
             {HOW_STEPS.map((step, i) => (
               <div className="ab-how-step ab-reveal" key={step.num} data-delay={String(i * 120)}>
-                <div className="ab-how-step-num">{step.num}</div>
+                <div className="ab-how-step-left">
+                  <div className="ab-how-step-circle">
+                    <div className="ab-how-step-icon">{step.icon}</div>
+                  </div>
+                  {i < HOW_STEPS.length - 1 && <div className="ab-how-step-connector"></div>}
+                </div>
                 <div className="ab-how-step-body">
+                  <div className="ab-how-step-num">{step.num}</div>
                   <h3 className="ab-how-step-title">{step.title}</h3>
                   <p className="ab-how-step-desc">{step.desc}</p>
                 </div>
@@ -311,14 +458,28 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── OUR STORY ── */}
+      {/* ════════════════════════════════════════════
+          OUR STORY
+          ════════════════════════════════════════════ */}
       <section className="ab-story">
-        <div className="ab-story-inner">
+        <div className="ab-inner">
           <div className="ab-story-header">
             <div className="ab-eyebrow ab-reveal" data-delay="0">05 / Our Story</div>
             <h2 className="ab-story-headline ab-reveal" data-delay="80">
               The journey<br /><em>behind Persist.</em>
             </h2>
+          </div>
+
+          {/* Founder card */}
+          <div className="ab-founder ab-reveal" data-delay="0">
+            <div className="ab-founder-avatar">JJ</div>
+            <div className="ab-founder-info">
+              <div className="ab-founder-name">Jack Jay</div>
+              <div className="ab-founder-role">Founder &amp; CEO, Persist Ventures</div>
+            </div>
+            <p className="ab-founder-quote">
+              "Every venture was a stepping stone toward building the ecosystem I always needed."
+            </p>
           </div>
 
           <div className="ab-story-body">
@@ -473,10 +634,13 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── FINAL CTA ── */}
+      {/* ════════════════════════════════════════════
+          FINAL CTA
+          ════════════════════════════════════════════ */}
       <section className="ab-cta">
         <div className="ab-cta-grid"></div>
-        <div className="ab-cta-glow"></div>
+        <div className="ab-blob ab-blob-cta-1"></div>
+        <div className="ab-blob ab-blob-cta-2"></div>
         <div className="ab-cta-noise"></div>
         <div className="ab-cta-inner">
           <div className="ab-eyebrow ab-eyebrow--center ab-reveal" data-delay="0">Join Us</div>
