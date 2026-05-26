@@ -762,6 +762,17 @@ export default function Home() {
       items.forEach(el => io.observe(el))
     })()
 
+    /* ── FINAL CTA SECTION REVEAL ────────────────────────────── */
+    const finalCtaSection = document.getElementById('apply')
+    if (finalCtaSection) {
+      const finalCtaObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          e.target.classList.toggle('is-in-view', e.isIntersecting)
+        })
+      }, { threshold: 0.1 })
+      finalCtaObs.observe(finalCtaSection)
+    }
+
   }, [])
 
   return (

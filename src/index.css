@@ -2118,6 +2118,55 @@ body::before {
   background: var(--violet); opacity: .7;
 }
 
+/* ── FINAL CTA SCROLL REVEAL ────────────────────────────── */
+/* initial hidden state — fade + rise */
+.final-cta-cohort,
+.final-cta-eyebrow,
+.final-cta-hero-line1,
+.final-cta-hero-line2,
+.final-cta-drop {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.85s cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* button & partner: opacity only — transform is reserved for hover/magnetic */
+.final-cta-apply-btn {
+  opacity: 0;
+  transition: opacity 0.85s ease, transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+.final-cta-partner {
+  opacity: 0;
+  transition: opacity 0.85s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+/* staggered reveal when section enters viewport */
+.final-cta.is-in-view .final-cta-cohort {
+  opacity: 1; transform: translateY(0); transition-delay: 0ms;
+}
+.final-cta.is-in-view .final-cta-eyebrow {
+  opacity: 1; transform: translateY(0); transition-delay: 130ms;
+}
+.final-cta.is-in-view .final-cta-hero-line1 {
+  opacity: 1; transform: translateY(0); transition-delay: 270ms;
+}
+.final-cta.is-in-view .final-cta-hero-line2 {
+  opacity: 1; transform: translateY(0); transition-delay: 410ms;
+}
+.final-cta.is-in-view .final-cta-drop {
+  opacity: 1; transform: translateY(0); transition-delay: 530ms;
+}
+/* button: per-property delays so opacity staggers in but hover stays instant */
+.final-cta.is-in-view .final-cta-apply-btn {
+  opacity: 1;
+  transition: opacity 0.85s ease 0.62s, transform 0.25s ease 0s, background 0.25s ease 0s, box-shadow 0.25s ease 0s;
+}
+.final-cta.is-in-view .final-cta-partner {
+  opacity: 1;
+  transition: opacity 0.85s ease 0.7s, color 0.25s ease 0s, border-color 0.25s ease 0s;
+}
+/* stats (.final-cta-stat) already have their own is-in observer + stagger in JS */
+
 /* ================== FOOTER ================== */
 .footer {
   background: var(--void);
