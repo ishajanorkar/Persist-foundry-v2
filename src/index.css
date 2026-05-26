@@ -156,7 +156,9 @@ body::before {
   white-space: nowrap;
   letter-spacing: 0.01em;
   transition: color 0.25s ease, background 0.25s ease;
+  display: inline-flex; align-items: center; gap: 4px;
 }
+.nav-pill-chevron { opacity: 0.6; flex-shrink: 0; }
 .nav-pill-link:hover { color: var(--paper); background: rgba(120, 84, 213, 0.14); }
 .nav-pill-link.is-active {
   color: var(--paper);

@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 const LINKS = [
-  { label: 'Impact',    id: 'impact' },
-  { label: 'Portfolio', id: 'portfolio' },
-  { label: 'Offer',     id: 'offer' },
-  { label: 'Apply',     id: 'filter' },
-  { label: 'Backed',    id: 'backed' },
+  { label: 'Home',         href: '/' },
+  { label: 'About',        id: 'impact' },
+  { label: 'Our Team',     id: 'backed' },
+  { label: 'Portfolio',    id: 'portfolio' },
+  { label: 'Careers',      id: 'offer' },
+  { label: 'Work With Us', href: '#', dropdown: true },
+  { label: 'Blog',         href: '#' },
+  { label: 'Contact Us',   id: 'apply' },
 ]
 
 export default function Navbar() {
@@ -65,13 +68,19 @@ export default function Navbar() {
 
         {/* CENTER PILL — desktop only */}
         <div className="nav-pill" aria-label="Navigation">
-          {LINKS.map(({ label, id }) => (
+          {LINKS.map(({ label, id, href, dropdown }) => (
             <a
-              key={id}
-              href={isHome ? `#${id}` : `/#${id}`}
+              key={label}
+              href={id ? (isHome ? `#${id}` : `/#${id}`) : href}
               className={`nav-pill-link${active === id ? ' is-active' : ''}`}
+              onClick={id ? (e) => { e.preventDefault(); go(id) } : undefined}
             >
               {label}
+              {dropdown && (
+                <svg className="nav-pill-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                  <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
             </a>
           ))}
         </div>
@@ -112,16 +121,21 @@ export default function Navbar() {
         </div>
 
         <nav className="nav-mobile-links">
-          {LINKS.map(({ label, id }, i) => (
+          {LINKS.map(({ label, id, href, dropdown }, i) => (
             <a
-              key={id}
-              href={isHome ? `#${id}` : `/#${id}`}
+              key={label}
+              href={id ? (isHome ? `#${id}` : `/#${id}`) : href}
               className={`nav-mobile-link${mobileOpen ? ' is-visible' : ''}`}
               style={{ transitionDelay: mobileOpen ? `${80 + i * 55}ms` : '0ms' }}
-              onClick={() => setMobileOpen(false)}
+              onClick={() => { if (id) go(id); else setMobileOpen(false) }}
             >
               <span className="nav-mobile-num">{String(i + 1).padStart(2, '0')}</span>
               {label}
+              {dropdown && (
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true" style={{marginLeft: '6px', opacity: 0.6}}>
+                  <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
             </a>
           ))}
         </nav>
