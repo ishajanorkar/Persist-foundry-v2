@@ -146,65 +146,55 @@ const XIcon = () => (
 /* ── card ────────────────────────────────────────────────── */
 function TeamCard({ person, revealDelay }) {
   const hasImg = !!person.img
+  const hasSocials = !!(person.li || person.x)
   return (
     <div className="tm-card tm-reveal-el" data-delay={revealDelay || '0'}>
-      {/* portrait */}
-      <div className="tm-ph-frame">
-        <div className={`tm-portrait${hasImg ? ' tm-portrait--photo' : ''}`}>
-          {hasImg && (
-            <img
-              src={person.img}
-              alt={person.name}
-              className="tm-portrait-img"
-            />
-          )}
-          <div className="tm-ph-name">{person.name.split(' ')[0]}</div>
-        </div>
-        {/* top-left index badge */}
-        <div className="tm-idx" aria-hidden="true">
-          <span className="tm-pip"></span>
-          {String(person.idx).padStart(2, '0')}&thinsp;/&thinsp;{String(TOTAL).padStart(2, '0')}
-        </div>
-        {/* corner quote */}
-        <div className="tm-corner" aria-hidden="true">&ldquo;</div>
+
+      {/* full-bleed portrait */}
+      <div className={`tm-portrait${hasImg ? ' tm-portrait--photo' : ''}`}>
+        {hasImg && (
+          <img
+            src={person.img}
+            alt={person.name}
+            className="tm-portrait-img"
+          />
+        )}
+        <div className="tm-ph-name">{person.name.split(' ')[0]}</div>
       </div>
 
-      {/* meta */}
-      <div className="tm-meta">
-        <div className="tm-role"><span className="tm-dash"></span>{person.role}</div>
-        <h3 className="tm-name">{person.name}</h3>
+      {/* gradient scrim */}
+      <div className="tm-scrim" aria-hidden="true"></div>
 
-        {/* hover-reveal bio + links */}
-        <div className="tm-reveal">
-          <div className="tm-reveal-inner">
-            <div className="tm-rule"></div>
-            <p>{person.bio}</p>
-            {(person.li || person.x) && (
-              <div className="tm-links">
-                {person.li && (
-                  <a
-                    href={`https://www.linkedin.com/in/${person.li}/`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${person.name} on LinkedIn`}
-                  >
-                    <LiIcon />
-                  </a>
-                )}
-                {person.x && (
-                  <a
-                    href={`https://x.com/${person.x}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${person.name} on X`}
-                  >
-                    <XIcon />
-                  </a>
-                )}
-              </div>
+      {/* bottom block — role, name rises, bio + socials fade+rise */}
+      <div className="tm-block">
+        <div className="tm-role">{person.role}</div>
+        <h3 className="tm-name">{person.name}</h3>
+        <div className="tm-hairline" aria-hidden="true"></div>
+        <p className="tm-bio">{person.bio}</p>
+        {hasSocials && (
+          <div className="tm-socials">
+            {person.li && (
+              <a
+                href={`https://www.linkedin.com/in/${person.li}/`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${person.name} on LinkedIn`}
+              >
+                <LiIcon />
+              </a>
+            )}
+            {person.x && (
+              <a
+                href={`https://x.com/${person.x}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${person.name} on X`}
+              >
+                <XIcon />
+              </a>
             )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
@@ -280,120 +270,27 @@ export default function Team() {
       <div className="progress" id="progress"></div>
 
       {/* ════════════════════════════════════════════
-          HERO
+          ALL MEMBERS — single unified grid
           ════════════════════════════════════════════ */}
-      <section className="tm-hero">
-        <div className="tm-hero-grid-bg"></div>
-        <div className="tm-blob tm-blob-1"></div>
-        <div className="tm-blob tm-blob-2"></div>
-        <div className="tm-hero-vignette"></div>
-
-        <div className="tm-hero-inner">
-          <div className="tm-hero-eyebrow tm-reveal-el" data-delay="0">
-            <span className="tm-hero-pip"></span>
-            Our Team &nbsp;·&nbsp; {String(TOTAL).padStart(2, '0')}
-          </div>
-          <h1 className="tm-hero-headline tm-reveal-el" data-delay="100">
-            The people who<br />
-            <em>said yes first.</em>
-          </h1>
-          <p className="tm-hero-sub tm-reveal-el" data-delay="220">
-            Operators, advisors, researchers, and builders who bet on this
-            ecosystem before it was obvious.
-          </p>
-          <div className="tm-hero-tags tm-reveal-el" data-delay="320">
-            <span>Operators</span>
-            <span className="tm-hero-sep">·</span>
-            <b>investors</b>
-            <span className="tm-hero-sep">·</span>
-            <span>researchers</span>
-            <span className="tm-hero-sep">·</span>
-            <b>builders</b>
-          </div>
-        </div>
-
-        <div className="tm-hero-scroll" aria-hidden="true">
-          Scroll
-          <div className="tm-hero-scroll-line"></div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════
-          LEADERSHIP
-          ════════════════════════════════════════════ */}
-      <section className="tm-section">
+      <section className="tm-section tm-section--first">
         <div className="tm-section-inner">
-          <div className="tm-head tm-reveal-el" data-delay="0">
-            <div className="tm-head-left">
-              <div className="tm-kicker">
-                <span className="tm-kicker-dash"></span>
-                <span className="tm-kicker-pip"></span>
-                Leadership &nbsp;·&nbsp; {String(LEADERSHIP.length).padStart(2, '0')}
-              </div>
-              <h2 className="tm-head-h2">The founding vision.<br /><em>Where it all starts.</em></h2>
-            </div>
-            <div className="tm-head-right">
-              Founders<br /><b>operators · builders</b><br />since 2017
-            </div>
-          </div>
 
-          <div className="tm-grid tm-grid--2">
-            {LEADERSHIP.map((p, i) => (
-              <TeamCard key={p.idx} person={p} revealDelay={String(i * 110)} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════
-          ADVISORS & BOARD
-          ════════════════════════════════════════════ */}
-      <section className="tm-section tm-section--alt">
-        <div className="tm-section-inner">
-          <div className="tm-head tm-reveal-el" data-delay="0">
-            <div className="tm-head-left">
-              <div className="tm-kicker">
-                <span className="tm-kicker-dash"></span>
-                <span className="tm-kicker-pip"></span>
-                Advisors &amp; Board &nbsp;·&nbsp; {String(ADVISORS.length).padStart(2, '0')}
-              </div>
-              <h2 className="tm-head-h2">Forged at the foundry.<br /><em>Eight quiet hands.</em></h2>
+          {/* page header */}
+          <div className="tm-page-head tm-reveal-el" data-delay="0">
+            <div className="tm-page-kicker">
+              <span className="tm-kicker-dash"></span>
+              <span className="tm-kicker-pip"></span>
+              Our Team
             </div>
-            <div className="tm-head-right">
-              Operators<br /><b>investors · researchers</b><br />writers · friends
-            </div>
+            <h1 className="tm-page-headline">Team Persist</h1>
+            <p className="tm-page-sub">
+              Operators, advisors, and builders. The quiet hands behind every bet we make.
+            </p>
           </div>
 
           <div className="tm-grid">
-            {ADVISORS.map((p, i) => (
-              <TeamCard key={p.idx} person={p} revealDelay={String((i % 4) * 85)} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════
-          CORE OPERATIONS
-          ════════════════════════════════════════════ */}
-      <section className="tm-section">
-        <div className="tm-section-inner">
-          <div className="tm-head tm-reveal-el" data-delay="0">
-            <div className="tm-head-left">
-              <div className="tm-kicker">
-                <span className="tm-kicker-dash"></span>
-                <span className="tm-kicker-pip"></span>
-                Core Operations &nbsp;·&nbsp; {String(OPERATIONS.length).padStart(2, '0')}
-              </div>
-              <h2 className="tm-head-h2">The people<br /><em>behind the scenes.</em></h2>
-            </div>
-            <div className="tm-head-right">
-              Operations<br /><b>design · engineering</b><br />management
-            </div>
-          </div>
-
-          <div className="tm-grid tm-grid--3">
-            {OPERATIONS.map((p, i) => (
-              <TeamCard key={p.idx} person={p} revealDelay={String(i * 90)} />
+            {[...LEADERSHIP, ...ADVISORS, ...OPERATIONS].map((p, i) => (
+              <TeamCard key={p.idx} person={p} revealDelay={String((i % 4) * 70)} />
             ))}
           </div>
         </div>
