@@ -2615,6 +2615,45 @@ body::before {
   .portfolio-row.is-reversed .portfolio-row-tag { margin-left: 0; }
   .portfolio-row-right { border-radius: 8px; aspect-ratio: 1.9 / 1; }
   .portfolio-v2-cta-link { padding: 16px 28px; font-size: 10px; }
+
+  /* ── 1. Panel-2: push content up so it clears the scroll cue ── */
+  .panel-2 { align-items: center; padding: 60px 20px 100px; }
+
+  /* ── 2. Marquee logos bigger on phone ── */
+  .marquee-logo { height: 64px; }
+  .marquee-logo img { max-height: 36px; max-width: 120px; }
+  .marquee-logo.is-stacked img { max-height: 48px; max-width: 100px; }
+
+  /* ── 3. "W" last logo centred in 2-col grid ── */
+  .backed-v2-cell:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    max-width: 50%;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* ── 4. Impact numbers: centred layout ── */
+  .impact-grid { grid-template-columns: 1fr; }
+  .impact-stat { text-align: center; padding: 28px 0 !important; }
+  .impact-num { justify-content: center; font-size: clamp(64px, 18vw, 100px); }
+
+  /* ── 5. Portfolio row 2 (is-reversed): same layout as rows 1 & 3 ── */
+  .portfolio-row.is-reversed .portfolio-row-desc { margin-left: 0; text-align: left; }
+  .portfolio-row.is-reversed .portfolio-row-name { text-align: left; }
+  .portfolio-row.is-reversed .portfolio-row-tag { text-align: left; }
+
+  /* ── 6. Filter cards: tighter padding + fix strikethrough width ── */
+  .filter-col { padding: 28px 20px; }
+  .filter-list li { font-size: clamp(16px, 4.5vw, 22px); padding: 8px 0 8px 30px; }
+  .filter-col.no .filter-list li::after {
+    left: 30px;
+    transform: scaleX(0);
+  }
+  .filter-col.no .filter-list li.is-revealed::after { transform: scaleX(1); }
+
+  /* ── 7. Footer subscribe button — prevent text clipping ── */
+  .footer-newsletter-btn { padding: 12px 12px; font-size: 9px; letter-spacing: 0.14em; }
+  .footer-newsletter-input { padding: 12px 10px; font-size: 10px; }
 }
 
 /* ── Very small phone (≤ 380px) ── */
