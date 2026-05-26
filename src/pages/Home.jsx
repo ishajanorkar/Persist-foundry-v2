@@ -217,9 +217,14 @@ export default function Home() {
       const railH = newHeight > 0 ? newHeight : rail.offsetHeight
       offerSteps.forEach((step, i) => {
         if (!offerVPips[i]) return
-        const stepTop = step.getBoundingClientRect().top + window.scrollY
-        const cy = stepTop - railTop + step.offsetHeight / 2
-        offerVPips[i].style.top = Math.max(0, Math.min(100, cy / railH * 100)) + '%'
+        // Last pip sits at the very end of the line (100%)
+        if (i === offerSteps.length - 1) {
+          offerVPips[i].style.top = '100%'
+        } else {
+          const stepTop = step.getBoundingClientRect().top + window.scrollY
+          const cy = stepTop - railTop + step.offsetHeight / 2
+          offerVPips[i].style.top = Math.max(0, Math.min(99, cy / railH * 100)) + '%'
+        }
       })
     }
     requestAnimationFrame(() => requestAnimationFrame(positionVPips))
