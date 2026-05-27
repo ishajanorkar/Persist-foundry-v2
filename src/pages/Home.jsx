@@ -858,8 +858,6 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="scroll-cue" id="scrollCue">Scroll<div className="line"></div></div>
-
           {/* PANEL 2 — RECOGNITION */}
           <div className="panel panel-2" id="panel2">
             <div className="panel-2-inner">
