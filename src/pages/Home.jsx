@@ -206,10 +206,14 @@ export default function Home() {
       const scrolled = Math.max(0, -rect.top)
       const progress = wrapScrollH > 0 ? Math.min(1, scrolled / wrapScrollH) : 0
       const n = offerPinCards.length
-      const activeIdx = Math.min(n - 1, Math.floor(progress * n))
+      // Give each card its own equal band of scroll progress
+      // Slight offset so card 0 enters at start, card n-1 peaks near end
+      const raw = progress * (n + 0.6) - 0.3 // shifts window so first card enters immediately
+      const activeIdx = Math.min(n - 1, Math.max(0, Math.floor(raw)))
       offerPinCards.forEach((card, i) => {
+        const reached = i <= activeIdx
         card.classList.toggle('is-active', i === activeIdx)
-        card.classList.toggle('is-past', i < activeIdx)
+        card.classList.toggle('is-past', reached && i < activeIdx)
       })
       if (offerStageNum) offerStageNum.textContent = String(activeIdx + 1).padStart(2, '0')
       offerTicking = false

@@ -906,7 +906,7 @@ body::before {
 /* ================== OFFER ================== */
 .offer-pin-wrap {
   position: relative;
-  height: 600vh;
+  height: 800vh;
 }
 .offer {
   background: var(--night);
@@ -1098,51 +1098,109 @@ body::before {
 .offer-step:nth-child(2) { margin-left: auto; margin-right: 5%; }
 .offer-step:nth-child(4) { margin-left: auto; margin-right: 0; }
 .offer-step:nth-child(6) { margin-left: auto; margin-right: 8%; }
+/* ── base card: starts invisible, entry offset via CSS custom props ── */
 .offer-card {
-  background: linear-gradient(160deg, rgba(120,84,213,0.12) 0%, rgba(18,10,36,0.7) 100%);
   border: 1px solid var(--hairline-strong);
   border-radius: 12px;
   padding: 28px 24px 24px;
   position: absolute;
   width: clamp(220px, 23vw, 330px);
   overflow: hidden;
-  transition: opacity 0.65s cubic-bezier(0.2,0.8,0.2,1), transform 0.65s cubic-bezier(0.2,0.8,0.2,1), border-color 0.5s ease, box-shadow 0.5s ease, filter 0.65s ease, z-index 0s;
+  /* entry offset + tilt + scale using per-card custom props */
+  transform: translate(var(--tx, 0px), var(--ty, 0px)) rotate(var(--r, 0deg)) scale(0.82);
+  opacity: 0;
+  filter: blur(4px);
+  transition: opacity 0.7s cubic-bezier(0.2,0.8,0.2,1), transform 0.7s cubic-bezier(0.2,0.8,0.2,1), border-color 0.5s ease, box-shadow 0.5s ease, filter 0.7s ease;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  opacity: 0.28;
-  filter: blur(2px);
   z-index: 1;
   will-change: transform, opacity, filter;
-  cursor: pointer;
 }
 
-/* ── scattered float positions + natural tilts (base = dimmed state) ── */
-.offer-field .offer-card[data-idx="0"] { top: 16%;  left: 3%;   transform: rotate(-2.5deg) scale(0.93); }
-.offer-field .offer-card[data-idx="1"] { top: 4%;   right: 5%;  transform: rotate(2deg)   scale(0.93); }
-.offer-field .offer-card[data-idx="2"] { top: 44%;  left: 27%;  transform: rotate(-1deg)  scale(0.93); }
-.offer-field .offer-card[data-idx="3"] { top: 20%;  right: 16%; transform: rotate(2.8deg) scale(0.93); }
-.offer-field .offer-card[data-idx="4"] { bottom: 8%; left: 7%;  transform: rotate(-1.8deg) scale(0.93); }
-.offer-field .offer-card[data-idx="5"] { bottom: 5%; right: 3%; transform: rotate(1.5deg) scale(0.93); }
+/* ─────────────────────────────────────────────────────────────────────────
+   PER-CARD SCATTER POSITIONS  +  ENTRY VECTORS  +  UNIQUE LAYOUTS
+   ────────────────────────────────────────────────────────────────────── */
 
-/* ── active card — spotlight, no tilt ── */
+/* Card 0 — The runway — upper-left, flies in from left */
+.offer-field .offer-card[data-idx="0"] {
+  --tx: -90px; --ty: 30px; --r: -3deg;
+  top: 14%; left: 4%;
+  background: linear-gradient(155deg, rgba(120,84,213,0.14) 0%, rgba(12,7,26,0.88) 100%);
+  width: clamp(240px, 25vw, 360px);
+}
+
+/* Card 1 — The team — upper-right, flies in from top-right, centered content */
+.offer-field .offer-card[data-idx="1"] {
+  --tx: 80px; --ty: -60px; --r: 2.5deg;
+  top: 5%; right: 6%;
+  background: linear-gradient(175deg, rgba(97,69,169,0.1) 0%, rgba(8,5,20,0.92) 100%);
+  text-align: center;
+  width: clamp(210px, 21vw, 300px);
+}
+.offer-field .offer-card[data-idx="1"] .offer-card-top { flex-direction: column; align-items: center; gap: 12px; margin-bottom: 20px; }
+.offer-field .offer-card[data-idx="1"] .offer-card-icon-wrap { width: 50px; height: 50px; margin: 0 auto; }
+.offer-field .offer-card[data-idx="1"] .offer-card-icon { width: 22px; height: 22px; }
+.offer-field .offer-card[data-idx="1"] .offer-card-bottom { text-align: center; }
+
+/* Card 2 — The investment — center, rises from below, no icon, wide */
+.offer-field .offer-card[data-idx="2"] {
+  --tx: -30px; --ty: 80px; --r: -1deg;
+  top: 42%; left: 26%;
+  background: linear-gradient(140deg, rgba(74,46,159,0.22) 0%, rgba(10,6,22,0.9) 100%);
+  width: clamp(250px, 26vw, 380px);
+}
+.offer-field .offer-card[data-idx="2"] .offer-card-icon-wrap { display: none; }
+.offer-field .offer-card[data-idx="2"] .offer-card-label { padding-left: 0; }
+.offer-field .offer-card[data-idx="2"] .offer-card-name { font-size: clamp(22px, 2.2vw, 34px); }
+
+/* Card 3 — The room — mid-right, flies in from right, left accent border */
+.offer-field .offer-card[data-idx="3"] {
+  --tx: 90px; --ty: -30px; --r: 3deg;
+  top: 22%; right: 15%;
+  background: linear-gradient(160deg, rgba(100,70,200,0.16) 0%, rgba(14,9,30,0.86) 100%);
+  border-left: 2px solid rgba(139,92,246,0.45);
+  border-radius: 4px 12px 12px 4px;
+  width: clamp(220px, 22vw, 320px);
+}
+
+/* Card 4 — The shortcut — lower-left, diagonal entry from bottom-left */
+.offer-field .offer-card[data-idx="4"] {
+  --tx: -70px; --ty: 80px; --r: -2deg;
+  bottom: 9%; left: 6%;
+  background: linear-gradient(170deg, rgba(55,30,110,0.28) 0%, rgba(8,5,18,0.94) 100%);
+  width: clamp(230px, 24vw, 345px);
+}
+.offer-field .offer-card[data-idx="4"] .offer-card-proof { color: rgba(199,184,245,0.55); font-size: clamp(11px, 1vw, 15px); }
+
+/* Card 5 — The ownership — lower-right, flies in from right, typographic */
+.offer-field .offer-card[data-idx="5"] {
+  --tx: 80px; --ty: 60px; --r: 1.8deg;
+  bottom: 5%; right: 4%;
+  background: linear-gradient(148deg, rgba(120,84,213,0.09) 0%, rgba(15,9,28,0.96) 100%);
+  width: clamp(220px, 22vw, 315px);
+}
+.offer-field .offer-card[data-idx="5"] .offer-card-num { color: rgba(199,184,245,0.13); }
+
+/* ── ACTIVE — spotlight, straight, glowing ── */
 .offer-field .offer-card.is-active {
   opacity: 1;
-  transform: rotate(0deg) scale(1.04);
+  transform: rotate(0deg) scale(1.05) translate(0, 0);
   filter: blur(0);
-  border-color: rgba(120, 84, 213, 0.8);
-  box-shadow: 0 0 0 1px rgba(120,84,213,0.14), 0 10px 70px rgba(97,69,169,0.55), 0 0 130px rgba(97,69,169,0.18);
+  border-color: rgba(120, 84, 213, 0.82);
+  box-shadow: 0 0 0 1px rgba(120,84,213,0.15), 0 12px 80px rgba(97,69,169,0.6), 0 0 140px rgba(97,69,169,0.2);
   z-index: 10;
 }
 .offer-field .offer-card.is-active .offer-card-icon-wrap {
-  background: rgba(97,69,169,0.25);
-  border-color: rgba(120,84,213,0.55);
+  background: rgba(97,69,169,0.28);
+  border-color: rgba(120,84,213,0.6);
 }
-.offer-field .offer-card.is-active .offer-card-num { color: rgba(155,127,228,0.16); }
+.offer-field .offer-card.is-active .offer-card-num { color: rgba(155,127,228,0.18); }
 
-/* ── past card — slightly visible, keeps tilt ── */
+/* ── PAST — settled at scatter position, faded, keeps tilt ── */
 .offer-field .offer-card.is-past {
-  opacity: 0.42;
-  filter: blur(0.8px);
+  opacity: 0.38;
+  filter: blur(0.6px);
+  transform: rotate(var(--r, 0deg)) scale(0.94);
 }
 
 /* scroll-into-view glow — on while card is in viewport, off when it leaves */
@@ -2579,10 +2637,19 @@ body::before {
   .offer-field .offer-card[data-idx="2"],
   .offer-field .offer-card[data-idx="3"],
   .offer-field .offer-card[data-idx="4"],
-  .offer-field .offer-card[data-idx="5"] { position: relative; width: 100%; top: auto; left: auto; right: auto; bottom: auto; opacity: 1; transform: none; filter: none; }
-  .offer-field .offer-card.is-past { opacity: 1; transform: none; filter: none; }
+  .offer-field .offer-card[data-idx="5"] {
+    position: relative !important;
+    width: 100% !important;
+    top: auto !important; left: auto !important; right: auto !important; bottom: auto !important;
+    opacity: 1 !important; transform: none !important; filter: none !important;
+    text-align: left;
+  }
+  .offer-field .offer-card[data-idx="1"] .offer-card-top { flex-direction: row; align-items: center; }
+  .offer-field .offer-card[data-idx="2"] .offer-card-icon-wrap { display: flex; }
+  .offer-field .offer-card.is-past { opacity: 1 !important; transform: none !important; filter: none !important; }
+  .offer-field .offer-card.is-active { box-shadow: none; }
   .offer-card-name { font-size: clamp(18px, 5vw, 26px); }
-  .offer-card-proof { font-size: 13px; }
+  .offer-card-proof { font-size: 13px; color: var(--stone-soft) !important; }
   .offer-card-top { margin-bottom: 16px; }
   .offer-card-step-of { display: none; }
 
