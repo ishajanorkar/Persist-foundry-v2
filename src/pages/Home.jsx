@@ -193,109 +193,31 @@ export default function Home() {
       })
     }
 
-    /* ── OFFER STAIRCASE REVEAL + PROGRESS ───────────────────── */
-    const offerSteps = document.querySelectorAll('.offer-step')
-    const offerProgressNum = document.getElementById('offerProgressNum')
-    const offerProgressFill = document.getElementById('offerProgressFill')
-    const offerVPips = document.querySelectorAll('.offer-v-pip')
-    const offerVFill = document.getElementById('offerVFill')
+    /* ── OFFER PIN SCROLL ──────────────────────────────────────── */
+    const offerPinWrap = document.getElementById('offerPinWrap')
+    const offerStageNum = document.getElementById('offerStageNum')
+    const offerPinCards = Array.from(document.querySelectorAll('.offer-field .offer-card'))
+    let offerTicking = false
 
-    function positionVPips() {
-      const rail = document.getElementById('offerVRail')
-      if (!rail || !offerVPips.length || !offerSteps.length) return
-
-      // Clip rail to end exactly at the bottom of the last card
-      const railRect = rail.getBoundingClientRect()
-      const lastStep = offerSteps[offerSteps.length - 1]
-      const newHeight = lastStep.getBoundingClientRect().bottom - railRect.top
-      if (newHeight > 0) {
-        rail.style.height = newHeight + 'px'
-        rail.style.bottom = 'auto'
-      }
-
-      const railTop = railRect.top + window.scrollY
-      const railH = newHeight > 0 ? newHeight : rail.offsetHeight
-      offerSteps.forEach((step, i) => {
-        if (!offerVPips[i]) return
-        // Last pip sits at the very end of the line (100%)
-        if (i === offerSteps.length - 1) {
-          offerVPips[i].style.top = '100%'
-        } else {
-          const stepTop = step.getBoundingClientRect().top + window.scrollY
-          const cy = stepTop - railTop + step.offsetHeight / 2
-          offerVPips[i].style.top = Math.max(0, Math.min(99, cy / railH * 100)) + '%'
-        }
+    function updateOffer() {
+      if (!offerPinWrap || !offerPinCards.length) { offerTicking = false; return }
+      const rect = offerPinWrap.getBoundingClientRect()
+      const wrapScrollH = offerPinWrap.offsetHeight - window.innerHeight
+      const scrolled = Math.max(0, -rect.top)
+      const progress = wrapScrollH > 0 ? Math.min(1, scrolled / wrapScrollH) : 0
+      const n = offerPinCards.length
+      const activeIdx = Math.min(n - 1, Math.floor(progress * n))
+      offerPinCards.forEach((card, i) => {
+        card.classList.toggle('is-active', i === activeIdx)
+        card.classList.toggle('is-past', i < activeIdx)
       })
-    }
-    requestAnimationFrame(() => requestAnimationFrame(positionVPips))
-    window.addEventListener('resize', positionVPips, { passive: true })
-
-    function setOfferStep(idx) {
-      if (offerProgressNum) offerProgressNum.textContent = String(idx + 1).padStart(2, '0')
-      if (offerProgressFill) offerProgressFill.style.width = ((idx + 1) / offerSteps.length) * 100 + '%'
-      offerVPips.forEach((pip, i) => {
-        pip.classList.toggle('is-done', i < idx)
-        pip.classList.toggle('is-active', i === idx)
-      })
-      const activePip = offerVPips[idx]
-      if (offerVFill && activePip && activePip.style.top) {
-        offerVFill.style.height = activePip.style.top
-      }
-    }
-
-    const stepRevealObs = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const idx = parseInt(entry.target.dataset.idx, 10) || 0
-          setTimeout(() => entry.target.classList.add('is-revealed'), idx % 2 * 80)
-          stepRevealObs.unobserve(entry.target)
-        }
-      })
-    }, { threshold: 0.25, rootMargin: '0px 0px -10% 0px' })
-    offerSteps.forEach(step => stepRevealObs.observe(step))
-
-    const stepGlowObs = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        entry.target.classList.toggle('is-in-view', entry.isIntersecting)
-      })
-    }, { threshold: 0.25, rootMargin: '0px 0px -10% 0px' })
-    offerSteps.forEach(step => stepGlowObs.observe(step))
-
-    const stepProgressObs = new IntersectionObserver(() => {
-      let mostVisible = null, highestRatio = 0
-      offerSteps.forEach(step => {
-        const r = step.getBoundingClientRect()
-        const vh = window.innerHeight
-        const visH = Math.max(0, Math.min(vh, r.bottom) - Math.max(0, r.top))
-        const ratio = visH / Math.min(r.height, vh)
-        if (ratio > highestRatio) { highestRatio = ratio; mostVisible = step }
-      })
-      if (mostVisible) {
-        const idx = parseInt(mostVisible.dataset.idx, 10) || 0
-        setOfferStep(idx)
-      }
-    }, { threshold: [0, 0.25, 0.5, 0.75, 1] })
-    offerSteps.forEach(step => stepProgressObs.observe(step))
-
-    let offerScrollTicking = false
-    function updateOfferProgress() {
-      const vh = window.innerHeight
-      let mostVisible = null, highestRatio = 0
-      offerSteps.forEach(step => {
-        const r = step.getBoundingClientRect()
-        const visH = Math.max(0, Math.min(vh, r.bottom) - Math.max(0, r.top))
-        const ratio = visH / Math.min(r.height, vh)
-        if (ratio > highestRatio) { highestRatio = ratio; mostVisible = step }
-      })
-      if (mostVisible) {
-        const idx = parseInt(mostVisible.dataset.idx, 10) || 0
-        setOfferStep(idx)
-      }
-      offerScrollTicking = false
+      if (offerStageNum) offerStageNum.textContent = String(activeIdx + 1).padStart(2, '0')
+      offerTicking = false
     }
     window.addEventListener('scroll', () => {
-      if (!offerScrollTicking) { requestAnimationFrame(updateOfferProgress); offerScrollTicking = true }
+      if (!offerTicking) { requestAnimationFrame(updateOffer); offerTicking = true }
     }, { passive: true })
+    updateOffer()
 
     /* ── FILTER LIST REVEAL ──────────────────────────────────── */
     const filterItems = document.querySelectorAll('.filter-list li')
@@ -1165,28 +1087,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* OFFER — DIAGONAL STAIRCASE */}
-      <section className="offer" id="offer">
-        <div className="offer-header">
-          <div className="offer-header-left">
+      {/* OFFER — SCROLL-PINNED GRID */}
+      <div className="offer-pin-wrap" id="offerPinWrap">
+        <section className="offer" id="offer">
+          <div className="offer-stage-num" id="offerStageNum" aria-hidden="true">01</div>
+
+          <div className="offer-pin-head">
             <div className="offer-eyebrow">What you get</div>
             <h2 className="offer-title">Six things.<br /><em>Nothing extra. Nothing missing.</em></h2>
           </div>
-        </div>
 
-        <div className="offer-stairs" id="offerStairs">
-          <div className="offer-v-rail" id="offerVRail">
-            <div className="offer-v-track"></div>
-            <div className="offer-v-fill" id="offerVFill"></div>
-            <div className="offer-v-pip" data-pip="0"></div>
-            <div className="offer-v-pip" data-pip="1"></div>
-            <div className="offer-v-pip" data-pip="2"></div>
-            <div className="offer-v-pip" data-pip="3"></div>
-            <div className="offer-v-pip" data-pip="4"></div>
-            <div className="offer-v-pip" data-pip="5"></div>
-          </div>
-          <div className="offer-step" data-idx="0">
-            <div className="offer-card">
+          <div className="offer-field" id="offerField">
+
+            <div className="offer-card" data-idx="0">
               <div className="offer-card-num">01</div>
               <div className="offer-card-top">
                 <span className="offer-card-icon-wrap">
@@ -1200,12 +1113,10 @@ export default function Home() {
                 <div className="offer-card-name">Your <em>move.</em></div>
                 <p className="offer-card-proof">Monthly capital so you can leave the job, stop explaining yourself, and start. Full-time or nothing.</p>
               </div>
-              <div className="offer-card-step-of">Step 01 / 06</div>
+              <div className="offer-card-step-of">01 / 06</div>
             </div>
-          </div>
 
-          <div className="offer-step" data-idx="1">
-            <div className="offer-card">
+            <div className="offer-card" data-idx="1">
               <div className="offer-card-num">02</div>
               <div className="offer-card-top">
                 <span className="offer-card-icon-wrap">
@@ -1220,12 +1131,10 @@ export default function Home() {
                 <div className="offer-card-name">Your <em>team.</em></div>
                 <p className="offer-card-proof">Designers, engineers, growth operators from day one. No hiring lag. No founder isolation.</p>
               </div>
-              <div className="offer-card-step-of">Step 02 / 06</div>
+              <div className="offer-card-step-of">02 / 06</div>
             </div>
-          </div>
 
-          <div className="offer-step" data-idx="2">
-            <div className="offer-card">
+            <div className="offer-card" data-idx="2">
               <div className="offer-card-num">03</div>
               <div className="offer-card-top">
                 <span className="offer-card-icon-wrap">
@@ -1240,12 +1149,10 @@ export default function Home() {
                 <div className="offer-card-name">The <em>capital.</em></div>
                 <p className="offer-card-proof">Pre-seed in at signing. Follow-on ready when you hit the next inflection point.</p>
               </div>
-              <div className="offer-card-step-of">Step 03 / 06</div>
+              <div className="offer-card-step-of">03 / 06</div>
             </div>
-          </div>
 
-          <div className="offer-step" data-idx="3">
-            <div className="offer-card">
+            <div className="offer-card" data-idx="3">
               <div className="offer-card-num">04</div>
               <div className="offer-card-top">
                 <span className="offer-card-icon-wrap">
@@ -1261,12 +1168,10 @@ export default function Home() {
                 <div className="offer-card-name">The <em>network.</em></div>
                 <p className="offer-card-proof">400+ operators, advisors, allies. The conversations that usually take a decade to get access to.</p>
               </div>
-              <div className="offer-card-step-of">Step 04 / 06</div>
+              <div className="offer-card-step-of">04 / 06</div>
             </div>
-          </div>
 
-          <div className="offer-step" data-idx="4">
-            <div className="offer-card">
+            <div className="offer-card" data-idx="4">
               <div className="offer-card-num">05</div>
               <div className="offer-card-top">
                 <span className="offer-card-icon-wrap">
@@ -1280,12 +1185,10 @@ export default function Home() {
                 <div className="offer-card-name">The <em>playbook.</em></div>
                 <p className="offer-card-proof">Nine years of frameworks, dead ends, and hard-won calls — so you skip the mistakes we already made.</p>
               </div>
-              <div className="offer-card-step-of">Step 05 / 06</div>
+              <div className="offer-card-step-of">05 / 06</div>
             </div>
-          </div>
 
-          <div className="offer-step" data-idx="5">
-            <div className="offer-card">
+            <div className="offer-card" data-idx="5">
               <div className="offer-card-num">06</div>
               <div className="offer-card-top">
                 <span className="offer-card-icon-wrap">
@@ -1299,11 +1202,12 @@ export default function Home() {
                 <div className="offer-card-name">The <em>company.</em></div>
                 <p className="offer-card-proof">Yours. We back the bet. You run the company. The work belongs to you.</p>
               </div>
-              <div className="offer-card-step-of">Step 06 / 06</div>
+              <div className="offer-card-step-of">06 / 06</div>
             </div>
+
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* MANIFESTO — CONVERGING DOTS NARRATIVE */}
       <section className="manifesto" id="manifesto">
