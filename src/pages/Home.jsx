@@ -788,6 +788,28 @@ export default function Home() {
       finalCtaObs.observe(finalCtaSection)
     }
 
+    /* ── STACKING PORTFOLIO CARDS ───────────────────────────── */
+    const pfStack = document.querySelector('.pf-stack')
+    if (pfStack) {
+      const stackCards = Array.from(pfStack.querySelectorAll('.portfolio-row'))
+      // Skip the scroll-reveal animation — cards are already visible in the stack
+      stackCards.forEach(card => card.classList.add('is-in-view'))
+      const STACK_TOP = 100 // matches sticky top in CSS
+      const updateStack = () => {
+        stackCards.forEach((card, i) => {
+          const next = stackCards[i + 1]
+          if (!next) { card.style.transform = ''; card.style.filter = ''; return }
+          const overlap = Math.max(0, Math.min(1,
+            (STACK_TOP + card.offsetHeight - next.getBoundingClientRect().top) / card.offsetHeight
+          ))
+          card.style.transform = `scale(${(1 - overlap * 0.04).toFixed(4)})`
+          card.style.filter = `brightness(${(1 - overlap * 0.22).toFixed(4)})`
+        })
+      }
+      window.addEventListener('scroll', updateStack, { passive: true })
+      updateStack()
+    }
+
   }, [])
 
   return (
@@ -1010,91 +1032,95 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="portfolio-row" data-row="0" data-url="https://opendroids.com/">
-            <div className="portfolio-row-left">
-              <div className="portfolio-row-tag">Robotics</div>
-              <h3 className="portfolio-row-name"><em>Open Droids</em></h3>
-              <p className="portfolio-row-desc">
-                Home robots that earn their keep. Built by someone who got tired of waiting for the future to arrive.
-              </p>
-              <div className="portfolio-row-stats">
-                <div>
-                  <div className="portfolio-row-stat-num">Pre-seed</div>
-                  <div className="portfolio-row-stat-label">Where they started</div>
-                </div>
-                <div>
-                  <div className="portfolio-row-stat-num">Series A<em>→</em></div>
-                  <div className="portfolio-row-stat-label">Where they're going</div>
-                </div>
-              </div>
-            </div>
-            <div className="portfolio-row-right">
-              <img src="/assets/opendroid-thumbnail.webp" alt="Open Droids" className="portfolio-row-thumb" />
-              <div className="portfolio-row-thumb-overlay"></div>
-              <div className="portfolio-row-meta">Case 01 / 03</div>
-              <div className="portfolio-row-visual-corner tl"></div>
-              <div className="portfolio-row-visual-corner tr"></div>
-              <div className="portfolio-row-visual-corner bl"></div>
-              <div className="portfolio-row-visual-corner br"></div>
-            </div>
-          </div>
+          <div className="pf-stack">
 
-          <div className="portfolio-row is-reversed" data-row="1" data-url="https://facesearchai.com/">
-            <div className="portfolio-row-left">
-              <div className="portfolio-row-tag">AI Privacy</div>
-              <h3 className="portfolio-row-name"><em>Face Search</em></h3>
-              <p className="portfolio-row-desc">
-                Find every place your face lives online. Built by someone who couldn't sleep until the problem was solved.
-              </p>
-              <div className="portfolio-row-stats">
-                <div>
-                  <div className="portfolio-row-stat-num">400K</div>
-                  <div className="portfolio-row-stat-label">Users</div>
-                </div>
-                <div>
-                  <div className="portfolio-row-stat-num">$8K<em>mrr</em></div>
-                  <div className="portfolio-row-stat-label">Climbing</div>
+            <div className="portfolio-row" data-row="0" data-url="https://opendroids.com/">
+              <div className="portfolio-row-left">
+                <div className="portfolio-row-tag">Robotics</div>
+                <h3 className="portfolio-row-name"><em>Open Droids</em></h3>
+                <p className="portfolio-row-desc">
+                  Home robots that earn their keep. Built by someone who got tired of waiting for the future to arrive.
+                </p>
+                <div className="portfolio-row-stats">
+                  <div>
+                    <div className="portfolio-row-stat-num">Pre-seed</div>
+                    <div className="portfolio-row-stat-label">Where they started</div>
+                  </div>
+                  <div>
+                    <div className="portfolio-row-stat-num">Series A<em>→</em></div>
+                    <div className="portfolio-row-stat-label">Where they're going</div>
+                  </div>
                 </div>
               </div>
+              <div className="portfolio-row-right">
+                <img src="/assets/opendroid-thumbnail.webp" alt="Open Droids" className="portfolio-row-thumb" />
+                <div className="portfolio-row-thumb-overlay"></div>
+                <div className="portfolio-row-meta">Case 01 / 03</div>
+                <div className="portfolio-row-visual-corner tl"></div>
+                <div className="portfolio-row-visual-corner tr"></div>
+                <div className="portfolio-row-visual-corner bl"></div>
+                <div className="portfolio-row-visual-corner br"></div>
+              </div>
             </div>
-            <div className="portfolio-row-right">
-              <img src="/assets/facesearch-ai-thumbnail.webp" alt="Face Search AI" className="portfolio-row-thumb" />
-              <div className="portfolio-row-thumb-overlay"></div>
-              <div className="portfolio-row-meta">Case 02 / 03</div>
-              <div className="portfolio-row-visual-corner tl"></div>
-              <div className="portfolio-row-visual-corner tr"></div>
-              <div className="portfolio-row-visual-corner bl"></div>
-              <div className="portfolio-row-visual-corner br"></div>
-            </div>
-          </div>
 
-          <div className="portfolio-row" data-row="2" data-url="https://swissmote.com/">
-            <div className="portfolio-row-left">
-              <div className="portfolio-row-tag">Talent</div>
-              <h3 className="portfolio-row-name"><em>Swissmote</em></h3>
-              <p className="portfolio-row-desc">
-                Hiring the world's most overlooked builders. Built by someone who heard "no" so many times he rewrote the rules.
-              </p>
-              <div className="portfolio-row-stats">
-                <div>
-                  <div className="portfolio-row-stat-num">Profitable</div>
-                  <div className="portfolio-row-stat-label">No outside capital</div>
-                </div>
-                <div>
-                  <div className="portfolio-row-stat-num">Global</div>
-                  <div className="portfolio-row-stat-label">Day one</div>
+            <div className="portfolio-row is-reversed" data-row="1" data-url="https://facesearchai.com/">
+              <div className="portfolio-row-left">
+                <div className="portfolio-row-tag">AI Privacy</div>
+                <h3 className="portfolio-row-name"><em>Face Search</em></h3>
+                <p className="portfolio-row-desc">
+                  Find every place your face lives online. Built by someone who couldn't sleep until the problem was solved.
+                </p>
+                <div className="portfolio-row-stats">
+                  <div>
+                    <div className="portfolio-row-stat-num">400K</div>
+                    <div className="portfolio-row-stat-label">Users</div>
+                  </div>
+                  <div>
+                    <div className="portfolio-row-stat-num">$8K<em>mrr</em></div>
+                    <div className="portfolio-row-stat-label">Climbing</div>
+                  </div>
                 </div>
               </div>
+              <div className="portfolio-row-right">
+                <img src="/assets/facesearch-ai-thumbnail.webp" alt="Face Search AI" className="portfolio-row-thumb" />
+                <div className="portfolio-row-thumb-overlay"></div>
+                <div className="portfolio-row-meta">Case 02 / 03</div>
+                <div className="portfolio-row-visual-corner tl"></div>
+                <div className="portfolio-row-visual-corner tr"></div>
+                <div className="portfolio-row-visual-corner bl"></div>
+                <div className="portfolio-row-visual-corner br"></div>
+              </div>
             </div>
-            <div className="portfolio-row-right">
-              <img src="/assets/swissmote-thimbnaail.webp" alt="Swissmote" className="portfolio-row-thumb" />
-              <div className="portfolio-row-thumb-overlay"></div>
-              <div className="portfolio-row-meta">Case 03 / 03</div>
-              <div className="portfolio-row-visual-corner tl"></div>
-              <div className="portfolio-row-visual-corner tr"></div>
-              <div className="portfolio-row-visual-corner bl"></div>
-              <div className="portfolio-row-visual-corner br"></div>
+
+            <div className="portfolio-row" data-row="2" data-url="https://swissmote.com/">
+              <div className="portfolio-row-left">
+                <div className="portfolio-row-tag">Talent</div>
+                <h3 className="portfolio-row-name"><em>Swissmote</em></h3>
+                <p className="portfolio-row-desc">
+                  Hiring the world's most overlooked builders. Built by someone who heard "no" so many times he rewrote the rules.
+                </p>
+                <div className="portfolio-row-stats">
+                  <div>
+                    <div className="portfolio-row-stat-num">Profitable</div>
+                    <div className="portfolio-row-stat-label">No outside capital</div>
+                  </div>
+                  <div>
+                    <div className="portfolio-row-stat-num">Global</div>
+                    <div className="portfolio-row-stat-label">Day one</div>
+                  </div>
+                </div>
+              </div>
+              <div className="portfolio-row-right">
+                <img src="/assets/swissmote-thimbnaail.webp" alt="Swissmote" className="portfolio-row-thumb" />
+                <div className="portfolio-row-thumb-overlay"></div>
+                <div className="portfolio-row-meta">Case 03 / 03</div>
+                <div className="portfolio-row-visual-corner tl"></div>
+                <div className="portfolio-row-visual-corner tr"></div>
+                <div className="portfolio-row-visual-corner bl"></div>
+                <div className="portfolio-row-visual-corner br"></div>
+              </div>
             </div>
+
           </div>
 
           <div className="portfolio-v2-cta">

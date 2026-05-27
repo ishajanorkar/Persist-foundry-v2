@@ -1568,6 +1568,31 @@ body::before {
   display: flex; align-items: center; gap: 12px;
 }
 .portfolio-v2-meta::before { display: none; }
+/* ── STACKING CARD WRAPPER ── */
+.pf-stack {
+  position: relative;
+  padding-bottom: 80px; /* breathing room after last card sticks */
+}
+.pf-stack .portfolio-row {
+  position: sticky;
+  top: 100px;
+  border-radius: 20px;
+  border-top: none !important;
+  border-bottom: none !important;
+  margin-bottom: 20px;
+  opacity: 1 !important;   /* skip scroll-reveal hidden state */
+  transform-origin: top center;
+  will-change: transform, filter;
+  transition: transform 0.18s linear, filter 0.18s linear !important;
+  box-shadow: 0 12px 60px rgba(20,16,30,0.14), 0 2px 8px rgba(20,16,30,0.06);
+  overflow: hidden;
+  background: #faf8f5;
+}
+.pf-stack .portfolio-row.is-in-view { transform: none; } /* JS overrides via inline style */
+.pf-stack .portfolio-row:nth-child(1) { z-index: 1; }
+.pf-stack .portfolio-row:nth-child(2) { z-index: 2; }
+.pf-stack .portfolio-row:nth-child(3) { z-index: 3; }
+
 /* ── PORTFOLIO ROW — two-column: text | 9:16 portrait image ── */
 .portfolio-row {
   display: grid;
