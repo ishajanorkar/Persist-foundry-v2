@@ -905,7 +905,7 @@ body::before {
 
 /* ================== OFFER ================== */
 .offer-pin-wrap {
-  /* plain wrapper — no scroll-hijacking */
+  /* plain wrapper */
 }
 .offer {
   background: var(--night);
@@ -913,7 +913,7 @@ body::before {
   border-top: 1px solid var(--hairline);
   border-bottom: 1px solid var(--hairline);
   position: relative;
-  min-height: 280vh;
+  height: 110vh;
   overflow: hidden;
 }
 .offer::before, .offer::after {
@@ -1114,21 +1114,22 @@ body::before {
 
 /* ═══════════════════════════════════════════════════════════════════════
    PER-CARD SCATTER POSITIONS + ENTRY VECTORS + UNIQUE LAYOUTS
-   Cards spread across 280vh — each has its own top% for staggered reveal
+   All 6 cards live inside the 110vh section — random x/y positions
+   so they appear as a scattered constellation when the section enters view
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* Card 0 — The runway — upper-left quadrant, flies in from left */
+/* Card 0 — The runway — upper-left, flies in from left */
 .offer-field .offer-card[data-idx="0"] {
   --tx: -100px; --ty: 20px; --r: -3deg;
-  top: 18%; left: 4%;
+  top: 20%; left: 3%;
   background: linear-gradient(155deg, rgba(120,84,213,0.14) 0%, rgba(12,7,26,0.88) 100%);
   width: clamp(240px, 25vw, 360px);
 }
 
 /* Card 1 — The team — upper-right, drops in from top, centered layout */
 .offer-field .offer-card[data-idx="1"] {
-  --tx: 70px; --ty: -70px; --r: 2.5deg;
-  top: 10%; right: 5%;
+  --tx: 60px; --ty: -70px; --r: 2.5deg;
+  top: 5%; right: 4%;
   background: linear-gradient(175deg, rgba(97,69,169,0.1) 0%, rgba(8,5,20,0.92) 100%);
   text-align: center;
   width: clamp(210px, 21vw, 300px);
@@ -1138,20 +1139,20 @@ body::before {
 .offer-field .offer-card[data-idx="1"] .offer-card-icon { width: 22px; height: 22px; }
 .offer-field .offer-card[data-idx="1"] .offer-card-bottom { text-align: center; }
 
-/* Card 2 — The investment — mid-left, rises from below, no icon, wider */
+/* Card 2 — The investment — center, rises from below */
 .offer-field .offer-card[data-idx="2"] {
   --tx: -40px; --ty: 90px; --r: -1.2deg;
-  top: 41%; left: 6%;
+  top: 48%; left: 30%;
   background: linear-gradient(140deg, rgba(74,46,159,0.22) 0%, rgba(10,6,22,0.9) 100%);
   width: clamp(250px, 26vw, 380px);
 }
 .offer-field .offer-card[data-idx="2"] .offer-card-icon-wrap { display: none; }
 .offer-field .offer-card[data-idx="2"] .offer-card-name { font-size: clamp(22px, 2.2vw, 34px); }
 
-/* Card 3 — The room — mid-right, flies in from right, left accent border */
+/* Card 3 — The room — upper middle-right, flies in from right, accent border */
 .offer-field .offer-card[data-idx="3"] {
   --tx: 100px; --ty: -20px; --r: 3deg;
-  top: 48%; right: 6%;
+  top: 10%; right: 22%;
   background: linear-gradient(160deg, rgba(100,70,200,0.16) 0%, rgba(14,9,30,0.86) 100%);
   border-left: 2px solid rgba(139,92,246,0.45);
   border-radius: 4px 12px 12px 4px;
@@ -1161,16 +1162,16 @@ body::before {
 /* Card 4 — The shortcut — lower-left, diagonal from bottom-left */
 .offer-field .offer-card[data-idx="4"] {
   --tx: -80px; --ty: 80px; --r: -2.2deg;
-  top: 66%; left: 14%;
+  top: 64%; left: 4%;
   background: linear-gradient(170deg, rgba(55,30,110,0.28) 0%, rgba(8,5,18,0.94) 100%);
   width: clamp(230px, 24vw, 345px);
 }
 .offer-field .offer-card[data-idx="4"] .offer-card-proof { color: rgba(199,184,245,0.55); font-size: clamp(11px, 1vw, 15px); }
 
-/* Card 5 — The ownership — lower-right, flies in from right, typographic */
+/* Card 5 — The ownership — lower-right, flies in from right */
 .offer-field .offer-card[data-idx="5"] {
   --tx: 90px; --ty: 60px; --r: 2deg;
-  top: 74%; right: 8%;
+  top: 60%; right: 3%;
   background: linear-gradient(148deg, rgba(120,84,213,0.09) 0%, rgba(15,9,28,0.96) 100%);
   width: clamp(220px, 22vw, 315px);
 }
@@ -2621,7 +2622,7 @@ body::before {
   .impact-stat { border-right: none; border-bottom: 1px solid var(--hairline); padding: 22px 0 !important; }
   .impact-stat:last-child { border-bottom: none; }
 
-  .offer { min-height: 0; padding: 80px 22px 60px; overflow: visible; }
+  .offer { height: auto; min-height: 0; padding: 80px 22px 60px; overflow: visible; }
   .offer-pin-head { position: relative; top: auto; left: auto; max-width: none; margin-bottom: 36px; }
   .offer-stage-num { display: none; }
   .offer-field { position: relative; inset: auto; display: flex; flex-direction: column; gap: 14px; }

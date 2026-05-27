@@ -193,21 +193,26 @@ export default function Home() {
       })
     }
 
-    /* ── OFFER FREE-SCROLL REVEAL + SPOTLIGHT ─────────────────── */
+    /* ── OFFER SCATTER REVEAL + SPOTLIGHT ─────────────────────── */
+    const offerSection = document.getElementById('offer')
     const offerStageNum = document.getElementById('offerStageNum')
     const offerCards = Array.from(document.querySelectorAll('.offer-field .offer-card'))
     let offerTicking = false
+    let offerRevealed = false
 
-    /* IntersectionObserver: fly each card in when it enters the viewport */
-    const cardRevealObs = new IntersectionObserver((entries) => {
+    /* Section-level reveal: when the offer section enters view, stagger all cards in */
+    const offerRevealObs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-entered')
-          cardRevealObs.unobserve(entry.target)
+        if (entry.isIntersecting && !offerRevealed) {
+          offerRevealed = true
+          offerCards.forEach((card, i) => {
+            setTimeout(() => card.classList.add('is-entered'), i * 130)
+          })
+          offerRevealObs.unobserve(offerSection)
         }
       })
-    }, { threshold: 0.12, rootMargin: '0px 0px -5% 0px' })
-    offerCards.forEach(card => cardRevealObs.observe(card))
+    }, { threshold: 0.15 })
+    if (offerSection) offerRevealObs.observe(offerSection)
 
     /* Scroll listener: spotlight whichever entered card is closest to screen center */
     function updateOfferSpotlight() {
@@ -217,7 +222,7 @@ export default function Home() {
       offerCards.forEach(card => {
         if (!card.classList.contains('is-entered')) return
         const rect = card.getBoundingClientRect()
-        if (rect.bottom < 0 || rect.top > vh) return // fully off screen
+        if (rect.bottom < 0 || rect.top > vh) return
         const cardMid = (rect.top + rect.bottom) / 2
         const dist = Math.abs(cardMid - centerY)
         if (dist < closestDist) { closestDist = dist; closestCard = card }
