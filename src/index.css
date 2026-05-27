@@ -804,7 +804,7 @@ body::before {
   gap: clamp(32px, 5vw, 64px);
   white-space: nowrap;
   align-items: center;
-  animation: scroll-marquee 45s linear infinite;
+  animation: scroll-marquee 20s linear infinite;
   width: fit-content;
 }
 .marquee-wrapper:hover .marquee-track { animation-play-state: paused; }
@@ -1497,7 +1497,7 @@ body::before {
 }
 .velocity-marquee-item {
   font-family: var(--serif);
-  font-size: clamp(72px, 13vw, 220px);
+  font-size: clamp(36px, 5.5vw, 88px);
   font-style: italic;
   font-weight: 400;
   color: var(--paper);
@@ -2507,7 +2507,7 @@ body::before {
   .sc-tr, .sc-br { right: 16px; }
 
   /* marquee — clamp() handles most of it; just tighten animation speed */
-  .marquee-track { animation-duration: 30s; }
+  .marquee-track { animation-duration: 16s; }
 
   .impact, .filter-section, .backed-v2 { padding-left: 22px; padding-right: 22px; padding-top: 80px; padding-bottom: 80px; }
   .impact-grid { grid-template-columns: 1fr; }
@@ -2617,7 +2617,7 @@ body::before {
   .marquee-logo { height: 52px; }
   .marquee-logo img { max-height: 28px; max-width: 100px; }
   .marquee-logo.is-stacked img { max-height: 38px; max-width: 84px; }
-  .marquee-track { gap: 28px; animation-duration: 22s; }
+  .marquee-track { gap: 28px; animation-duration: 12s; }
 
   .backed-v2-list { grid-template-columns: repeat(2, 1fr); }
   .backed-v2-cell { padding: 36px 16px; }

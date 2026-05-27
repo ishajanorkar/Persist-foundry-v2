@@ -717,7 +717,7 @@ export default function Home() {
     const velSection = document.getElementById('velocityMarquee')
     if (velTrack && velSection) {
       let trackX = 0, lastY = window.scrollY, velocity = 0
-      const baseSpeed = 1.2
+      const baseSpeed = 3.0
       let halfWidth = 0
       function measureHalf() { halfWidth = velTrack.scrollWidth / 2 }
       requestAnimationFrame(() => requestAnimationFrame(measureHalf))
