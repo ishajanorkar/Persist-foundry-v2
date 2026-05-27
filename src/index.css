@@ -905,21 +905,16 @@ body::before {
 
 /* ================== OFFER ================== */
 .offer-pin-wrap {
-  position: relative;
-  height: 800vh;
+  /* plain wrapper — no scroll-hijacking */
 }
 .offer {
   background: var(--night);
   color: var(--paper);
   border-top: 1px solid var(--hairline);
   border-bottom: 1px solid var(--hairline);
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  position: relative;
+  min-height: 280vh;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: 48px 60px 36px;
 }
 .offer::before, .offer::after {
   content: "";
@@ -941,10 +936,10 @@ body::before {
 }
 .offer-pin-head {
   position: absolute;
-  top: 48px;
+  top: 60px;
   left: 60px;
   z-index: 10;
-  max-width: 460px;
+  max-width: 520px;
   pointer-events: none;
 }
 .offer-pin-head > * { pointer-events: auto; }
@@ -967,22 +962,22 @@ body::before {
 .offer-eyebrow::before {
   display: none;
 }
-/* ── ambient background number ── */
+/* ── ambient background number — scrolls with the section ── */
 .offer-stage-num {
   position: absolute;
-  top: 50%;
+  top: 10%;
   left: 50%;
-  transform: translate(-50%, -48%);
+  transform: translateX(-50%);
   font-family: var(--serif);
-  font-size: clamp(200px, 38vw, 600px);
+  font-size: clamp(160px, 32vw, 520px);
   line-height: 0.85;
-  color: rgba(120, 84, 213, 0.042);
+  color: rgba(120, 84, 213, 0.04);
   pointer-events: none;
   letter-spacing: -0.07em;
   z-index: 0;
   user-select: none;
-  transition: opacity 0.5s ease;
   white-space: nowrap;
+  transition: opacity 0.5s ease;
 }
 /* ── floating card field ── */
 .offer-field {
@@ -1117,22 +1112,23 @@ body::before {
   will-change: transform, opacity, filter;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   PER-CARD SCATTER POSITIONS  +  ENTRY VECTORS  +  UNIQUE LAYOUTS
-   ────────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   PER-CARD SCATTER POSITIONS + ENTRY VECTORS + UNIQUE LAYOUTS
+   Cards spread across 280vh — each has its own top% for staggered reveal
+   ═══════════════════════════════════════════════════════════════════════ */
 
-/* Card 0 — The runway — upper-left, flies in from left */
+/* Card 0 — The runway — upper-left quadrant, flies in from left */
 .offer-field .offer-card[data-idx="0"] {
-  --tx: -90px; --ty: 30px; --r: -3deg;
-  top: 14%; left: 4%;
+  --tx: -100px; --ty: 20px; --r: -3deg;
+  top: 18%; left: 4%;
   background: linear-gradient(155deg, rgba(120,84,213,0.14) 0%, rgba(12,7,26,0.88) 100%);
   width: clamp(240px, 25vw, 360px);
 }
 
-/* Card 1 — The team — upper-right, flies in from top-right, centered content */
+/* Card 1 — The team — upper-right, drops in from top, centered layout */
 .offer-field .offer-card[data-idx="1"] {
-  --tx: 80px; --ty: -60px; --r: 2.5deg;
-  top: 5%; right: 6%;
+  --tx: 70px; --ty: -70px; --r: 2.5deg;
+  top: 10%; right: 5%;
   background: linear-gradient(175deg, rgba(97,69,169,0.1) 0%, rgba(8,5,20,0.92) 100%);
   text-align: center;
   width: clamp(210px, 21vw, 300px);
@@ -1142,31 +1138,30 @@ body::before {
 .offer-field .offer-card[data-idx="1"] .offer-card-icon { width: 22px; height: 22px; }
 .offer-field .offer-card[data-idx="1"] .offer-card-bottom { text-align: center; }
 
-/* Card 2 — The investment — center, rises from below, no icon, wide */
+/* Card 2 — The investment — mid-left, rises from below, no icon, wider */
 .offer-field .offer-card[data-idx="2"] {
-  --tx: -30px; --ty: 80px; --r: -1deg;
-  top: 42%; left: 26%;
+  --tx: -40px; --ty: 90px; --r: -1.2deg;
+  top: 41%; left: 6%;
   background: linear-gradient(140deg, rgba(74,46,159,0.22) 0%, rgba(10,6,22,0.9) 100%);
   width: clamp(250px, 26vw, 380px);
 }
 .offer-field .offer-card[data-idx="2"] .offer-card-icon-wrap { display: none; }
-.offer-field .offer-card[data-idx="2"] .offer-card-label { padding-left: 0; }
 .offer-field .offer-card[data-idx="2"] .offer-card-name { font-size: clamp(22px, 2.2vw, 34px); }
 
 /* Card 3 — The room — mid-right, flies in from right, left accent border */
 .offer-field .offer-card[data-idx="3"] {
-  --tx: 90px; --ty: -30px; --r: 3deg;
-  top: 22%; right: 15%;
+  --tx: 100px; --ty: -20px; --r: 3deg;
+  top: 48%; right: 6%;
   background: linear-gradient(160deg, rgba(100,70,200,0.16) 0%, rgba(14,9,30,0.86) 100%);
   border-left: 2px solid rgba(139,92,246,0.45);
   border-radius: 4px 12px 12px 4px;
   width: clamp(220px, 22vw, 320px);
 }
 
-/* Card 4 — The shortcut — lower-left, diagonal entry from bottom-left */
+/* Card 4 — The shortcut — lower-left, diagonal from bottom-left */
 .offer-field .offer-card[data-idx="4"] {
-  --tx: -70px; --ty: 80px; --r: -2deg;
-  bottom: 9%; left: 6%;
+  --tx: -80px; --ty: 80px; --r: -2.2deg;
+  top: 66%; left: 14%;
   background: linear-gradient(170deg, rgba(55,30,110,0.28) 0%, rgba(8,5,18,0.94) 100%);
   width: clamp(230px, 24vw, 345px);
 }
@@ -1174,17 +1169,24 @@ body::before {
 
 /* Card 5 — The ownership — lower-right, flies in from right, typographic */
 .offer-field .offer-card[data-idx="5"] {
-  --tx: 80px; --ty: 60px; --r: 1.8deg;
-  bottom: 5%; right: 4%;
+  --tx: 90px; --ty: 60px; --r: 2deg;
+  top: 74%; right: 8%;
   background: linear-gradient(148deg, rgba(120,84,213,0.09) 0%, rgba(15,9,28,0.96) 100%);
   width: clamp(220px, 22vw, 315px);
 }
 .offer-field .offer-card[data-idx="5"] .offer-card-num { color: rgba(199,184,245,0.13); }
 
-/* ── ACTIVE — spotlight, straight, glowing ── */
+/* ── ENTERED: revealed, settled at scatter position, slightly dimmed ── */
+.offer-field .offer-card.is-entered {
+  opacity: 0.35;
+  filter: blur(0.5px);
+  transform: rotate(var(--r, 0deg)) scale(0.94);
+}
+
+/* ── ACTIVE: spotlight — comes AFTER is-entered so it always wins ── */
 .offer-field .offer-card.is-active {
   opacity: 1;
-  transform: rotate(0deg) scale(1.05) translate(0, 0);
+  transform: rotate(0deg) scale(1.05);
   filter: blur(0);
   border-color: rgba(120, 84, 213, 0.82);
   box-shadow: 0 0 0 1px rgba(120,84,213,0.15), 0 12px 80px rgba(97,69,169,0.6), 0 0 140px rgba(97,69,169,0.2);
@@ -1195,13 +1197,6 @@ body::before {
   border-color: rgba(120,84,213,0.6);
 }
 .offer-field .offer-card.is-active .offer-card-num { color: rgba(155,127,228,0.18); }
-
-/* ── PAST — settled at scatter position, faded, keeps tilt ── */
-.offer-field .offer-card.is-past {
-  opacity: 0.38;
-  filter: blur(0.6px);
-  transform: rotate(var(--r, 0deg)) scale(0.94);
-}
 
 /* scroll-into-view glow — on while card is in viewport, off when it leaves */
 .offer-step.is-in-view .offer-card {
@@ -2626,8 +2621,7 @@ body::before {
   .impact-stat { border-right: none; border-bottom: 1px solid var(--hairline); padding: 22px 0 !important; }
   .impact-stat:last-child { border-bottom: none; }
 
-  .offer-pin-wrap { height: auto; }
-  .offer { position: relative; height: auto; min-height: 0; padding: 80px 22px 60px; overflow: visible; display: block; }
+  .offer { min-height: 0; padding: 80px 22px 60px; overflow: visible; }
   .offer-pin-head { position: relative; top: auto; left: auto; max-width: none; margin-bottom: 36px; }
   .offer-stage-num { display: none; }
   .offer-field { position: relative; inset: auto; display: flex; flex-direction: column; gap: 14px; }
@@ -2638,16 +2632,14 @@ body::before {
   .offer-field .offer-card[data-idx="3"],
   .offer-field .offer-card[data-idx="4"],
   .offer-field .offer-card[data-idx="5"] {
-    position: relative !important;
-    width: 100% !important;
+    position: relative !important; width: 100% !important;
     top: auto !important; left: auto !important; right: auto !important; bottom: auto !important;
-    opacity: 1 !important; transform: none !important; filter: none !important;
-    text-align: left;
+    opacity: 1 !important; transform: none !important; filter: none !important; text-align: left;
   }
   .offer-field .offer-card[data-idx="1"] .offer-card-top { flex-direction: row; align-items: center; }
   .offer-field .offer-card[data-idx="2"] .offer-card-icon-wrap { display: flex; }
-  .offer-field .offer-card.is-past { opacity: 1 !important; transform: none !important; filter: none !important; }
-  .offer-field .offer-card.is-active { box-shadow: none; }
+  .offer-field .offer-card.is-entered,
+  .offer-field .offer-card.is-active { opacity: 1 !important; transform: none !important; filter: none !important; box-shadow: none; }
   .offer-card-name { font-size: clamp(18px, 5vw, 26px); }
   .offer-card-proof { font-size: 13px; color: var(--stone-soft) !important; }
   .offer-card-top { margin-bottom: 16px; }

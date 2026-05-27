@@ -193,35 +193,46 @@ export default function Home() {
       })
     }
 
-    /* ── OFFER PIN SCROLL ──────────────────────────────────────── */
-    const offerPinWrap = document.getElementById('offerPinWrap')
+    /* ── OFFER FREE-SCROLL REVEAL + SPOTLIGHT ─────────────────── */
     const offerStageNum = document.getElementById('offerStageNum')
-    const offerPinCards = Array.from(document.querySelectorAll('.offer-field .offer-card'))
+    const offerCards = Array.from(document.querySelectorAll('.offer-field .offer-card'))
     let offerTicking = false
 
-    function updateOffer() {
-      if (!offerPinWrap || !offerPinCards.length) { offerTicking = false; return }
-      const rect = offerPinWrap.getBoundingClientRect()
-      const wrapScrollH = offerPinWrap.offsetHeight - window.innerHeight
-      const scrolled = Math.max(0, -rect.top)
-      const progress = wrapScrollH > 0 ? Math.min(1, scrolled / wrapScrollH) : 0
-      const n = offerPinCards.length
-      // Give each card its own equal band of scroll progress
-      // Slight offset so card 0 enters at start, card n-1 peaks near end
-      const raw = progress * (n + 0.6) - 0.3 // shifts window so first card enters immediately
-      const activeIdx = Math.min(n - 1, Math.max(0, Math.floor(raw)))
-      offerPinCards.forEach((card, i) => {
-        const reached = i <= activeIdx
-        card.classList.toggle('is-active', i === activeIdx)
-        card.classList.toggle('is-past', reached && i < activeIdx)
+    /* IntersectionObserver: fly each card in when it enters the viewport */
+    const cardRevealObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-entered')
+          cardRevealObs.unobserve(entry.target)
+        }
       })
-      if (offerStageNum) offerStageNum.textContent = String(activeIdx + 1).padStart(2, '0')
+    }, { threshold: 0.12, rootMargin: '0px 0px -5% 0px' })
+    offerCards.forEach(card => cardRevealObs.observe(card))
+
+    /* Scroll listener: spotlight whichever entered card is closest to screen center */
+    function updateOfferSpotlight() {
+      const vh = window.innerHeight
+      const centerY = vh * 0.5
+      let closestCard = null, closestDist = Infinity
+      offerCards.forEach(card => {
+        if (!card.classList.contains('is-entered')) return
+        const rect = card.getBoundingClientRect()
+        if (rect.bottom < 0 || rect.top > vh) return // fully off screen
+        const cardMid = (rect.top + rect.bottom) / 2
+        const dist = Math.abs(cardMid - centerY)
+        if (dist < closestDist) { closestDist = dist; closestCard = card }
+      })
+      offerCards.forEach(card => card.classList.toggle('is-active', card === closestCard))
+      if (offerStageNum && closestCard) {
+        const idx = offerCards.indexOf(closestCard)
+        offerStageNum.textContent = String(idx + 1).padStart(2, '0')
+      }
       offerTicking = false
     }
     window.addEventListener('scroll', () => {
-      if (!offerTicking) { requestAnimationFrame(updateOffer); offerTicking = true }
+      if (!offerTicking) { requestAnimationFrame(updateOfferSpotlight); offerTicking = true }
     }, { passive: true })
-    updateOffer()
+    updateOfferSpotlight()
 
     /* ── FILTER LIST REVEAL ──────────────────────────────────── */
     const filterItems = document.querySelectorAll('.filter-list li')
