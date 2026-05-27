@@ -1148,7 +1148,7 @@ body::before {
   color: var(--violet-soft);
   display: flex; align-items: center; gap: 10px;
 }
-.offer-card-label::before { content: ""; width: 8px; height: 1px; background: var(--violet-soft); }
+.offer-card-label::before { display: none; }
 .offer-card-icon-wrap {
   flex-shrink: 0;
   width: 36px; height: 36px;
@@ -1353,7 +1353,7 @@ body::before {
   margin-bottom: 28px;
   display: flex; align-items: center; gap: 14px;
 }
-.section-label::before { content: ""; width: 32px; height: 1px; background: var(--violet-deep); }
+.section-label::before { display: none; }
 .filter-headline {
   font-family: var(--serif);
   font-size: clamp(56px, 7vw, 128px);
@@ -1567,7 +1567,7 @@ body::before {
   color: var(--stone); margin-top: 26px;
   display: flex; align-items: center; gap: 12px;
 }
-.portfolio-v2-meta::before { content: ""; width: 24px; height: 1px; background: var(--stone); }
+.portfolio-v2-meta::before { display: none; }
 /* ── PORTFOLIO ROW — two-column: text | 9:16 portrait image ── */
 .portfolio-row {
   display: grid;
