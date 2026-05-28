@@ -1071,9 +1071,10 @@ body::before {
   transition: color 0.5s ease;
 }
 
-/* Top row: label + icon */
+/* Top row: icon then label, left-aligned */
 .offer-card-top {
-  display: flex; justify-content: space-between; align-items: flex-start;
+  display: flex; justify-content: flex-start; align-items: center;
+  gap: 18px;
   margin-bottom: 60px;
   z-index: 2; position: relative;
 }
@@ -1083,11 +1084,9 @@ body::before {
   text-transform: uppercase;
   letter-spacing: 0.32em;
   color: var(--violet-soft);
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center;
 }
-.offer-card-label::before {
-  content: ""; width: 8px; height: 1px; background: var(--violet-soft);
-}
+.offer-card-label::before { display: none; }
 .offer-card-icon-wrap {
   width: 56px; height: 56px;
   border: 1px solid var(--hairline-strong);

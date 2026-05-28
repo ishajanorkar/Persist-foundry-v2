@@ -193,10 +193,8 @@ export default function Home() {
       })
     }
 
-    /* ── OFFER STAIRCASE REVEAL + PROGRESS ────────────────────── */
+    /* ── OFFER STAIRCASE REVEAL ────────────────────────────────── */
     const offerSteps = document.querySelectorAll('.offer-step')
-    const offerProgressNum = document.getElementById('offerProgressNum')
-    const offerProgressFill = document.getElementById('offerProgressFill')
 
     /* Reveal each step as it enters the viewport */
     const stepRevealObs = new IntersectionObserver((entries) => {
@@ -209,30 +207,6 @@ export default function Home() {
       })
     }, { threshold: 0.25, rootMargin: '0px 0px -10% 0px' })
     offerSteps.forEach(step => stepRevealObs.observe(step))
-
-    /* Update progress pill to show whichever step is most visible */
-    function updateOfferProgress() {
-      const vh = window.innerHeight
-      let mostVisible = null, highestRatio = 0
-      offerSteps.forEach(step => {
-        const rect = step.getBoundingClientRect()
-        const visibleTop = Math.max(0, rect.top)
-        const visibleBottom = Math.min(vh, rect.bottom)
-        const visibleHeight = Math.max(0, visibleBottom - visibleTop)
-        const ratio = visibleHeight / Math.min(rect.height, vh)
-        if (ratio > highestRatio) { highestRatio = ratio; mostVisible = step }
-      })
-      if (mostVisible && offerProgressNum && offerProgressFill) {
-        const idx = parseInt(mostVisible.dataset.idx, 10) || 0
-        offerProgressNum.textContent = String(idx + 1).padStart(2, '0')
-        offerProgressFill.style.width = ((idx + 1) / offerSteps.length) * 100 + '%'
-      }
-    }
-    let offerProgTicking = false
-    window.addEventListener('scroll', () => {
-      if (!offerProgTicking) { requestAnimationFrame(() => { updateOfferProgress(); offerProgTicking = false }); offerProgTicking = true }
-    }, { passive: true })
-    updateOfferProgress()
 
     /* ── FILTER LIST REVEAL ──────────────────────────────────── */
     const filterItems = document.querySelectorAll('.filter-list li')
@@ -1109,10 +1083,6 @@ export default function Home() {
             <div className="offer-eyebrow">What you get</div>
             <h2 className="offer-title">Six things.<br /><em>Nothing extra. Nothing missing.</em></h2>
           </div>
-          <div className="offer-progress">
-            <span><span className="offer-progress-num" id="offerProgressNum">01</span> / 06</span>
-            <div className="offer-progress-bar"><div className="offer-progress-fill" id="offerProgressFill"></div></div>
-          </div>
         </div>
 
         <div className="offer-stairs" id="offerStairs">
@@ -1121,18 +1091,17 @@ export default function Home() {
             <div className="offer-card">
               <div className="offer-card-num">01</div>
               <div className="offer-card-top">
-                <span className="offer-card-label">The runway</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <path d="M12 2v20M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/>
                   </svg>
                 </span>
+                <span className="offer-card-label">The runway</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">Your <em>stake.</em></div>
                 <p className="offer-card-proof">Monthly capital so you can leave the job, tell the family, and stop apologizing for the work.</p>
               </div>
-              <div className="offer-card-step-of">Step 01 / 06</div>
             </div>
           </div>
 
@@ -1140,19 +1109,18 @@ export default function Home() {
             <div className="offer-card">
               <div className="offer-card-num">02</div>
               <div className="offer-card-top">
-                <span className="offer-card-label">The people</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <circle cx="9" cy="8" r="4"/><circle cx="17" cy="10" r="3"/>
                     <path d="M3 20v-1.5a4 4 0 014-4h4a4 4 0 014 4V20M22 20v-1a3 3 0 00-2-2.83"/>
                   </svg>
                 </span>
+                <span className="offer-card-label">The people</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">Your <em>team.</em></div>
                 <p className="offer-card-proof">Designers, engineers, growth operators. From day one. No hiring, no founder loneliness.</p>
               </div>
-              <div className="offer-card-step-of">Step 02 / 06</div>
             </div>
           </div>
 
@@ -1160,19 +1128,18 @@ export default function Home() {
             <div className="offer-card">
               <div className="offer-card-num">03</div>
               <div className="offer-card-top">
-                <span className="offer-card-label">The fuel</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <rect x="2" y="6" width="20" height="13" rx="2"/>
                     <path d="M2 11h20M6 15h2M11 15h3"/>
                   </svg>
                 </span>
+                <span className="offer-card-label">The fuel</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">The <em>capital.</em></div>
                 <p className="offer-card-proof">Pre-seed in. Follow-on capital ready when you hit the next inflection.</p>
               </div>
-              <div className="offer-card-step-of">Step 03 / 06</div>
             </div>
           </div>
 
@@ -1180,7 +1147,6 @@ export default function Home() {
             <div className="offer-card">
               <div className="offer-card-num">04</div>
               <div className="offer-card-top">
-                <span className="offer-card-label">The room</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/>
@@ -1188,12 +1154,12 @@ export default function Home() {
                     <path d="M6 7l4 3M18 7l-4 3M6 17l4-3M18 17l-4-3"/>
                   </svg>
                 </span>
+                <span className="offer-card-label">The room</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">The <em>network.</em></div>
                 <p className="offer-card-proof">400+ advisors, operators, allies. The room you were never invited into.</p>
               </div>
-              <div className="offer-card-step-of">Step 04 / 06</div>
             </div>
           </div>
 
@@ -1201,18 +1167,17 @@ export default function Home() {
             <div className="offer-card">
               <div className="offer-card-num">05</div>
               <div className="offer-card-top">
-                <span className="offer-card-label">The shortcuts</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <path d="M4 4h13a3 3 0 013 3v13M4 4v16h16M4 4l8 8 4-4 4 4"/>
                   </svg>
                 </span>
+                <span className="offer-card-label">The shortcuts</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">The <em>playbook.</em></div>
                 <p className="offer-card-proof">Nine years of frameworks, mistakes, shortcuts. So you stop repeating ours.</p>
               </div>
-              <div className="offer-card-step-of">Step 05 / 06</div>
             </div>
           </div>
 
@@ -1220,18 +1185,17 @@ export default function Home() {
             <div className="offer-card">
               <div className="offer-card-num">06</div>
               <div className="offer-card-top">
-                <span className="offer-card-label">The ownership</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <path d="M3 12l9-9 9 9M5 10v10h14V10M9 20v-6h6v6"/>
                   </svg>
                 </span>
+                <span className="offer-card-label">The ownership</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">The <em>company.</em></div>
                 <p className="offer-card-proof">Yours. We back the bet. You make the call. The work is yours to own.</p>
               </div>
-              <div className="offer-card-step-of">Step 06 / 06</div>
             </div>
           </div>
 
