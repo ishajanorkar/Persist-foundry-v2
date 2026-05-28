@@ -23,7 +23,7 @@ export default function Home() {
       requestAnimationFrame(animateCursor)
     }
     animateCursor()
-    document.querySelectorAll('a, button, .pf-card, .filter-col, .backed-logo, .offer-item').forEach(el => {
+    document.querySelectorAll('a, button, .pf-card, .filter-col, .backed-logo, .offer-card').forEach(el => {
       el.addEventListener('mouseenter', () => cursor && cursor.classList.add('is-hover'))
       el.addEventListener('mouseleave', () => cursor && cursor.classList.remove('is-hover'))
     })
@@ -193,51 +193,46 @@ export default function Home() {
       })
     }
 
-    /* ── OFFER SCATTER REVEAL + SPOTLIGHT ─────────────────────── */
-    const offerSection = document.getElementById('offer')
-    const offerStageNum = document.getElementById('offerStageNum')
-    const offerCards = Array.from(document.querySelectorAll('.offer-field .offer-card'))
-    let offerTicking = false
-    let offerRevealed = false
+    /* ── OFFER STAIRCASE REVEAL + PROGRESS ────────────────────── */
+    const offerSteps = document.querySelectorAll('.offer-step')
+    const offerProgressNum = document.getElementById('offerProgressNum')
+    const offerProgressFill = document.getElementById('offerProgressFill')
 
-    /* Section-level reveal: when the offer section enters view, stagger all cards in */
-    const offerRevealObs = new IntersectionObserver((entries) => {
+    /* Reveal each step as it enters the viewport */
+    const stepRevealObs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting && !offerRevealed) {
-          offerRevealed = true
-          offerCards.forEach((card, i) => {
-            setTimeout(() => card.classList.add('is-entered'), i * 130)
-          })
-          offerRevealObs.unobserve(offerSection)
+        if (entry.isIntersecting) {
+          const idx = parseInt(entry.target.dataset.idx, 10) || 0
+          setTimeout(() => entry.target.classList.add('is-revealed'), idx % 2 * 80)
+          stepRevealObs.unobserve(entry.target)
         }
       })
-    }, { threshold: 0.15 })
-    if (offerSection) offerRevealObs.observe(offerSection)
+    }, { threshold: 0.25, rootMargin: '0px 0px -10% 0px' })
+    offerSteps.forEach(step => stepRevealObs.observe(step))
 
-    /* Scroll listener: spotlight whichever entered card is closest to screen center */
-    function updateOfferSpotlight() {
+    /* Update progress pill to show whichever step is most visible */
+    function updateOfferProgress() {
       const vh = window.innerHeight
-      const centerY = vh * 0.5
-      let closestCard = null, closestDist = Infinity
-      offerCards.forEach(card => {
-        if (!card.classList.contains('is-entered')) return
-        const rect = card.getBoundingClientRect()
-        if (rect.bottom < 0 || rect.top > vh) return
-        const cardMid = (rect.top + rect.bottom) / 2
-        const dist = Math.abs(cardMid - centerY)
-        if (dist < closestDist) { closestDist = dist; closestCard = card }
+      let mostVisible = null, highestRatio = 0
+      offerSteps.forEach(step => {
+        const rect = step.getBoundingClientRect()
+        const visibleTop = Math.max(0, rect.top)
+        const visibleBottom = Math.min(vh, rect.bottom)
+        const visibleHeight = Math.max(0, visibleBottom - visibleTop)
+        const ratio = visibleHeight / Math.min(rect.height, vh)
+        if (ratio > highestRatio) { highestRatio = ratio; mostVisible = step }
       })
-      offerCards.forEach(card => card.classList.toggle('is-active', card === closestCard))
-      if (offerStageNum && closestCard) {
-        const idx = offerCards.indexOf(closestCard)
-        offerStageNum.textContent = String(idx + 1).padStart(2, '0')
+      if (mostVisible && offerProgressNum && offerProgressFill) {
+        const idx = parseInt(mostVisible.dataset.idx, 10) || 0
+        offerProgressNum.textContent = String(idx + 1).padStart(2, '0')
+        offerProgressFill.style.width = ((idx + 1) / offerSteps.length) * 100 + '%'
       }
-      offerTicking = false
     }
+    let offerProgTicking = false
     window.addEventListener('scroll', () => {
-      if (!offerTicking) { requestAnimationFrame(updateOfferSpotlight); offerTicking = true }
+      if (!offerProgTicking) { requestAnimationFrame(() => { updateOfferProgress(); offerProgTicking = false }); offerProgTicking = true }
     }, { passive: true })
-    updateOfferSpotlight()
+    updateOfferProgress()
 
     /* ── FILTER LIST REVEAL ──────────────────────────────────── */
     const filterItems = document.querySelectorAll('.filter-list li')
@@ -1107,74 +1102,85 @@ export default function Home() {
         </div>
       </section>
 
-      {/* OFFER — SCROLL-PINNED GRID */}
-      <div className="offer-pin-wrap" id="offerPinWrap">
-        <section className="offer" id="offer">
-          <div className="offer-stage-num" id="offerStageNum" aria-hidden="true">01</div>
-
-          <div className="offer-pin-head">
+      {/* OFFER — STAIRCASE SCROLL REVEAL */}
+      <section className="offer" id="offer">
+        <div className="offer-header">
+          <div className="offer-header-left">
             <div className="offer-eyebrow">What you get</div>
             <h2 className="offer-title">Six things.<br /><em>Nothing extra. Nothing missing.</em></h2>
           </div>
+          <div className="offer-progress">
+            <span><span className="offer-progress-num" id="offerProgressNum">01</span> / 06</span>
+            <div className="offer-progress-bar"><div className="offer-progress-fill" id="offerProgressFill"></div></div>
+          </div>
+        </div>
 
-          <div className="offer-field" id="offerField">
+        <div className="offer-stairs" id="offerStairs">
 
-            <div className="offer-card" data-idx="0">
+          <div className="offer-step" data-idx="0">
+            <div className="offer-card">
               <div className="offer-card-num">01</div>
               <div className="offer-card-top">
+                <span className="offer-card-label">The runway</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <path d="M12 2v20M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/>
                   </svg>
                 </span>
-                <span className="offer-card-label">The runway.</span>
               </div>
               <div className="offer-card-bottom">
-                <div className="offer-card-name">Your <em>move.</em></div>
-                <p className="offer-card-proof">Monthly capital so you can leave the job, stop explaining yourself, and start. Full-time or nothing.</p>
+                <div className="offer-card-name">Your <em>stake.</em></div>
+                <p className="offer-card-proof">Monthly capital so you can leave the job, tell the family, and stop apologizing for the work.</p>
               </div>
-              <div className="offer-card-step-of">01 / 06</div>
+              <div className="offer-card-step-of">Step 01 / 06</div>
             </div>
+          </div>
 
-            <div className="offer-card" data-idx="1">
+          <div className="offer-step" data-idx="1">
+            <div className="offer-card">
               <div className="offer-card-num">02</div>
               <div className="offer-card-top">
+                <span className="offer-card-label">The people</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <circle cx="9" cy="8" r="4"/><circle cx="17" cy="10" r="3"/>
                     <path d="M3 20v-1.5a4 4 0 014-4h4a4 4 0 014 4V20M22 20v-1a3 3 0 00-2-2.83"/>
                   </svg>
                 </span>
-                <span className="offer-card-label">The team.</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">Your <em>team.</em></div>
-                <p className="offer-card-proof">Designers, engineers, growth operators from day one. No hiring lag. No founder isolation.</p>
+                <p className="offer-card-proof">Designers, engineers, growth operators. From day one. No hiring, no founder loneliness.</p>
               </div>
-              <div className="offer-card-step-of">02 / 06</div>
+              <div className="offer-card-step-of">Step 02 / 06</div>
             </div>
+          </div>
 
-            <div className="offer-card" data-idx="2">
+          <div className="offer-step" data-idx="2">
+            <div className="offer-card">
               <div className="offer-card-num">03</div>
               <div className="offer-card-top">
+                <span className="offer-card-label">The fuel</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <rect x="2" y="6" width="20" height="13" rx="2"/>
                     <path d="M2 11h20M6 15h2M11 15h3"/>
                   </svg>
                 </span>
-                <span className="offer-card-label">The investment.</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">The <em>capital.</em></div>
-                <p className="offer-card-proof">Pre-seed in at signing. Follow-on ready when you hit the next inflection point.</p>
+                <p className="offer-card-proof">Pre-seed in. Follow-on capital ready when you hit the next inflection.</p>
               </div>
-              <div className="offer-card-step-of">03 / 06</div>
+              <div className="offer-card-step-of">Step 03 / 06</div>
             </div>
+          </div>
 
-            <div className="offer-card" data-idx="3">
+          <div className="offer-step" data-idx="3">
+            <div className="offer-card">
               <div className="offer-card-num">04</div>
               <div className="offer-card-top">
+                <span className="offer-card-label">The room</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/>
@@ -1182,52 +1188,55 @@ export default function Home() {
                     <path d="M6 7l4 3M18 7l-4 3M6 17l4-3M18 17l-4-3"/>
                   </svg>
                 </span>
-                <span className="offer-card-label">The room.</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">The <em>network.</em></div>
-                <p className="offer-card-proof">400+ operators, advisors, allies. The conversations that usually take a decade to get access to.</p>
+                <p className="offer-card-proof">400+ advisors, operators, allies. The room you were never invited into.</p>
               </div>
-              <div className="offer-card-step-of">04 / 06</div>
+              <div className="offer-card-step-of">Step 04 / 06</div>
             </div>
+          </div>
 
-            <div className="offer-card" data-idx="4">
+          <div className="offer-step" data-idx="4">
+            <div className="offer-card">
               <div className="offer-card-num">05</div>
               <div className="offer-card-top">
+                <span className="offer-card-label">The shortcuts</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <path d="M4 4h13a3 3 0 013 3v13M4 4v16h16M4 4l8 8 4-4 4 4"/>
                   </svg>
                 </span>
-                <span className="offer-card-label">The shortcut.</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">The <em>playbook.</em></div>
-                <p className="offer-card-proof">Nine years of frameworks, dead ends, and hard-won calls — so you skip the mistakes we already made.</p>
+                <p className="offer-card-proof">Nine years of frameworks, mistakes, shortcuts. So you stop repeating ours.</p>
               </div>
-              <div className="offer-card-step-of">05 / 06</div>
+              <div className="offer-card-step-of">Step 05 / 06</div>
             </div>
+          </div>
 
-            <div className="offer-card" data-idx="5">
+          <div className="offer-step" data-idx="5">
+            <div className="offer-card">
               <div className="offer-card-num">06</div>
               <div className="offer-card-top">
+                <span className="offer-card-label">The ownership</span>
                 <span className="offer-card-icon-wrap">
                   <svg className="offer-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <path d="M3 12l9-9 9 9M5 10v10h14V10M9 20v-6h6v6"/>
                   </svg>
                 </span>
-                <span className="offer-card-label">The ownership.</span>
               </div>
               <div className="offer-card-bottom">
                 <div className="offer-card-name">The <em>company.</em></div>
-                <p className="offer-card-proof">Yours. We back the bet. You run the company. The work belongs to you.</p>
+                <p className="offer-card-proof">Yours. We back the bet. You make the call. The work is yours to own.</p>
               </div>
-              <div className="offer-card-step-of">06 / 06</div>
+              <div className="offer-card-step-of">Step 06 / 06</div>
             </div>
-
           </div>
-        </section>
-      </div>
+
+        </div>
+      </section>
 
       {/* MANIFESTO — CONVERGING DOTS NARRATIVE */}
       <section className="manifesto" id="manifesto">
