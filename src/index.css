@@ -44,6 +44,11 @@ a, button { cursor: none; }
 
 #root { margin: 0; padding: 0; }
 
+/* ── typography utilities ─────────────────────────────── */
+.serif { font-family: var(--serif); font-weight: 400; letter-spacing: -0.01em; }
+.mono  { font-family: var(--mono);  font-weight: 400; }
+.sans  { font-family: var(--sans);  font-weight: 400; }
+
 body::before {
   content: "";
   position: fixed; inset: 0;
@@ -1637,11 +1642,12 @@ body::before {
 }
 .prog-head-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
 .prog-title {
+  font-family: var(--serif); font-weight: 400;
   font-size: clamp(40px, 5.2vw, 78px); line-height: 0.98; letter-spacing: -0.02em;
   margin: 0; color: #fff;
 }
 .prog-title em { font-style: italic; color: var(--violet); }
-.prog-sub { margin: 0; max-width: 440px; font-size: 13px; line-height: 1.7; color: var(--violet-soft); }
+.prog-sub { margin: 0; max-width: 440px; font-size: 14px; line-height: 1.7; color: var(--violet-soft); }
 .prog-sub-hint { color: var(--ink-dim, #7E6E99); }
 
 /* panels container */
@@ -1682,6 +1688,7 @@ body::before {
 .prog-panel.on .prog-p-ghost { opacity: .07; transform: scale(1); }
 .prog-p-num {
   position: absolute; left: 50%; top: 46%; transform: translate(-50%,-50%);
+  font-family: var(--serif); font-weight: 400;
   font-size: clamp(120px, 16vw, 240px); line-height: 1; color: #fff; opacity: .05;
   transition: opacity .5s ease, top .6s cubic-bezier(.2,.7,.2,1), left .6s cubic-bezier(.2,.7,.2,1), transform .6s ease;
   pointer-events: none; user-select: none;
@@ -1698,6 +1705,7 @@ body::before {
 .prog-panel.on .prog-spine { opacity: 0; pointer-events: none; }
 .prog-spine-idx { font-size: 11px; letter-spacing: .2em; color: var(--ink-dim, #7E6E99); }
 .prog-spine-name {
+  font-family: var(--serif); font-weight: 400;
   writing-mode: vertical-rl; transform: rotate(180deg);
   font-size: clamp(20px, 2vw, 28px); color: var(--violet-soft); letter-spacing: .01em; white-space: nowrap;
   transition: color .3s ease;
@@ -1731,8 +1739,8 @@ body::before {
 .prog-c-icon { width: 54px; height: 54px; color: var(--violet); filter: drop-shadow(0 0 16px rgba(167,139,250,.45)); flex: none; }
 .prog-c-tag { font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--ink-dim, #7E6E99); white-space: nowrap; }
 .prog-c-mid { margin-top: auto; }
-.prog-c-name { font-size: clamp(30px, 3.4vw, 50px); line-height: 1; color: #fff; margin: 0; }
-.prog-c-ess { font-style: italic; font-size: clamp(16px, 1.7vw, 21px); line-height: 1.4; color: var(--violet-soft); margin: 14px 0 0; max-width: 30ch; }
+.prog-c-name { font-family: var(--serif); font-weight: 400; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; color: #fff; margin: 0; }
+.prog-c-ess { font-family: var(--serif); font-style: italic; font-size: clamp(16px, 1.7vw, 21px); line-height: 1.4; color: var(--violet-soft); margin: 14px 0 0; max-width: 30ch; }
 .prog-c-points { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-direction: column; gap: 11px; max-width: 34ch; }
 .prog-c-points li { display: flex; align-items: center; gap: 13px; font-size: 12px; color: var(--violet-soft); }
 .prog-pip { width: 5px; height: 5px; border-radius: 50%; background: var(--violet); box-shadow: 0 0 8px var(--violet); flex: none; }
@@ -1767,7 +1775,7 @@ body::before {
   animation: progRing 4.2s linear forwards; transform-origin: center;
 }
 @keyframes progRing { from { transform: scale(.4); opacity: .7; } to { transform: scale(1); opacity: 0; } }
-.prog-count { font-size: 18px; color: var(--violet-soft); }
+.prog-count { font-family: var(--serif); font-weight: 400; font-size: 18px; color: var(--violet-soft); }
 .prog-count em { font-style: italic; color: var(--violet); font-size: 24px; }
 .prog-count span { opacity: .5; }
 
