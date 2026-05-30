@@ -1356,8 +1356,26 @@ function ProgramsSection() {
   const [locked, setLocked] = useState(false)
   const [paused, setPaused] = useState(false)
   const [autoplay] = useState(true)
+  const sectionRef = useRef(null)
 
   const go = useCallback((i) => setActive(((i % PROGRAMS.length) + PROGRAMS.length) % PROGRAMS.length), [])
+
+  // Reset to card 1 every time the section enters the viewport
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setActive(0)
+          setLocked(false)
+        }
+      },
+      { threshold: 0.15 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
 
   // auto-advance
   useEffect(() => {
@@ -1377,7 +1395,7 @@ function ProgramsSection() {
   }, [active, go])
 
   return (
-    <section className="prog-section" id="programs">
+    <section className="prog-section" id="programs" ref={sectionRef}>
       <div className="prog-grid-bg" aria-hidden="true"></div>
       <div className="prog-inner">
 
