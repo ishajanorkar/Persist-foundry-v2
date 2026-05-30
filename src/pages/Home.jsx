@@ -1383,7 +1383,6 @@ function ProgramsSection() {
 
         <header className="prog-head">
           <div className="prog-kicker">
-            <span className="prog-kicker-pip"></span>
             WHAT WE RUN · 05
           </div>
           <div className="prog-head-row">
@@ -1416,7 +1415,6 @@ function ProgramsSection() {
                   <svg className="prog-p-ghost" viewBox="0 0 672 793">
                     {HUB_PATHS.map((d, k) => <path key={k} d={d} fill="currentColor" />)}
                   </svg>
-                  <span className="prog-p-num serif">{p.roman}</span>
                 </div>
 
                 {/* collapsed spine */}
@@ -1455,21 +1453,6 @@ function ProgramsSection() {
           })}
         </div>
 
-        <div className="prog-foot">
-          <div className="prog-dots">
-            {PROGRAMS.map((_, i) => (
-              <button
-                key={i}
-                className={'prog-dot' + (i === active ? ' on' : '')}
-                onClick={() => { go(i); setLocked(true) }}
-                aria-label={'Program ' + (i + 1)}
-              >
-                {i === active && autoplay && !paused && !locked && <span className="prog-dot-ring" key={active}></span>}
-              </button>
-            ))}
-          </div>
-          <div className="prog-count serif"><em>{PROGRAMS[active].roman}</em> <span>/ V</span></div>
-        </div>
 
       </div>
     </section>
