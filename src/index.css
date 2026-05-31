@@ -968,331 +968,172 @@ body::before {
   line-height: 1.5;
 }
 
-/* ================== OFFER ================== */
-.offer {
-  background: var(--night);
-  color: var(--paper);
-  border-top: 1px solid var(--hairline);
-  border-bottom: 1px solid var(--hairline);
+/* ================== SIX THINGS — horizontal pinned scroll ================== */
+.st-wrap {
   position: relative;
-  padding: 140px 0 200px;
-  overflow: hidden;
-  isolation: isolate;
+  background:
+    radial-gradient(60% 50% at 20% 10%, rgba(139,92,246,.13) 0%, transparent 55%),
+    radial-gradient(140% 90% at 50% 0%, #160a28 0%, #0B0613 50%, #06030c 100%);
 }
-/* Atmospheric violet blobs — pushed far off-screen and heavily blurred
-   so they read as ambient color wash, never as a hard edge near a card. */
-.offer::before, .offer::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  z-index: -1;
-  filter: blur(120px);
-  opacity: 0.55;
-}
-.offer::before {
-  top: -25%; left: -25%;
-  width: 75%; height: 75%;
-  background: radial-gradient(circle at center,
-    rgba(120, 84, 213, 0.22) 0%,
-    rgba(97, 69, 169, 0.08) 45%,
-    transparent 75%);
-}
-.offer::after {
-  bottom: -25%; right: -25%;
-  width: 75%; height: 75%;
-  background: radial-gradient(circle at center,
-    rgba(155, 127, 228, 0.18) 0%,
-    rgba(120, 84, 213, 0.06) 45%,
-    transparent 75%);
+.st-grid-bg {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: linear-gradient(rgba(139,92,246,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139,92,246,.055) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(120% 80% at 50% 50%, #000 30%, transparent 92%);
+  -webkit-mask-image: radial-gradient(120% 80% at 50% 50%, #000 30%, transparent 92%);
 }
 
-/* Sticky section header — title on left, progress pill on right */
-.offer-header {
-  position: sticky;
-  top: 100px;
-  z-index: 2;
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 60px;
-  margin-bottom: 80px;
-  display: flex; justify-content: space-between; align-items: flex-end;
-  pointer-events: none;
+/* 600vh scroll driver + 100vh sticky pin */
+.st-h-scroll { position: relative; z-index: 1; height: 600vh; }
+.st-pin      { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+
+/* top bar */
+.st-topbar {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 6;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  padding: clamp(26px, 3.4vw, 46px) clamp(24px, 5vw, 72px);
 }
-.offer-header > * { pointer-events: auto; }
-.offer-header-left { max-width: 720px; }
-.offer-eyebrow {
-  font-family: var(--mono);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.28em;
-  color: var(--violet-soft);
-  margin-bottom: 22px;
+.st-kicker {
   display: inline-flex; align-items: center; gap: 14px;
-  padding: 9px 18px;
-  background: rgba(7, 5, 15, 0.55);
-  backdrop-filter: blur(16px) saturate(120%);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
-  border: 1px solid var(--hairline-strong);
-  border-radius: 100px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--violet-soft);
 }
-.offer-eyebrow::before {
-  content: ""; width: 24px; height: 1px; background: var(--violet-soft); opacity: 0.7;
+.st-kicker-dash {
+  width: 34px; height: 1px; background: var(--violet-soft); opacity: 0.55;
 }
-.offer-title {
-  font-family: var(--serif);
-  font-size: clamp(44px, 5.2vw, 84px);
-  line-height: 0.96;
-  letter-spacing: -0.035em;
-  font-weight: 400;
-  color: var(--paper);
-}
-.offer-title em { font-style: italic; color: var(--violet-soft); font-weight: 400; }
+.st-count { font-size: 14px; color: var(--violet-soft); }
+.st-count em { font-style: italic; color: var(--violet); font-size: 22px; }
+.st-count span { opacity: .5; }
 
-/* Live progress indicator pill */
-.offer-progress {
-  font-family: var(--mono);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.32em;
-  color: var(--stone-soft);
-  display: flex; align-items: center; gap: 14px;
-  padding: 12px 18px;
-  background: rgba(7, 5, 15, 0.55);
-  backdrop-filter: blur(16px) saturate(120%);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
-  border: 1px solid var(--hairline-strong);
-  border-radius: 100px;
-}
-.offer-progress-bar {
-  width: 100px; height: 1px;
-  background: var(--hairline-strong);
-  position: relative;
-  overflow: hidden;
-}
-.offer-progress-fill {
-  position: absolute; top: 0; left: 0;
-  height: 100%; width: 0;
-  background: var(--violet);
-  box-shadow: 0 0 8px var(--violet-glow);
-  transition: width 0.2s linear;
-}
-.offer-progress-num { color: var(--paper); font-weight: 500; }
-
-/* Staircase container */
-.offer-stairs {
-  position: relative;
-  z-index: 1;
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 60px;
-  padding-top: 80px;
-}
-
-/* Each step — alternates left/right like a descending staircase */
-.offer-step {
-  width: min(620px, 70%);
-  margin-bottom: 14vh;
-  position: relative;
-  z-index: 1;
-  opacity: 0;
-  transform: translateY(60px);
-  transition: opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
-              transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.offer-step.is-revealed { opacity: 1; transform: translateY(0); }
-/* Odd steps: left edge, each row drifts slightly inward */
-.offer-step:nth-child(1) { margin-left: 0; }
-.offer-step:nth-child(3) { margin-left: 4%; }
-.offer-step:nth-child(5) { margin-left: 8%; }
-/* Even steps: right edge, each row drifts slightly inward — mirrors odd side */
-.offer-step:nth-child(2) { margin-left: auto; margin-right: 0; }
-.offer-step:nth-child(4) { margin-left: auto; margin-right: 4%; }
-.offer-step:nth-child(6) { margin-left: auto; margin-right: 8%; }
-
-/* Per-step ambient glow — radial blob sitting BEHIND the card, fades in on reveal.
-   Heavily blurred + transparent edges so it reads as a soft halo, never an edge. */
-.offer-step::before {
-  content: "";
+/* receding hero headline */
+.st-hero {
   position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%) scale(0.7);
-  width: 180%;
-  height: 200%;
-  background: radial-gradient(ellipse at center,
-    rgba(120, 84, 213, 0.28) 0%,
-    rgba(97, 69, 169, 0.10) 30%,
-    rgba(74, 46, 159, 0.03) 55%,
-    transparent 78%);
-  opacity: 0;
-  pointer-events: none;
-  z-index: -1;
-  filter: blur(80px);
-  transition: opacity 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s,
-              transform 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s;
+  top: clamp(86px, 13vh, 150px); left: clamp(24px, 5vw, 72px);
+  z-index: 4; margin: 0;
+  font-size: clamp(40px, 5.2vw, 84px); line-height: 0.98; letter-spacing: -0.02em;
+  color: #fff; max-width: 13ch; pointer-events: none;
+  text-shadow: 0 0 60px rgba(8,4,15,.5);
 }
-.offer-step.is-revealed::before {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
+.st-hero em { font-style: italic; color: var(--violet); }
+
+/* horizontal track */
+.st-track {
+  display: flex; align-items: center; height: 100vh;
+  will-change: transform;
+  padding-left: 48vw; padding-right: 19vw;
 }
 
-/* The card face — solid base + inner gradient overlay so the section
-   blobs can't bleed through the sides */
-.offer-card {
-  background: #0e0a1f;
-  border: 1px solid var(--hairline-strong);
-  border-radius: 8px;
-  padding: 52px 48px 44px;
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  transition: transform 0.5s cubic-bezier(0.2,0.8,0.2,1),
-              border-color 0.6s ease, box-shadow 0.6s ease;
-}
-/* Inner gradient overlay — purely decorative, sits ABOVE the solid bg
-   but BELOW all content (z-index: 0). Section blobs can't reach this. */
-.offer-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(165deg,
-    rgba(120, 84, 213, 0.14) 0%,
-    rgba(74, 46, 159, 0.06) 40%,
-    transparent 100%);
-  pointer-events: none;
-  z-index: 0;
-  border-radius: inherit;
-}
-/* Flash glow when the step is revealed by scroll — one-shot animation */
-.offer-step.is-revealed .offer-card {
-  animation: offerCardFlash 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-@keyframes offerCardFlash {
-  0% {
-    border-color: var(--hairline-strong);
-    box-shadow: 0 0 0 0 rgba(120, 84, 213, 0);
-  }
-  35% {
-    border-color: rgba(139, 92, 246, 0.95);
-    box-shadow:
-      0 0 0 1px rgba(139, 92, 246, 0.35),
-      0 0 60px rgba(120, 84, 213, 0.55),
-      0 0 120px rgba(97, 69, 169, 0.32),
-      0 12px 50px rgba(74, 46, 159, 0.4);
-  }
-  100% {
-    border-color: rgba(120, 84, 213, 0.32);
-    box-shadow:
-      0 0 0 1px rgba(120, 84, 213, 0.08),
-      0 8px 32px rgba(74, 46, 159, 0.18);
-  }
-}
-.offer-card:hover {
-  border-color: var(--violet);
-  transform: translateY(-6px);
-  box-shadow: 0 24px 60px rgba(74,46,159,0.45),
-              0 0 80px rgba(120, 84, 213, 0.25);
-}
-.offer-card:hover .offer-card-icon-wrap {
-  background: var(--violet);
-  border-color: var(--violet);
-}
-.offer-card:hover .offer-card-icon { color: var(--paper); }
-.offer-card:hover .offer-card-num { color: rgba(155,127,228,0.22); }
-
-/* Large watermark number */
-.offer-card-num {
-  font-family: var(--serif);
-  font-size: clamp(120px, 16vw, 240px);
-  line-height: 0.85;
-  color: rgba(199,184,245,0.08);
-  position: absolute;
-  top: 10px; right: 28px;
-  pointer-events: none;
-  letter-spacing: -0.05em;
-  z-index: 1;
-  transition: color 0.5s ease;
-}
-
-/* Top row: icon then label, left-aligned */
-.offer-card-top {
-  display: flex; justify-content: flex-start; align-items: center;
-  gap: 18px;
-  margin-bottom: 60px;
-  z-index: 2; position: relative;
-}
-.offer-card-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.32em;
-  color: var(--violet-soft);
+/* each panel */
+.st-panel {
+  position: relative; flex: 0 0 auto;
+  width: min(64vw, 860px); height: 64vh;
   display: flex; align-items: center;
+  margin-right: 6vw; opacity: 0.26; will-change: opacity, transform;
 }
-.offer-card-label::before { display: none; }
-.offer-card-icon-wrap {
-  width: 56px; height: 56px;
-  border: 1px solid var(--hairline-strong);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(7,5,15,0.4);
-  transition: background 0.5s ease, border-color 0.5s ease, transform 0.5s ease;
-  flex-shrink: 0;
-}
-.offer-card-icon {
-  width: 24px; height: 24px;
-  color: var(--violet-soft);
-  transition: color 0.5s ease;
+.st-panel:last-child { margin-right: 0; }
+
+/* large faint ghost number */
+.st-ghost {
+  position: absolute; right: -2%; top: 50%; transform: translateY(-50%);
+  font-size: min(48vh, 460px); line-height: 0.8;
+  color: #fff; opacity: .06; pointer-events: none; user-select: none; will-change: transform;
 }
 
-/* Bottom: name + proof */
-.offer-card-bottom { z-index: 2; position: relative; }
-.offer-card-name {
-  font-family: var(--serif);
-  font-size: clamp(44px, 5vw, 84px);
-  line-height: 0.96;
-  font-weight: 400;
-  color: var(--paper);
-  letter-spacing: -0.035em;
-  margin-bottom: 18px;
+/* panel inner content */
+.st-p-in {
+  position: relative; z-index: 2; max-width: 540px;
+  border-left: 1px solid rgba(200,184,225,.12);
+  padding-left: clamp(26px, 3vw, 48px);
 }
-.offer-card-name em { font-style: italic; color: var(--violet-soft); font-weight: 400; }
-.offer-card-proof {
-  font-family: var(--serif);
-  font-size: clamp(16px, 1.3vw, 20px);
-  font-style: italic;
-  line-height: 1.5;
-  color: var(--stone-soft);
-  max-width: 460px;
+.st-r1 { display: flex; align-items: center; gap: 18px; margin-bottom: 28px; }
+.st-p-icon {
+  width: 50px; height: 50px; color: var(--violet); flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(200,184,225,.12); border-radius: 50%; padding: 11px;
+  filter: drop-shadow(0 0 14px rgba(167,139,250,.4));
+}
+.st-p-cat {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.30em;
+  text-transform: uppercase; color: var(--violet-soft);
+}
+.st-p-title {
+  font-size: clamp(52px, 6.6vw, 108px); line-height: 0.94;
+  letter-spacing: -0.025em; margin: 0; color: #fff;
+}
+.st-p-title em { font-style: italic; color: var(--violet); }
+.st-p-body {
+  margin: 26px 0 0; max-width: 420px;
+  font-size: 15px; line-height: 1.7; color: var(--violet-soft);
+  font-style: italic; letter-spacing: 0.005em;
 }
 
-/* Thin violet connector line between steps */
-.offer-step::after {
-  content: "";
+/* bottom progress bar + markers */
+.st-prog {
   position: absolute;
-  bottom: -10vh;
-  width: 1px; height: 8vh;
-  background: linear-gradient(180deg, var(--violet-soft), transparent);
-  opacity: 0;
-  transition: opacity 0.6s ease 0.3s;
+  left: clamp(24px, 5vw, 72px); right: clamp(24px, 5vw, 72px);
+  bottom: clamp(26px, 4vh, 52px); z-index: 6;
 }
-.offer-step.is-revealed::after { opacity: 0.45; }
-.offer-step:nth-child(odd)::after  { right: 10%; }
-.offer-step:nth-child(even)::after { left: 10%; }
-.offer-step:last-child::after { display: none; }
+.st-pline {
+  position: relative; height: 1px;
+  background: rgba(200,184,225,.16); border-radius: 2px; overflow: hidden;
+}
+.st-pline i {
+  position: absolute; left: 0; top: -0.5px; height: 2px; width: 100%;
+  background: var(--violet); box-shadow: 0 0 12px var(--violet);
+  transform-origin: left; transform: scaleX(0);
+}
+.st-marks { display: flex; justify-content: space-between; margin-top: 14px; }
+.st-mark {
+  display: flex; flex-direction: column; gap: 4px; align-items: flex-start;
+  opacity: .5; transition: opacity .3s ease;
+  background: none; border: 0; padding: 0; cursor: pointer; color: inherit; font-family: inherit;
+}
+.st-mark.on, .st-mark.done { opacity: 1; }
+.st-mark:hover { opacity: 1; }
+.st-m-n { font-style: italic; font-size: 14px; color: var(--ink-dim, #7E6E99); transition: color .3s ease; }
+.st-mark.on  .st-m-n { color: var(--violet); }
+.st-mark.done .st-m-n { color: var(--violet-soft); }
+.st-m-cat {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--ink-dim, #7E6E99); transition: color .3s ease;
+}
+.st-mark.on .st-m-cat { color: #fff; }
 
-/* Step counter badge */
-.offer-card-step-of {
-  position: absolute;
-  bottom: 32px; right: 36px;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--stone-soft);
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  opacity: 0.7;
+/* ── short viewport ≤680px height */
+@media (max-height: 680px) {
+  .st-hero { font-size: clamp(32px, 5vw, 52px); top: 74px; }
+  .st-panel { height: 58vh; }
+  .st-p-title { font-size: clamp(40px, 5.4vw, 72px); }
+  .st-m-cat { display: none; }
+}
+
+/* ── tablet/mobile ≤900px: vertical stack */
+@media (max-width: 900px) {
+  .st-h-scroll { height: auto; }
+  .st-pin { position: static; height: auto; overflow: visible; }
+  .st-topbar {
+    position: sticky; top: 0;
+    background: linear-gradient(180deg, #0B0613 72%, transparent);
+    backdrop-filter: blur(4px);
+  }
+  .st-hero {
+    position: relative; top: auto; left: auto;
+    padding: 14px 22px 0; font-size: clamp(30px, 8vw, 46px); max-width: none;
+  }
+  .st-track { flex-direction: column; height: auto; transform: none !important; padding: 18px 22px 70px; }
+  .st-panel {
+    width: 100%; height: auto; opacity: 1 !important; transform: none !important;
+    margin: 0; padding: 46px 0; border-bottom: 1px solid rgba(200,184,225,.12);
+  }
+  .st-panel:last-child { border-bottom: 0; }
+  .st-ghost { font-size: clamp(120px, 34vw, 200px); right: 0; opacity: .05; }
+  .st-prog { display: none; }
+}
+@media (max-width: 520px) {
+  .st-p-title { font-size: clamp(40px, 11vw, 62px); }
+  .st-p-icon  { width: 42px; height: 42px; padding: 9px; }
+  .st-p-body  { font-size: 14px; }
 }
 
 /* ================== MANIFESTO (converging dots) ================== */
