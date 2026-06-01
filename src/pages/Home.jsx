@@ -1291,10 +1291,9 @@ function SixThingsSection() {
 
   return (
     <div className="st-wrap" id="offer">
-      <div className="st-grid-bg" aria-hidden="true"></div>
-
       <section className="st-h-scroll" ref={sectionRef}>
         <div className="st-pin" ref={pinRef}>
+          <div className="st-grid-bg" aria-hidden="true"></div>
 
           {/* top bar */}
           <div className="st-topbar">

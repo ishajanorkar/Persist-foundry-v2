@@ -976,7 +976,7 @@ body::before {
     radial-gradient(140% 90% at 50% 0%, #160a28 0%, #0B0613 50%, #06030c 100%);
 }
 .st-grid-bg {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
   background-image: linear-gradient(rgba(139,92,246,.055) 1px, transparent 1px),
     linear-gradient(90deg, rgba(139,92,246,.055) 1px, transparent 1px);
   background-size: 64px 64px;
