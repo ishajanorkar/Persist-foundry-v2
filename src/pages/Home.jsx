@@ -207,36 +207,61 @@ export default function Home() {
     }, { threshold: 0.3 })
     filterItems.forEach(li => filterRevealObs.observe(li))
 
-    /* ── MANIFESTO — CONVERGING CANVAS ──────────────────────── */
+    /* ── MANIFESTO — LERP-DRIVEN SCROLL ─────────────────────── */
     ;(() => {
       const mScroll  = document.getElementById('manifestoScroll')
       const mHint    = document.getElementById('manifestoHint')
-      const mSteps   = document.querySelectorAll('.manifesto-step')
+      const mSteps   = Array.from(document.querySelectorAll('.manifesto-step'))
       const mNumEl   = document.getElementById('manifestoCounterNum')
       const mFillEl  = document.getElementById('manifestoCounterFill')
       const ROMAN    = ['I','II','III','IV','V']
       if (!mScroll) return
 
-      let mProg = 0
-
-      function ss(e0, e1, x) {
-        const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)))
-        return t * t * (3 - 2 * t)
-      }
-
-      // ── logo trace elements ───────────────────────────────────
+      // logo trace elements
       const mltSolid   = document.getElementById('mltSolidRect')
       const mltFeather = document.getElementById('mltFeatherRect')
       const mltEdge    = document.getElementById('mltEdgeGlow')
       const mltPGlow   = document.getElementById('mltPGlow')
       const mltInfGlow = document.getElementById('mltInfGlow')
 
-      function updateLogoTrace(progress, t) {
-        const pc     = Math.max(0, Math.min(1, progress))
+      let mTarget = 0   // raw scroll progress (0–1)
+      let mCurrent = 0  // lerped progress
+
+      function ss(e0, e1, x) {
+        const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)))
+        return t * t * (3 - 2 * t)
+      }
+
+      function readScroll() {
+        const rect  = mScroll.getBoundingClientRect()
+        const total = mScroll.offsetHeight - window.innerHeight
+        if (total <= 0) return
+        mTarget = Math.max(0, Math.min(1, -rect.top / total))
+      }
+
+      function applyManifesto(p) {
+        // Counter
+        const idx = Math.min(4, Math.floor(p * 5 + 0.0001))
+        if (mNumEl)  mNumEl.textContent  = ROMAN[idx]
+        if (mFillEl) mFillEl.style.width = `${(idx / 4) * 100}%`
+        if (mHint)   mHint.style.opacity = p > 0.02 ? '0' : '1'
+
+        // Continuous proximity crossfade — no class toggles, pure JS
+        const pos = p * 5  // 0 → 5 across all steps
+        mSteps.forEach((el, i) => {
+          const dist   = i - pos
+          const opacity = Math.max(0, 1 - Math.abs(dist) * 2.8)
+          const ty     = dist * 30  // ±30px per step unit
+          el.style.opacity   = String(opacity)
+          el.style.transform = `translateY(calc(-50% + ${ty}px))`
+        })
+      }
+
+      function updateLogoTrace(p, t) {
+        const pc     = Math.max(0, Math.min(1, p))
         const pI     = ss(0.0, 0.9, pc)
         const finale = ss(0.86, 1.0, pc)
-        const WIPE_X0 = 20, WIPE_X1 = 660
-        const wipeX  = WIPE_X0 + (WIPE_X1 - WIPE_X0) * pI
+        const wipeX  = 20 + (660 - 20) * pI
 
         if (mltSolid)   mltSolid.setAttribute('width', String(wipeX + 240))
         if (mltFeather) mltFeather.setAttribute('x', String(wipeX))
@@ -246,43 +271,21 @@ export default function Home() {
           const fade   = ss(0.0, 0.06, pc) * (1 - ss(0.82, 0.92, pc))
           mltEdge.style.opacity = String(fade * breath)
         }
-        if (mltInfGlow) {
-          mltInfGlow.style.opacity = String(finale * (0.82 + 0.18 * Math.sin(t * 0.0028)))
-        }
-        if (mltPGlow) {
-          mltPGlow.style.opacity = String(finale * (0.85 + 0.15 * Math.sin(t * 0.0028 + 1.1)))
-        }
+        if (mltInfGlow) mltInfGlow.style.opacity = String(finale * (0.82 + 0.18 * Math.sin(t * 0.0028)))
+        if (mltPGlow)   mltPGlow.style.opacity   = String(finale * (0.85 + 0.15 * Math.sin(t * 0.0028 + 1.1)))
       }
 
-      ;(function logoLoop(t) {
-        updateLogoTrace(mProg, t)
-        requestAnimationFrame(logoLoop)
+      // single rAF loop: lerp + apply + logo
+      ;(function mLoop(t) {
+        readScroll()
+        mCurrent += (mTarget - mCurrent) * 0.07
+        if (Math.abs(mTarget - mCurrent) < 0.0003) mCurrent = mTarget
+        applyManifesto(mCurrent)
+        updateLogoTrace(mCurrent, t)
+        requestAnimationFrame(mLoop)
       })(0)
 
-      // ── scroll → steps ────────────────────────────────────────
-      function updateMScroll() {
-        const rect  = mScroll.getBoundingClientRect()
-        const total = mScroll.offsetHeight - window.innerHeight
-        if (total <= 0) return
-        mProg = Math.max(0, Math.min(1, -rect.top / total))
-        const idx = Math.min(4, Math.floor(mProg * 5 + 0.0001))
-        if (mNumEl)  mNumEl.textContent  = ROMAN[idx]
-        if (mFillEl) mFillEl.style.width = `${(idx / 4) * 100}%`
-        if (mHint)   mHint.style.opacity = mProg > 0.02 ? '0' : '1'
-        mSteps.forEach((el, i) => {
-          el.classList.remove('is-active', 'is-before', 'is-after')
-          if (i === idx)    el.classList.add('is-active')
-          else if (i < idx) el.classList.add('is-before')
-          else              el.classList.add('is-after')
-        })
-      }
-
-      let mTick = false
-      window.addEventListener('scroll', () => {
-        if (!mTick) { requestAnimationFrame(() => { updateMScroll(); mTick = false }); mTick = true }
-      }, { passive: true })
-      window.addEventListener('resize', updateMScroll, { passive: true })
-      updateMScroll()
+      window.addEventListener('resize', readScroll, { passive: true })
     })()
 
     /* ── FILTER DIVIDER DRAW-IN ──────────────────────────────── */

@@ -1220,17 +1220,15 @@ body::before {
   position: relative; width: 100%; max-width: 1280px; margin: 0 auto;
 }
 
-/* steps — one visible at a time, crossfade */
+/* steps — opacity + translateY driven directly by JS rAF lerp */
 .manifesto-step {
   position: absolute; left: 0; right: 0; top: 50%;
   transform: translateY(-50%);
   opacity: 0;
-  transition: opacity 0.6s ease, transform 0.9s cubic-bezier(0.2,0.7,0.2,1);
+  will-change: opacity, transform;
   pointer-events: none;
 }
-.manifesto-step.is-active  { opacity: 1; transform: translateY(-50%); pointer-events: auto; }
-.manifesto-step.is-before  { transform: translateY(calc(-50% - 24px)); }
-.manifesto-step.is-after   { transform: translateY(calc(-50% + 24px)); }
+.manifesto-step.is-active { pointer-events: auto; }
 
 .manifesto-step-headline {
   font-family: var(--serif); font-weight: 400;
