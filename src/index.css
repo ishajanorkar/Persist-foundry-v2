@@ -473,9 +473,9 @@ body::before {
 }
 .panel-1-headline {
   font-family: var(--serif);
-  font-size: clamp(32px, 4.4vw, 78px);
-  line-height: 0.92;
-  letter-spacing: -0.025em;
+  font-size: clamp(58px, 8.5vw, 156px);
+  line-height: 0.88;
+  letter-spacing: -0.035em;
   font-weight: 400;
   color: var(--paper);
   max-width: 1200px;
@@ -667,9 +667,9 @@ body::before {
 }
 .panel-2-headline {
   font-family: var(--serif);
-  font-size: clamp(22px, 2.6vw, 44px);
-  line-height: 1.0;
-  letter-spacing: -0.018em;
+  font-size: clamp(38px, 4.6vw, 78px);
+  line-height: 0.96;
+  letter-spacing: -0.025em;
   font-weight: 400;
   color: var(--paper);
 }
@@ -2572,7 +2572,7 @@ body::before {
   .panel-1 { padding-top: 112px; }
 
   /* Smaller headline — saves ~50 px across three stacked lines */
-  .panel-1-headline { font-size: clamp(26px, 3.4vw, 52px); }
+  .panel-1-headline { font-size: clamp(44px, 6.4vw, 96px); }
 
   /* Tighten the gap between headline and buttons */
   .panel-1-actions { margin-top: 28px; }
@@ -2590,7 +2590,7 @@ body::before {
 /* Extra tight — very short viewport (e.g. 13" MacBook with dev tools open) */
 @media (max-height: 720px) and (min-width: 1024px) {
   .panel-1 { padding-top: 96px; }
-  .panel-1-headline { font-size: clamp(24px, 3.2vw, 44px); }
+  .panel-1-headline { font-size: clamp(40px, 5.8vw, 80px); }
   .panel-1-meta { margin-bottom: 20px; }
   .panel-1-actions { margin-top: 20px; }
   .scroll-cue { bottom: 18px; font-size: 9px; }
@@ -2617,7 +2617,7 @@ body::before {
   .scrub-block { height: 280vh; }
 
   .panel-1 { padding: 115px 28px 50px; }
-  .panel-1-headline { font-size: clamp(26px, 5.5vw, 44px); }
+  .panel-1-headline { font-size: clamp(46px, 10.5vw, 72px); }
   .panel-1-actions { margin-top: 32px; flex-wrap: wrap; gap: 10px; }
   .panel-1-actions .btn-primary { flex: 1 1 auto; justify-content: center; }
   .panel-1-actions .btn-ghost { flex: 1 1 auto; }
@@ -2627,7 +2627,7 @@ body::before {
   .panel-2 { padding: 0 28px 60px; align-items: flex-end; }
   .panel-2-inner { max-width: 100%; }
   .panel-2-plate { margin-left: 0; padding: 0; }
-  .panel-2-headline { font-size: clamp(20px, 4.6vw, 34px); }
+  .panel-2-headline { font-size: clamp(38px, 9vw, 60px); }
 
   .panel-3 { padding: 80px 28px; }
   .panel-3-headline { font-size: clamp(26px, 6.2vw, 48px); }
@@ -2763,7 +2763,7 @@ body::before {
 
   .panel-1 { padding: 100px 20px 44px; justify-content: flex-start; }
   .panel-1-meta { font-size: 9.5px; padding: 7px 14px 7px 11px; }
-  .panel-1-headline { font-size: clamp(22px, 7vw, 36px); line-height: 0.95; }
+  .panel-1-headline { font-size: clamp(40px, 13vw, 60px); line-height: 0.9; }
   .panel-1-actions { margin-top: 28px; flex-direction: column; gap: 10px; }
   .panel-1-actions .btn-primary,
   .panel-1-actions .btn-ghost { width: 100%; text-align: center; justify-content: center; }
@@ -2774,7 +2774,7 @@ body::before {
   .panel-2 { padding: 0 20px 44px; }
   .panel-2-eyebrow { font-size: 9.5px; padding: 7px 12px 7px 11px; }
   .panel-2-plate { margin-left: 0; padding: 0; }
-  .panel-2-headline { font-size: clamp(18px, 6vw, 30px); line-height: 1.0; }
+  .panel-2-headline { font-size: clamp(32px, 11.5vw, 52px); line-height: 0.95; }
 
   .panel-3 { padding: 60px 20px; }
   .panel-3-eyebrow { font-size: 9.5px; margin-bottom: 28px; }
@@ -2855,8 +2855,8 @@ body::before {
 
 /* ── Very small phone (≤ 380px) ── */
 @media (max-width: 380px) {
-  .panel-1-headline { font-size: clamp(20px, 8vw, 32px); }
-  .panel-2-headline { font-size: clamp(16px, 7vw, 26px); }
+  .panel-1-headline { font-size: clamp(36px, 14vw, 50px); }
+  .panel-2-headline { font-size: clamp(28px, 12.5vw, 44px); }
   .panel-3-headline { font-size: clamp(20px, 8.5vw, 34px); }
   .nav-logo img { width: 24px; height: 24px; }
   .nav-logo span { font-size: 16px; }
