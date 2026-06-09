@@ -984,8 +984,8 @@ body::before {
   -webkit-mask-image: radial-gradient(120% 80% at 50% 50%, #000 30%, transparent 92%);
 }
 
-/* 600vh scroll driver + 100vh sticky pin */
-.st-h-scroll { position: relative; z-index: 1; height: 600vh; }
+/* 760vh scroll driver + 100vh sticky pin — extra 160vh dwell on last panel */
+.st-h-scroll { position: relative; z-index: 1; height: 760vh; }
 .st-pin      { position: sticky; top: 0; height: 100vh; overflow: hidden; }
 
 /* top bar */

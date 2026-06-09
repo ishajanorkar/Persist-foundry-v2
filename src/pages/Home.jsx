@@ -1186,7 +1186,7 @@ function SixThingsSection() {
       const section = sectionRef.current, pin = pinRef.current
       if (!section || !pin) return
       if (isMobile()) { targetP.current = 0; return }
-      const dist = (section.offsetHeight - pin.clientHeight) * 0.9
+      const dist = (section.offsetHeight - pin.clientHeight) * 0.72
       targetP.current = clamp01st(-section.getBoundingClientRect().top / (dist || 1))
     }
 
