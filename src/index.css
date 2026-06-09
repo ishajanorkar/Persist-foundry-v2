@@ -1009,11 +1009,12 @@ body::before {
 /* receding hero headline */
 .st-hero {
   position: absolute;
-  top: clamp(86px, 13vh, 150px); left: clamp(24px, 5vw, 72px);
+  top: clamp(86px, 13vh, 140px); left: clamp(24px, 5vw, 72px);
   z-index: 4; margin: 0;
-  font-size: clamp(40px, 5.2vw, 84px); line-height: 0.98; letter-spacing: -0.02em;
+  font-size: clamp(36px, 4.4vw, 72px); line-height: 0.98; letter-spacing: -0.02em;
   color: #fff; max-width: 13ch; pointer-events: none;
   text-shadow: 0 0 60px rgba(8,4,15,.5);
+  will-change: opacity, transform;
 }
 .st-hero em { font-style: italic; color: var(--violet); }
 

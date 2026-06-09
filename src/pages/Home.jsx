@@ -579,7 +579,7 @@ export default function Home() {
 
           {/* PANEL 1 — HERO */}
           <div className="panel panel-1 is-active" id="panel1">
-            <div className="panel-1-meta"><span className="dot"></span>Cohort 2026 / Open</div>
+            {/* <div className="panel-1-meta"><span className="dot"></span>Cohort 2026 / Open</div> */}
             <h1 className="panel-1-headline">
               <span className="word" style={{'--i': 0}}><span>Bet</span></span>
               <span className="word" style={{'--i': 1}}><span>on</span></span>
@@ -867,27 +867,7 @@ export default function Home() {
         </span>
       </div>
 
-      {/* VELOCITY MARQUEE */}
-      <section className="velocity-marquee" id="velocityMarquee">
-        <div className="velocity-marquee-track" id="velocityTrack">
-          <span className="velocity-marquee-item">You made the bet. We matched it.</span>
-          <span className="velocity-marquee-star" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
-          </span>
-          <span className="velocity-marquee-item is-outline">You made the bet. We matched it.</span>
-          <span className="velocity-marquee-star" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
-          </span>
-          <span className="velocity-marquee-item">You made the bet. We matched it.</span>
-          <span className="velocity-marquee-star" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
-          </span>
-          <span className="velocity-marquee-item is-outline">You made the bet. We matched it.</span>
-          <span className="velocity-marquee-star" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.5h7.9l-6.4 4.7 2.4 7.8L12 15.4 5.5 20l2.4-7.8L1.5 7.5h7.9z"/></svg>
-          </span>
-        </div>
-      </section>
+      
 
       {/* SIX THINGS — HORIZONTAL PINNED SCROLL */}
       <SixThingsSection />
@@ -1218,13 +1198,22 @@ function SixThingsSection() {
         track.style.transform = ''
         panelRefs.current.forEach(el => { if (el) { el.style.opacity = ''; el.style.transform = '' } })
         numRefs.current.forEach(el => { if (el) el.style.transform = '' })
-        if (heroRef.current) heroRef.current.style.opacity = ''
+        if (heroRef.current) { heroRef.current.style.opacity = ''; heroRef.current.style.transform = '' }
         return
       }
 
       const maxShift = track.scrollWidth - pin.clientWidth
       track.style.transform = `translate3d(${-p * maxShift}px,0,0)`
 
+      // Hero: fade out quickly (gone by 8%) and slide up so it clears the panels
+      const heroProgress = Math.max(0, 1 - p / 0.08)
+      if (heroRef.current) {
+        heroRef.current.style.opacity = String(heroProgress)
+        heroRef.current.style.transform = `translateY(${-p * 90}px)`
+      }
+
+      // Panels: delay rising until hero has mostly cleared (after p > 0.06)
+      const panelReveal = clamp01st((p - 0.04) / 0.08)
       const center = pin.clientWidth / 2
       let best = 0, bestD = Infinity
       panelRefs.current.forEach((el, i) => {
@@ -1233,14 +1222,12 @@ function SixThingsSection() {
         const c = r.left + r.width / 2
         const d = Math.abs(c - center)
         const t = clamp01st(1 - d / (r.width * 0.82))
-        el.style.opacity = String(0.26 + 0.74 * t)
+        el.style.opacity = String((0.26 + 0.74 * t) * panelReveal)
         el.style.transform = `scale(${0.93 + 0.07 * t})`
         const num = numRefs.current[i]
         if (num) num.style.transform = `translateX(${(c - center) * 0.06}px)`
         if (d < bestD) { bestD = d; best = i }
       })
-
-      if (heroRef.current) heroRef.current.style.opacity = String(Math.max(0, 1 - p / 0.14))
       if (barRef.current)  barRef.current.style.transform = `scaleX(${p})`
       if (activeRef.current !== best) { activeRef.current = best; setActive(best) }
     }
