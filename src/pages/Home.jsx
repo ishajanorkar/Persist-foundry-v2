@@ -607,7 +607,7 @@ export default function Home() {
           {/* PANEL 2 — RECOGNITION */}
           <div className="panel panel-2" id="panel2">
             <div className="panel-2-inner">
-              <div className="panel-2-eyebrow">01 / The compound</div>
+              
               <div className="panel-2-plate">
                 <h2 className="panel-2-headline">
                   <span className="word" style={{'--i': 0}}><span>The</span></span>
@@ -628,7 +628,7 @@ export default function Home() {
 
           {/* PANEL 3 — TRANSFORMATION */}
           <div className="panel panel-3" id="panel3">
-            <div className="panel-3-eyebrow">02 / The offer</div>
+            
             <h2 className="panel-3-headline">
               <span className="word" style={{'--i': 0}}><span>You've</span></span>
               <span className="word" style={{'--i': 1}}><span>already</span></span>
