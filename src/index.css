@@ -182,9 +182,11 @@ body::before {
   display: inline-flex; align-items: center; gap: 8px;
   font-size: 14px;
   padding: 18px 24px;
-  background: rgba(199,184,245,0.08);
+  background: rgba(120,84,213,0.10);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: var(--paper);
-  border: 1px solid rgba(199,184,245,0.18);
+  border: 1px solid rgba(199,184,245,0.45);
   border-radius: 100px;
   font-weight: 500;
   font-family: var(--sans);
@@ -192,19 +194,23 @@ body::before {
   cursor: none;
   white-space: nowrap;
   position: relative; overflow: hidden;
-  box-shadow: none;
-  transition: background 0.32s ease, border-color 0.32s ease, box-shadow 0.32s ease, transform 0.2s ease, gap 0.3s ease;
+  box-shadow: 0 2px 16px rgba(120,84,213,0.18);
+  transition: background 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              gap 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .nav-cta::before {
   content: "";
   position: absolute; inset: 0;
   background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 55%);
-  opacity: 0; transition: opacity 0.3s;
+  opacity: 0; transition: opacity 0.45s;
 }
 .nav-cta:hover {
   background: linear-gradient(135deg, var(--violet) 0%, var(--violet-deep) 100%);
-  border-color: transparent;
-  box-shadow: 0 6px 32px rgba(120, 84, 213, 0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+  border-color: rgba(199,184,245,0.6);
+  box-shadow: 0 0 0 3px rgba(120,84,213,0.18), 0 8px 36px rgba(120,84,213,0.5), inset 0 1px 0 rgba(255,255,255,0.18);
   transform: translateY(-1px);
   gap: 12px;
 }
@@ -504,10 +510,12 @@ body::before {
 .tm-join-btn,
 .final-cta-apply-btn,
 .portfolio-v2-cta-link {
-  background: rgba(199,184,245,0.08);
+  background: rgba(120,84,213,0.10);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: var(--paper);
   text-decoration: none;
-  border: 1px solid rgba(199,184,245,0.2);
+  border: 1px solid rgba(199,184,245,0.45);
   padding: 18px 34px;
   font-family: var(--sans);
   font-size: 14px;
@@ -515,13 +523,13 @@ body::before {
   letter-spacing: 0.01em;
   text-transform: none;
   border-radius: 100px;
-  transition: background 0.32s cubic-bezier(0.2, 0.8, 0.2, 1),
-              border-color 0.32s cubic-bezier(0.2, 0.8, 0.2, 1),
-              box-shadow 0.32s cubic-bezier(0.2, 0.8, 0.2, 1),
-              transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
-              gap 0.3s ease;
+  transition: background 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              gap 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex; align-items: center; gap: 10px;
-  box-shadow: none;
+  box-shadow: 0 0 0 0 rgba(120,84,213,0), 0 2px 16px rgba(120,84,213,0.18);
   position: relative;
   overflow: hidden;
   cursor: none;
@@ -548,8 +556,8 @@ body::before {
 .final-cta-apply-btn:hover,
 .portfolio-v2-cta-link:hover {
   background: linear-gradient(135deg, var(--violet) 0%, var(--violet-deep) 100%);
-  border-color: transparent;
-  box-shadow: 0 6px 36px rgba(120, 84, 213, 0.55), inset 0 1px 0 rgba(255,255,255,0.2);
+  border-color: rgba(199,184,245,0.6);
+  box-shadow: 0 0 0 3px rgba(120,84,213,0.18), 0 8px 40px rgba(120,84,213,0.5), inset 0 1px 0 rgba(255,255,255,0.18);
   transform: translateY(-2px);
   gap: 14px;
 }
