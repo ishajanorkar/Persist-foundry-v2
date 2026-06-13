@@ -1986,7 +1986,7 @@ body::before {
   color: var(--ink);
   max-width: 1200px;
 }
-.backed-v2-statement em { font-style: italic; color: var(--ink-soft); font-weight: 400; }
+.backed-v2-statement em { font-style: italic; color: var(--violet); font-weight: 400; }
 .backed-v2-statement .small {
   display: block;
   font-family: var(--serif); font-style: italic;
