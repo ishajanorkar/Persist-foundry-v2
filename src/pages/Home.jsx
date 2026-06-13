@@ -694,23 +694,23 @@ export default function Home() {
             </h3>
           </div>
           <div className="backed-v2-list">
-            <a href="https://tether.to/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell is-featured">
+            <a href="https://tether.to/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell is-featured" style={{'--brand-bg':'#26A17B','--logo-invert':'1'}}>
               <img src="/assets/tether.png" alt="Tether" className="backed-v2-logo" />
               <div className="backed-v2-tag">Founders of</div>
             </a>
-            <a href="https://dna.fund/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell">
+            <a href="https://dna.fund/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell" style={{'--brand-bg':'#111111','--logo-invert':'1'}}>
               <img src="/assets/dna.png" alt="DNA Fund" className="backed-v2-logo" />
               <div className="backed-v2-tag">Capital partner</div>
             </a>
-            <a href="https://percival.vc/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell">
+            <a href="https://percival.vc/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell" style={{'--brand-bg':'#111111','--logo-invert':'1'}}>
               <img src="/assets/percival.png" alt="Percival" className="backed-v2-logo" />
               <div className="backed-v2-tag">Capital partner</div>
             </a>
-            <a href="https://blockchainff.com/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell">
+            <a href="https://blockchainff.com/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell" style={{'--brand-bg':'#f89520','--logo-invert':'0'}}>
               <img src="/assets/blockchain-fund.png" alt="Blockchain FF" className="backed-v2-logo" />
               <div className="backed-v2-tag">Capital partner</div>
             </a>
-            <a href="https://welara.com/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell">
+            <a href="https://welara.com/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell" style={{'--brand-bg':'#fff6e5','--logo-invert':'0'}}>
               <img src="/assets/w.png" alt="Welara" className="backed-v2-logo" />
               <div className="backed-v2-tag">Capital partner</div>
             </a>
