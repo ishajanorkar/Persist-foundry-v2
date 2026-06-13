@@ -593,10 +593,6 @@ export default function Home() {
                 Apply for fellowship
                 <svg className="btn-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
-              <button className="btn-ghost" onClick={() => scrollTo('impact')}>
-                See proof
-                <svg className="btn-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3l5 5-5 5M3 8h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
             </div>
             <div className="panel-1-status">
               <span className="strong">Persist</span><br />
