@@ -1960,10 +1960,10 @@ body::before {
 /* ================== BACKED v2 ================== */
 .backed-v2 {
   padding: 150px 48px;
-  background: var(--bone);
+  background: linear-gradient(160deg, #EDE8FA 0%, #E8E2F7 40%, #EDE8FA 100%);
   color: var(--ink);
-  border-top: 1px solid rgba(20,16,30,0.08);
-  border-bottom: 1px solid rgba(20,16,30,0.08);
+  border-top: 1px solid rgba(120,84,213,0.15);
+  border-bottom: 1px solid rgba(120,84,213,0.15);
   position: relative;
   overflow: hidden;
 }
