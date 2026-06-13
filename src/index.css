@@ -890,7 +890,7 @@ body::before {
   max-width: clamp(120px, 18vw, 240px);
   object-fit: contain;
   display: block;
-  filter: brightness(0) invert(1) opacity(0.75);
+  filter: none;
 }
 .marquee-logo.is-stacked img {
   max-height: clamp(42px, 6.5vw, 72px);
