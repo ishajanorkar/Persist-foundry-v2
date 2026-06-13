@@ -702,15 +702,15 @@ export default function Home() {
               <img src="/assets/dna.png" alt="DNA Fund" className="backed-v2-logo" />
               <div className="backed-v2-tag">Capital partner</div>
             </a>
-            <a href="https://percival.vc/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell" style={{'--brand-bg':'#111111','--logo-invert':'1'}}>
-              <img src="/assets/percival.png" alt="Percival" className="backed-v2-logo" />
-              <div className="backed-v2-tag">Capital partner</div>
-            </a>
             <a href="https://blockchainff.com/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell" style={{'--brand-bg':'#f89520','--logo-invert':'0'}}>
               <img src="/assets/blockchain-fund.png" alt="Blockchain FF" className="backed-v2-logo" />
               <div className="backed-v2-tag">Capital partner</div>
             </a>
-            <a href="https://welara.com/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell" style={{'--brand-bg':'#fff6e5','--logo-invert':'0'}}>
+            <a href="https://percival.vc/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell" style={{'--brand-bg':'#111111','--logo-invert':'1'}}>
+              <img src="/assets/percival.png" alt="Percival" className="backed-v2-logo" />
+              <div className="backed-v2-tag">Capital partner</div>
+            </a>
+            <a href="https://welara.com/" target="_blank" rel="noopener noreferrer" className="backed-v2-cell is-welara" style={{'--brand-bg':'#fff6e5','--logo-invert':'0'}}>
               <img src="/assets/w.png" alt="Welara" className="backed-v2-logo" />
               <div className="backed-v2-tag">Capital partner</div>
             </a>

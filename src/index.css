@@ -2046,8 +2046,7 @@ body::before {
   position: relative; z-index: 1;
 }
 .backed-v2-cell:hover .backed-v2-tag { color: rgba(255,255,255,0.6); }
-/* For light-background brand cells (--logo-invert:0), tag goes dark on hover */
-[style*="--logo-invert:0"]:hover .backed-v2-tag { color: rgba(0,0,0,0.5); }
+.backed-v2-cell.is-welara:hover .backed-v2-tag { color: rgba(0,0,0,0.5); }
 .backed-v2-cell.is-featured .backed-v2-tag { color: rgba(255,255,255,0.7); }
 
 /* ================== FINAL CTA ================== */
