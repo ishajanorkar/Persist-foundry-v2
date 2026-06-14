@@ -717,7 +717,13 @@ export default function Home() {
       {/* IMPACT */}
       <section className="impact" id="impact">
         <div className="impact-inner">
-          <div className="impact-eyebrow">Nine years, in numbers</div>
+          <div className="impact-header">
+            <div className="impact-eyebrow">
+              <span className="impact-eyebrow-dot"></span>
+              Nine years, in numbers
+            </div>
+            <div className="impact-year-range">2016 — 2025</div>
+          </div>
           <div className="impact-grid">
             <div className="impact-stat">
               <div className="impact-num" data-target="30">0<span className="symbol">+</span></div>
