@@ -1649,7 +1649,9 @@ body::before {
   inset: 0;
   z-index: 3;
   pointer-events: none;
-  background: linear-gradient(100deg, transparent 50%, rgba(10,6,19,0.40) 70%, rgba(10,6,19,0.86) 88%);
+  background:
+    linear-gradient(to right, transparent 42%, rgba(10,6,19,0.55) 66%, rgba(10,6,19,0.88) 84%, rgba(10,6,19,0.92) 100%),
+    linear-gradient(to bottom, rgba(10,6,19,0.18) 0%, transparent 22%);
 }
 
 /* detail cards */
