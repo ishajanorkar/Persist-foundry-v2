@@ -1491,13 +1491,11 @@ body::before {
 }
 
 .prog-header-wrap {
-  position: absolute;
-  top: 0; left: 0; right: 0;
+  position: relative;
   max-width: 1240px;
   margin: 0 auto;
-  padding: clamp(80px,10vw,118px) clamp(24px,4vw,56px) 30px;
-  z-index: 8;
-  pointer-events: none;
+  padding: clamp(90px,10vw,118px) clamp(24px,4vw,56px) clamp(48px,5vw,64px);
+  z-index: 2;
 }
 .prog-kicker {
   font-family: var(--mono);
