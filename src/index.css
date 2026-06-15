@@ -1901,7 +1901,17 @@ body::before {
   max-width: 420px;
 }
 .portfolio-v2-cta-label em { color: var(--ink); font-style: italic; }
-/* .portfolio-v2-cta-link styling is unified with .btn-primary above. */
+/* Override shared glass style — this button sits on a light background */
+.portfolio-v2-cta-link {
+  background: linear-gradient(135deg, var(--violet) 0%, var(--violet-deep) 100%);
+  border-color: transparent;
+  box-shadow: 0 4px 24px rgba(120,84,213,0.35);
+  color: #fff;
+}
+.portfolio-v2-cta-link:hover {
+  box-shadow: 0 0 0 3px rgba(120,84,213,0.22), 0 10px 40px rgba(120,84,213,0.55);
+  transform: translateY(-2px);
+}
 
 /* hide system cursor only over the thumbnail side so tooltip takes over */
 .portfolio-row[data-url] .portfolio-row-right,
