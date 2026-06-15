@@ -707,6 +707,21 @@ export default function Home() {
       {/* IMPACT */}
       <section className="impact" id="impact">
         <div className="impact-inner">
+
+          {/* backstory */}
+          <div className="impact-backstory">
+            <p className="impact-backstory-body">
+              Founded in 2016, Persist began as one founder's answer to a broken system —
+              inspired by the Thiel Fellowship's model but built to be open to everyone.
+              What started as a PayPal-to-Ethereum exchange became proof that the right
+              ecosystem changes everything.
+            </p>
+            <blockquote className="impact-backstory-quote">
+              "Every venture was a stepping stone toward building the ecosystem I always needed."
+              <cite>— Jack Jay, Founder &amp; CEO</cite>
+            </blockquote>
+          </div>
+
           <div className="impact-header">
             <div className="impact-eyebrow">
               Nine years, in numbers

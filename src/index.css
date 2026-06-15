@@ -921,6 +921,47 @@ body::before {
   pointer-events: none;
 }
 .impact-inner { max-width: 1500px; margin: 0 auto; position: relative; z-index: 1; }
+.impact-backstory {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, 4vw, 64px);
+  align-items: start;
+  padding-bottom: clamp(48px, 6vw, 72px);
+  border-bottom: 1px solid rgba(20,16,30,0.10);
+  margin-bottom: clamp(40px, 5vw, 60px);
+}
+.impact-backstory-body {
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: 1.7;
+  color: var(--ink);
+  margin: 0;
+  max-width: 52ch;
+}
+.impact-backstory-quote {
+  margin: 0;
+  padding-left: clamp(20px, 2vw, 28px);
+  border-left: 2px solid var(--violet);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(16px, 1.5vw, 20px);
+  line-height: 1.55;
+  color: var(--ink);
+  opacity: 0.85;
+}
+.impact-backstory-quote cite {
+  display: block;
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--stone);
+}
+@media (max-width: 720px) {
+  .impact-backstory { grid-template-columns: 1fr; gap: 28px; }
+}
+
 .impact-header {
   display: flex;
   align-items: center;
