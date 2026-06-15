@@ -860,13 +860,7 @@ body::before {
   box-shadow: 0 2px 12px rgba(120, 84, 213, 0.08);
 }
 .marquee-eyebrow-inner::before {
-  content: "";
-  width: 6px; height: 6px;
-  background: var(--violet);
-  border-radius: 50%;
-  box-shadow: 0 0 10px var(--violet-glow);
-  animation: pulse 2.6s ease-in-out infinite;
-  flex-shrink: 0;
+  display: none;
 }
 .marquee-band {
   overflow: hidden;
@@ -945,13 +939,6 @@ body::before {
   margin-bottom: 0;
 }
 .impact-eyebrow::before { display: none; }
-.impact-eyebrow-dot {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--violet);
-  display: inline-block;
-  flex-shrink: 0;
-}
 .impact-year-range {
   font-family: var(--mono);
   font-size: 10px;
@@ -1029,9 +1016,6 @@ body::before {
   display: inline-flex; align-items: center; gap: 14px;
   font-family: var(--mono); font-size: 11px; letter-spacing: 0.32em;
   text-transform: uppercase; color: var(--violet-soft);
-}
-.st-kicker-dash {
-  width: 34px; height: 1px; background: var(--violet-soft); opacity: 0.55;
 }
 .st-count { font-size: 14px; color: var(--violet-soft); }
 .st-count em { font-style: italic; color: var(--violet); font-size: 22px; }

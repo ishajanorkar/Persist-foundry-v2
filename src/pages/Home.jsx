@@ -719,7 +719,6 @@ export default function Home() {
         <div className="impact-inner">
           <div className="impact-header">
             <div className="impact-eyebrow">
-              <span className="impact-eyebrow-dot"></span>
               Nine years, in numbers
             </div>
             <div className="impact-year-range">2016 — 2025</div>
@@ -1290,7 +1289,6 @@ function SixThingsSection() {
           {/* top bar */}
           <div className="st-topbar">
             <div className="st-kicker">
-              <span className="st-kicker-dash"></span>
               WHAT YOU GET
             </div>
             <div className="st-count serif">
