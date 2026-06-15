@@ -553,16 +553,6 @@ export default function Home() {
       {/* PROGRESS BAR */}
       <div className="progress" id="progress"></div>
 
-      {/* SECTION DOTS */}
-      <div className="section-dots" id="sectionDots">
-        <div className="section-dot is-active" data-section="hero"></div>
-        <div className="section-dot" data-section="impact"></div>
-        <div className="section-dot" data-section="offer"></div>
-        <div className="section-dot" data-section="manifesto"></div>
-        <div className="section-dot" data-section="filter"></div>
-        <div className="section-dot" data-section="portfolio"></div>
-        <div className="section-dot" data-section="apply"></div>
-      </div>
 
       {/* SCROLL-SCRUB VIDEO */}
       <section className="scrub-block" id="scrubBlock">
