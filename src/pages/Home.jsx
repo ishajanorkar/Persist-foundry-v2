@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 
 export default function Home() {
   const initialized = useRef(false)
@@ -1354,179 +1354,258 @@ function SixThingsSection() {
 
 const PROGRAMS = [
   {
-    roman: 'I', idx: '01', name: 'Accelerator', tag: 'The sprint',
-    essence: 'A focused sprint for the bet already in motion.',
+    idx: '01', name: 'Accelerator', eyebrow: '01 · The Sprint',
+    desc: 'A focused sprint for the bet already in motion.',
     points: ['8–12 week intensive', 'Capital + conviction up front', 'A room that moves at your pace'],
-    icon: 'rocket',
+    cta: 'Explore Accelerator',
+    fill: 'radial-gradient(circle at 38% 32%, #d3c2fb, #8f73e6 46%, #6849c9 100%)',
+    shadow: '0 0 30px 4px rgba(133,99,224,0.55)', hasRing: false, size: 38,
   },
   {
-    roman: 'II', idx: '02', name: 'Co-Founder Bridge', tag: 'The match',
-    essence: 'For the founder still missing their other half.',
-    points: ['Matched on conviction, not résumés', 'We stake the partnership', 'Built to outlast the honeymoon'],
-    icon: 'bridge',
+    idx: '02', name: 'Co-Founder Bridge', eyebrow: '02 · The Match',
+    desc: 'For the solo founder still missing the other half of the bet.',
+    points: ['Curated co-founder matching', 'Equity & alignment frameworks', 'Trial sprints before you commit'],
+    cta: 'Explore the Bridge',
+    fill: 'radial-gradient(circle at 38% 32%, #c2cefb, #6f80df 48%, #4a59c4 100%)',
+    shadow: '0 0 26px 3px rgba(96,116,216,0.5)', hasRing: false, size: 27,
   },
   {
-    roman: 'III', idx: '03', name: 'Studio for Companies', tag: 'The spin-out',
-    essence: 'New ventures spun out from inside proven walls.',
-    points: ['Partner with established companies', 'De-risked zero-to-one', 'Shared upside, shared spine'],
-    icon: 'company',
+    idx: '03', name: 'Studio for Companies', eyebrow: '03 · The Build',
+    desc: 'Embedded operators for companies scaling a proven bet.',
+    points: ['Senior operators on demand', 'Product, growth & ops', 'Outcomes, not retainers'],
+    cta: 'Explore the Studio',
+    fill: 'radial-gradient(circle at 38% 32%, #e6c9f6, #b576dd 48%, #8c4fc2 100%)',
+    shadow: '0 0 34px 5px rgba(168,98,212,0.55)', hasRing: true, size: 44,
   },
   {
-    roman: 'IV', idx: '04', name: 'Studio for Founders', tag: 'The build',
-    essence: 'Zero to one, with us in the room.',
-    points: ['For the bet without the build yet', 'Hands-on from day one', 'Pre-idea to first customers'],
-    icon: 'founder',
+    idx: '04', name: 'Studio for Founders', eyebrow: '04 · The Forge',
+    desc: 'A standing studio for founders between bets.',
+    points: ['From idea to incorporation', 'Capital + craft on tap', 'Built beside other founders'],
+    cta: 'Explore Founders Studio',
+    fill: 'radial-gradient(circle at 38% 32%, #c1bef9, #7b76e6 48%, #514cc4 100%)',
+    shadow: '0 0 28px 4px rgba(99,93,214,0.5)', hasRing: false, size: 31,
   },
   {
-    roman: 'V', idx: '05', name: 'Sub Studio Program', tag: 'The network',
-    essence: 'A network of focused studios — each one a single thesis.',
-    points: ['Specialized rooms', 'One thesis, compounded', 'Plugged into the whole foundry'],
-    icon: 'substudio',
+    idx: '05', name: 'Sub Studio Program', eyebrow: '05 · The Orbit',
+    desc: 'A satellite track for the bets still taking shape.',
+    points: ['Part-time, low commitment', 'Full access to the network', 'Graduate into a room'],
+    cta: 'Explore Sub Studio',
+    fill: 'radial-gradient(circle at 38% 32%, #ebc3ec, #c878cd 48%, #a4509f 100%)',
+    shadow: '0 0 24px 3px rgba(180,92,178,0.5)', hasRing: false, size: 24,
   },
 ]
-
-const HUB_PATHS = [
-  'M660.177 205.188C640.292 173.231 610.089 150.756 569.546 138.778C565.576 137.608 561.63 136.571 557.724 135.666C553.13 130.73 548.256 125.997 543.11 121.481C495.821 79.979 427.368 58.0347 345.158 58.0347H58.4163V158.554C49.5965 164.38 41.2289 171.141 33.4619 178.799C19.3314 192.75 8.27343 208.744 0.381592 225.892V0H345.151C441.662 0 523.349 26.9274 581.376 77.8812C610.097 103.077 632.29 133.53 647.365 168.372C652.496 180.226 656.769 192.516 660.169 205.188H660.177Z',
-  'M649.089 395.558C631.979 436.749 604.561 472.239 567.48 500.663C506.638 547.281 424.039 571.924 328.596 571.924H228.45V792.17H0.390137V360.427C5.10809 370.627 10.988 380.453 18.022 389.725C29.7194 405.135 43.4132 417.854 58.4248 427.843V734.136H170.423V513.889H328.603C409.924 513.889 482.167 492.865 532.06 454.685C559.822 453.086 587.42 444.368 611.844 428.639C626.13 419.444 638.631 408.223 649.089 395.558Z',
-  'M600.505 423.072C545.41 458.546 473.557 456.846 422.182 416.537C413.713 409.885 404.075 401.33 394.171 392.136L436.866 352.131C441.881 357.138 446.669 361.684 450.974 365.505C482.346 393.244 518.92 398.078 557.342 380.876C593.877 364.523 615.759 327.652 612.998 287.78C612.047 273.954 609.036 261.5 604.007 250.489L664.396 247.962C665.496 251.471 666.471 255.043 667.375 258.708C682.8 321.281 655.46 387.676 600.497 423.08L600.505 423.072Z',
-  'M164.512 447.894C114.595 450.81 64.3511 429.622 31.0681 385.765C-15.4485 324.455 -9.10075 237.769 45.8848 183.494C72.2663 157.455 105.97 142.319 140.634 138.786L141.757 196.79C132.835 198.349 123.75 201.188 114.572 205.259C78.7233 221.183 56.6932 257.897 58.284 296.42C59.9216 336.55 84.5564 370.917 122.401 384.127C134.294 388.268 145.757 390.397 156.807 390.561L164.52 447.894H164.512Z',
-  'M605.41 165.962C565.031 153.618 521.345 173.651 484.779 200.314C470.321 205.328 456.783 214.202 444.236 226.594C385.07 285.026 326.544 344.098 266.934 402.078C237.535 430.682 201.117 445.772 164.512 447.885L156.799 390.552C182.807 390.95 206.42 380.469 227.311 359.89C286.991 301.122 345.743 241.418 406.024 183.243C449.343 141.445 501.709 127.907 559.946 145.11C577.009 150.155 592.161 157.127 605.402 165.962H605.41Z',
-  'M328.097 243.688C313.303 257.047 299.672 269.36 281.954 285.37C270.319 272.745 250.13 249.638 233.153 232.552C228.794 228.154 224.653 224.154 220.917 220.839C197.063 199.651 170.182 191.799 141.749 196.789L140.626 138.786C178.565 134.918 217.65 144.939 249.584 169.737C257.944 176.225 267.551 184.889 277.478 194.333C295.118 211.084 313.764 230.221 328.097 243.696V243.688Z',
-]
-
-function ProgramIcon({ name }) {
-  const common = { width: '100%', height: '100%', viewBox: '0 0 48 48', fill: 'none', stroke: 'currentColor', strokeWidth: 1.4, strokeLinecap: 'round', strokeLinejoin: 'round' }
-  switch (name) {
-    case 'rocket': return (<svg {...common}><path d="M24 6c6 4 9 10 9 18 0 4-1 7-2 9H17c-1-2-2-5-2-9 0-8 3-14 9-18Z"/><circle cx="24" cy="20" r="3.4"/><path d="M17 33c-3 1-5 3-6 9 6-1 8-3 9-6M31 33c3 1 5 3 6 9-6-1-8-3-9-6"/><path d="M21 42c1 2 2 3 3 3s2-1 3-3"/></svg>)
-    case 'bridge': return (<svg {...common}><circle cx="13" cy="17" r="4.2"/><circle cx="35" cy="17" r="4.2"/><path d="M13 21v6M35 21v6"/><path d="M7 33c0-6 5-8 6-8M41 33c0-6-5-8-6-8"/><path d="M9 33h30" opacity="0.5"/></svg>)
-    case 'company': return (<svg {...common}><path d="M10 40V14l11-5v31"/><path d="M21 40V20l13 4v16"/><path d="M14 18v0M14 24v0M14 30v0M27 27v0M27 33v0"/><path d="M30 16l5-5M35 11h-4M35 11v4"/></svg>)
-    case 'founder': return (<svg {...common}><circle cx="19" cy="16" r="5"/><path d="M11 39c0-6 3.5-10 8-10s8 4 8 10"/><circle cx="35" cy="14" r="5.5"/><path d="M35 9.5v1M35 17.5v1M30.5 14h1M38.5 14h1" opacity="0.7"/></svg>)
-    case 'substudio': return (<svg {...common}><rect x="8" y="8" width="13" height="13" rx="2"/><rect x="27" y="8" width="13" height="13" rx="2"/><rect x="8" y="27" width="13" height="13" rx="2"/><rect x="27" y="27" width="13" height="13" rx="2"/><path d="M21 14.5h6M14.5 21v6M33.5 21v6M21 33.5h6" opacity="0.5"/></svg>)
-    default: return null
-  }
-}
 
 function ProgramsSection() {
-  const [active, setActive] = useState(0)
-  const [locked, setLocked] = useState(false)
-  const [paused, setPaused] = useState(false)
-  const [autoplay] = useState(true)
-  const sectionRef = useRef(null)
+  const pinRef   = useRef(null)
+  const stageRef = useRef(null)
+  const starsRef = useRef(null)
+  const sunRef   = useRef(null)
+  const itemRefs = useRef(PROGRAMS.map(() => ({
+    planet: React.createRef(), body: React.createRef(), ring: React.createRef(),
+    orbit: React.createRef(), card: React.createRef(), num: React.createRef(), dot: React.createRef(),
+  })))
 
-  const go = useCallback((i) => setActive(((i % PROGRAMS.length) + PROGRAMS.length) % PROGRAMS.length), [])
+  const state = useRef({ active: 0, t: 0, last: 0, ang: [], scl: [], op: [], cx: 0, cy: 0, rx: [], ry: [], tilt: 0.46, baseAngle: -0.55, sunSize: 180, narrow: false, activeScale: [], anchor: { x: 0, y: 0 } })
+  const rafRef = useRef(null)
 
-  // Reset to card 1 every time the section enters the viewport
-  useEffect(() => {
-    const el = sectionRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setActive(0)
-          setLocked(false)
-        }
-      },
-      { threshold: 0.15 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
+  const setActive = useCallback((idx) => {
+    const s = state.current
+    if (idx === s.active) return
+    s.active = idx
+    const refs = itemRefs.current
+    refs.forEach((r, i) => {
+      const on = i === idx
+      const c = r.card.current
+      if (c) { c.style.opacity = on ? '1' : '0'; c.style.transform = `translateY(calc(-50% + ${on ? 0 : 16}px))`; c.style.pointerEvents = on ? 'auto' : 'none' }
+      const o = r.orbit.current
+      if (o) { o.style.borderColor = on ? 'rgba(198,176,248,0.52)' : 'rgba(176,156,232,0.10)'; o.style.boxShadow = on ? '0 0 46px rgba(140,104,232,0.20)' : 'none' }
+      const nm = r.num.current; if (nm) nm.style.opacity = on ? '0' : '0.6'
+      const rg = r.ring.current
+      if (rg) { rg.style.borderColor = on ? 'rgba(238,229,255,0.95)' : 'rgba(216,198,255,0)'; rg.style.boxShadow = on ? '0 0 20px rgba(170,126,240,0.85), inset 0 0 9px rgba(238,229,255,0.42)' : 'none' }
+      const dt = r.dot.current
+      if (dt) { dt.style.background = on ? '#cab4fb' : 'rgba(176,156,232,0.22)'; dt.style.boxShadow = on ? '0 0 12px rgba(164,137,239,0.95)' : 'none'; dt.style.height = on ? '22px' : '8px'; dt.style.opacity = on ? '1' : '0.7' }
+    })
   }, [])
 
-  // auto-advance
-  useEffect(() => {
-    if (!autoplay || paused || locked) return
-    const id = setTimeout(() => go(active + 1), 4200)
-    return () => clearTimeout(id)
-  }, [active, autoplay, paused, locked, go])
+  const layout = useCallback(() => {
+    const st = stageRef.current; if (!st) return
+    const s = state.current
+    const W = st.clientWidth, H = st.clientHeight
+    s.narrow = W < 880
+    s.cx = 0
+    s.cy = s.narrow ? H * 0.36 : H * 0.54
+    s.tilt = s.narrow ? 0.54 : 0.46
+    s.baseAngle = s.narrow ? -0.64 : -0.55
+    s.sunSize = s.narrow ? 120 : 180
+    const cos = Math.cos(s.baseAngle)
+    const cardW = Math.min(380, W * 0.30)
+    const cardRight = W * 0.035
+    const cardLeft = W - cardRight - cardW
+    const x0 = Math.max(s.narrow ? W * 0.18 : W * 0.17, s.sunSize * 0.5 + (s.narrow ? 54 : 130))
+    const x4 = s.narrow ? W * 0.74 : (cardLeft - W * 0.12)
+    s.rx = [0,1,2,3,4].map(i => (x0 + (x4 - x0) * (i / 4)) / cos)
+    s.ry = s.rx.map(r => r * s.tilt)
+    s.activeScale = PROGRAMS.map(p => (s.narrow ? 56 : 78) / p.size)
+    s.anchor = s.narrow ? { x: W * 0.5, y: H * 0.80 } : { x: W * 0.62, y: H * 0.50 }
+    const refs = itemRefs.current
+    refs.forEach((r, i) => {
+      const o = r.orbit.current
+      if (o) { o.style.width = (s.rx[i] * 2) + 'px'; o.style.height = (s.ry[i] * 2) + 'px'; o.style.left = s.cx + 'px'; o.style.top = s.cy + 'px' }
+      const pl = r.planet.current
+      if (pl) { pl.style.width = PROGRAMS[i].size + 'px'; pl.style.height = PROGRAMS[i].size + 'px' }
+    })
+    const sn = sunRef.current
+    if (sn) { sn.style.width = s.sunSize + 'px'; sn.style.height = s.sunSize + 'px'; sn.style.left = s.cx + 'px'; sn.style.top = s.cy + 'px' }
+  }, [])
 
-  // keyboard nav
-  useEffect(() => {
-    function onKey(e) {
-      if (e.key === 'ArrowRight') { go(active + 1); setLocked(true) }
-      else if (e.key === 'ArrowLeft') { go(active - 1); setLocked(true) }
+  const makeStars = useCallback(() => {
+    const st = stageRef.current, el = starsRef.current; if (!st || !el) return
+    const W = st.clientWidth, H = st.clientHeight; const sh = []
+    for (let i = 0; i < 120; i++) {
+      const x = (Math.random() * W).toFixed(0), y = (Math.random() * H).toFixed(0)
+      const bright = Math.random() > 0.84
+      const a = ((bright ? 0.7 : 0.28) * Math.random() + 0.08).toFixed(2)
+      sh.push(`${x}px ${y}px 0 ${bright ? '0.6px' : '0'} rgba(${bright ? '225,215,255' : '190,175,230'},${a})`)
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [active, go])
+    el.style.boxShadow = sh.join(',')
+  }, [])
+
+  useEffect(() => {
+    const s = state.current
+    const N = PROGRAMS.length
+    s.ang = PROGRAMS.map((_, i) => i * (2 * Math.PI / N) + 0.7)
+    s.scl = PROGRAMS.map(() => 1)
+    s.op  = PROGRAMS.map((_, i) => i === 0 ? 1 : 0.46)
+    layout(); makeStars()
+    setActive(0)
+
+    const ro = new ResizeObserver(() => { layout(); makeStars() })
+    ro.observe(stageRef.current)
+
+    const frame = (now) => {
+      if (!s.last) s.last = now
+      let dt = (now - s.last) / 1000; s.last = now; if (dt > 0.05) dt = 0.05
+      s.t += dt
+
+      // scroll → active index
+      const pin = pinRef.current
+      if (pin) {
+        const r = pin.getBoundingClientRect()
+        const denom = (r.height - window.innerHeight) || 1
+        let p = (-r.top) / denom; p = Math.max(0, Math.min(0.99999, p))
+        const idx = Math.min(Math.floor(p * N), N - 1)
+        if (idx !== s.active) setActive(idx)
+      }
+
+      // sun breathe
+      const sn = sunRef.current
+      if (sn && s.cx != null) {
+        const sc = 1 + Math.sin(s.t * 1.3) * 0.045
+        sn.style.left = s.cx + 'px'; sn.style.top = s.cy + 'px'
+        sn.style.width = s.sunSize + 'px'; sn.style.height = s.sunSize + 'px'
+        sn.style.transform = `translate(-50%,-50%) scale(${sc.toFixed(3)})`
+      }
+
+      // planets
+      PROGRAMS.forEach((prog, i) => {
+        const r = itemRefs.current[i]
+        const isA = i === s.active
+        const ang = s.baseAngle + Math.sin(s.t * 0.5 + i * 1.3) * 0.020
+        const tO = isA ? 1 : 0.62; const tS = isA ? s.activeScale[i] : 1
+        s.scl[i] += (tS - s.scl[i]) * Math.min(1, dt * 5.5)
+        s.op[i]  += (tO - s.op[i])  * Math.min(1, dt * 5.5)
+        const x = s.cx + Math.cos(ang) * s.rx[i]
+        const y = s.cy + Math.sin(ang) * s.ry[i]
+        const pl = r.planet.current, bd = r.body.current
+        if (pl) { pl.style.left = x + 'px'; pl.style.top = y + 'px'; pl.style.opacity = s.op[i].toFixed(3); pl.style.zIndex = isA ? 6 : 2 }
+        if (bd) bd.style.transform = `scale(${s.scl[i].toFixed(3)})`
+      })
+
+      rafRef.current = requestAnimationFrame(frame)
+    }
+    rafRef.current = requestAnimationFrame(frame)
+    return () => { cancelAnimationFrame(rafRef.current); ro.disconnect() }
+  }, [layout, makeStars, setActive])
 
   return (
-    <section className="prog-section" id="programs" ref={sectionRef}>
-      <div className="prog-grid-bg" aria-hidden="true"></div>
-      <div className="prog-inner">
-
-        <header className="prog-head">
-          <div className="prog-kicker">
-            WHAT WE RUN · 05
-          </div>
-          <div className="prog-head-row">
-            <h2 className="prog-title serif">Five rooms. <em>One bet.</em></h2>
-            <p className="prog-sub">
-              Every founder meets us through one of five doors. Same conviction behind each — a different way in.{' '}
-              <span className="prog-sub-hint">Hover a panel.</span>
-            </p>
-          </div>
-        </header>
-
-        <div
-          className="prog-panels"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => { setPaused(false); setLocked(false) }}
-        >
-          {PROGRAMS.map((p, i) => {
-            const on = i === active
-            return (
-              <article
-                key={p.name}
-                className={'prog-panel' + (on ? ' on' : '')}
-                onMouseEnter={() => { if (!locked) go(i) }}
-                onClick={() => { go(i); setLocked(true) }}
-                tabIndex={0}
-                onFocus={() => go(i)}
-              >
-                {/* ambient bg */}
-                <div className="prog-p-bg" aria-hidden="true">
-                  <svg className="prog-p-ghost" viewBox="0 0 672 793">
-                    {HUB_PATHS.map((d, k) => <path key={k} d={d} fill="currentColor" />)}
-                  </svg>
-                </div>
-
-                {/* collapsed spine */}
-                <div className="prog-spine">
-                  <span className="prog-spine-idx">{p.idx}</span>
-                  <span className="prog-spine-name serif">{p.name}</span>
-                  <span className="prog-spine-plus" aria-hidden="true">
-                    <svg width="13" height="13" viewBox="0 0 13 13"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
-                  </span>
-                </div>
-
-                {/* expanded content */}
-                <div className="prog-content">
-                  <div className="prog-c-top">
-                    <span className="prog-c-icon"><ProgramIcon name={p.icon} /></span>
-                    <span className="prog-c-tag">{p.idx} · {p.tag}</span>
-                  </div>
-                  <div className="prog-c-mid">
-                    <h3 className="prog-c-name serif">{p.name}</h3>
-                    <p className="prog-c-ess serif">{p.essence}</p>
-                  </div>
-                  <ul className="prog-c-points">
-                    {p.points.map((pt) => (
-                      <li key={pt}><span className="prog-pip"></span>{pt}</li>
-                    ))}
-                  </ul>
-                  <a className="prog-c-cta" href="#apply" onClick={(e) => e.stopPropagation()}>
-                    Explore {p.name}
-                    <span className="prog-c-cta-arr">
-                      <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 9 9 2M9 2H4.5M9 2V6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </span>
-                  </a>
-                </div>
-              </article>
-            )
-          })}
+    <section className="prog-section" id="programs">
+      {/* header above the pin */}
+      <div className="prog-header-wrap">
+        <div className="prog-kicker">What we run · 05</div>
+        <div className="prog-head-row">
+          <h2 className="prog-title">Five&nbsp;rooms.<em> One&nbsp;bet.</em></h2>
+          <p className="prog-sub">Every founder meets us through one of five doors. Same conviction behind each — a different way in. <span className="prog-sub-hint">Scroll to traverse the system.</span></p>
         </div>
+      </div>
 
+      {/* pinned orrery */}
+      <div ref={pinRef} className="prog-pin-driver">
+        <div ref={stageRef} className="prog-stage">
 
+          {/* starfield */}
+          <div ref={starsRef} className="prog-stars" aria-hidden="true"></div>
+
+          {/* orrery field */}
+          <div className="prog-orrery-field">
+            {/* orbit rings */}
+            {PROGRAMS.map((_, i) => (
+              <div key={i} ref={itemRefs.current[i].orbit} className="prog-orbit" aria-hidden="true"></div>
+            ))}
+
+            {/* sun */}
+            <div ref={sunRef} className="prog-sun" aria-hidden="true"></div>
+
+            {/* planets */}
+            {PROGRAMS.map((p, i) => (
+              <div key={i} ref={itemRefs.current[i].planet} className="prog-planet">
+                <div ref={itemRefs.current[i].body} className="prog-planet-body">
+                  <div ref={itemRefs.current[i].ring} className="prog-planet-ring"></div>
+                  {p.hasRing && (
+                    <div className="prog-planet-saturn-ring" aria-hidden="true"></div>
+                  )}
+                  <div className="prog-planet-sphere" style={{ background: p.fill, boxShadow: p.shadow }}></div>
+                  <div className="prog-planet-gloss" aria-hidden="true"></div>
+                </div>
+                <div ref={itemRefs.current[i].num} className="prog-planet-num">{p.idx}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* scrim */}
+          <div className="prog-scrim" aria-hidden="true"></div>
+
+          {/* detail cards */}
+          {PROGRAMS.map((p, i) => (
+            <div key={i} ref={itemRefs.current[i].card} className="prog-card">
+              <div className="prog-card-eyebrow">{p.eyebrow}</div>
+              <h3 className="prog-card-title">{p.name}</h3>
+              <p className="prog-card-desc">{p.desc}</p>
+              <ul className="prog-card-bullets">
+                {p.points.map(b => (
+                  <li key={b}><span className="prog-card-pip"></span>{b}</li>
+                ))}
+              </ul>
+              <a href="#apply" className="prog-card-cta">
+                {p.cta}
+                <span className="prog-card-cta-icon">↗</span>
+              </a>
+            </div>
+          ))}
+
+          {/* progress rail */}
+          <div className="prog-rail" aria-hidden="true">
+            {PROGRAMS.map((_, i) => (
+              <div key={i} ref={itemRefs.current[i].dot} className="prog-dot"></div>
+            ))}
+          </div>
+
+          {/* scroll hint */}
+          <div className="prog-scroll-hint" aria-hidden="true">
+            <span>SCROLL</span>
+            <span className="prog-scroll-arr">↓</span>
+          </div>
+
+        </div>
       </div>
     </section>
   )
