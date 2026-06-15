@@ -1352,184 +1352,181 @@ function SixThingsSection() {
    PROGRAMS SECTION — "WHAT WE RUN · 05 / Five rooms. One bet."
 ───────────────────────────────────────────────────────────── */
 
-const PROGRAMS = [
-  {
-    idx: '01', name: 'Accelerator', eyebrow: '01 · The Sprint',
-    desc: 'A focused sprint for the bet already in motion.',
-    points: ['8–12 week intensive', 'Capital + conviction up front', 'A room that moves at your pace'],
-    cta: 'Explore Accelerator',
-    fill: 'radial-gradient(circle at 38% 32%, #d3c2fb, #8f73e6 46%, #6849c9 100%)',
-    shadow: '0 0 30px 4px rgba(133,99,224,0.55)', hasRing: false, size: 38,
-  },
-  {
-    idx: '02', name: 'Co-Founder Bridge', eyebrow: '02 · The Match',
-    desc: 'For the solo founder still missing the other half of the bet.',
-    points: ['Curated co-founder matching', 'Equity & alignment frameworks', 'Trial sprints before you commit'],
-    cta: 'Explore the Bridge',
-    fill: 'radial-gradient(circle at 38% 32%, #c2cefb, #6f80df 48%, #4a59c4 100%)',
-    shadow: '0 0 26px 3px rgba(96,116,216,0.5)', hasRing: false, size: 27,
-  },
-  {
-    idx: '03', name: 'Studio for Companies', eyebrow: '03 · The Build',
-    desc: 'Embedded operators for companies scaling a proven bet.',
-    points: ['Senior operators on demand', 'Product, growth & ops', 'Outcomes, not retainers'],
-    cta: 'Explore the Studio',
-    fill: 'radial-gradient(circle at 38% 32%, #e6c9f6, #b576dd 48%, #8c4fc2 100%)',
-    shadow: '0 0 34px 5px rgba(168,98,212,0.55)', hasRing: true, size: 44,
-  },
-  {
-    idx: '04', name: 'Studio for Founders', eyebrow: '04 · The Forge',
-    desc: 'A standing studio for founders between bets.',
-    points: ['From idea to incorporation', 'Capital + craft on tap', 'Built beside other founders'],
-    cta: 'Explore Founders Studio',
-    fill: 'radial-gradient(circle at 38% 32%, #c1bef9, #7b76e6 48%, #514cc4 100%)',
-    shadow: '0 0 28px 4px rgba(99,93,214,0.5)', hasRing: false, size: 31,
-  },
-  {
-    idx: '05', name: 'Sub Studio Program', eyebrow: '05 · The Orbit',
-    desc: 'A satellite track for the bets still taking shape.',
-    points: ['Part-time, low commitment', 'Full access to the network', 'Graduate into a room'],
-    cta: 'Explore Sub Studio',
-    fill: 'radial-gradient(circle at 38% 32%, #ebc3ec, #c878cd 48%, #a4509f 100%)',
-    shadow: '0 0 24px 3px rgba(180,92,178,0.5)', hasRing: false, size: 24,
-  },
+const PROG_DATA = [
+  { idx:'01', name:'Accelerator',        eyebrow:'01 · The Sprint',
+    desc:'A focused sprint for the bet already in motion.',
+    bullets:['8–12 week intensive','Capital + conviction up front','A room that moves at your pace'],
+    cta:'Explore Accelerator',
+    fill:'radial-gradient(circle at 38% 32%, #d3c2fb, #8f73e6 46%, #6849c9 100%)',
+    shadow:'0 0 30px 4px rgba(133,99,224,0.55)', hasRing:false, size:38 },
+  { idx:'02', name:'Co-Founder Bridge',  eyebrow:'02 · The Match',
+    desc:'For the solo founder still missing the other half of the bet.',
+    bullets:['Curated co-founder matching','Equity & alignment frameworks','Trial sprints before you commit'],
+    cta:'Explore the Bridge',
+    fill:'radial-gradient(circle at 38% 32%, #c2cefb, #6f80df 48%, #4a59c4 100%)',
+    shadow:'0 0 26px 3px rgba(96,116,216,0.5)', hasRing:false, size:27 },
+  { idx:'03', name:'Studio for Companies', eyebrow:'03 · The Build',
+    desc:'Embedded operators for companies scaling a proven bet.',
+    bullets:['Senior operators on demand','Product, growth & ops','Outcomes, not retainers'],
+    cta:'Explore the Studio',
+    fill:'radial-gradient(circle at 38% 32%, #e6c9f6, #b576dd 48%, #8c4fc2 100%)',
+    shadow:'0 0 34px 5px rgba(168,98,212,0.55)', hasRing:true, size:44 },
+  { idx:'04', name:'Studio for Founders', eyebrow:'04 · The Forge',
+    desc:'A standing studio for founders between bets.',
+    bullets:['From idea to incorporation','Capital + craft on tap','Built beside other founders'],
+    cta:'Explore Founders Studio',
+    fill:'radial-gradient(circle at 38% 32%, #c1bef9, #7b76e6 48%, #514cc4 100%)',
+    shadow:'0 0 28px 4px rgba(99,93,214,0.5)', hasRing:false, size:31 },
+  { idx:'05', name:'Sub Studio Program',  eyebrow:'05 · The Orbit',
+    desc:'A satellite track for the bets still taking shape.',
+    bullets:['Part-time, low commitment','Full access to the network','Graduate into a room'],
+    cta:'Explore Sub Studio',
+    fill:'radial-gradient(circle at 38% 32%, #ebc3ec, #c878cd 48%, #a4509f 100%)',
+    shadow:'0 0 24px 3px rgba(180,92,178,0.5)', hasRing:false, size:24 },
 ]
 
 function ProgramsSection() {
+  /* ── refs ── */
   const pinRef   = useRef(null)
   const stageRef = useRef(null)
   const starsRef = useRef(null)
   const sunRef   = useRef(null)
-  const itemRefs = useRef(PROGRAMS.map(() => ({
-    planet: React.createRef(), body: React.createRef(), ring: React.createRef(),
-    orbit: React.createRef(), card: React.createRef(), num: React.createRef(), dot: React.createRef(),
+  /* per-item refs stored in a ref so they never change identity */
+  const IR = useRef(PROG_DATA.map(() => ({
+    planet: { current:null }, body: { current:null }, ring: { current:null },
+    orbit:  { current:null }, card: { current:null }, num:  { current:null }, dot: { current:null },
   })))
 
-  const state = useRef({ active: 0, t: 0, last: 0, ang: [], scl: [], op: [], cx: 0, cy: 0, rx: [], ry: [], tilt: 0.46, baseAngle: -0.55, sunSize: 180, narrow: false, activeScale: [], anchor: { x: 0, y: 0 } })
-  const rafRef = useRef(null)
-
-  const setActive = useCallback((idx) => {
-    const s = state.current
-    if (idx === s.active) return
-    s.active = idx
-    const refs = itemRefs.current
-    refs.forEach((r, i) => {
-      const on = i === idx
-      const c = r.card.current
-      if (c) { c.style.opacity = on ? '1' : '0'; c.style.transform = `translateY(calc(-50% + ${on ? 0 : 16}px))`; c.style.pointerEvents = on ? 'auto' : 'none' }
-      const o = r.orbit.current
-      if (o) { o.style.borderColor = on ? 'rgba(198,176,248,0.52)' : 'rgba(176,156,232,0.10)'; o.style.boxShadow = on ? '0 0 46px rgba(140,104,232,0.20)' : 'none' }
-      const nm = r.num.current; if (nm) nm.style.opacity = on ? '0' : '0.6'
-      const rg = r.ring.current
-      if (rg) { rg.style.borderColor = on ? 'rgba(238,229,255,0.95)' : 'rgba(216,198,255,0)'; rg.style.boxShadow = on ? '0 0 20px rgba(170,126,240,0.85), inset 0 0 9px rgba(238,229,255,0.42)' : 'none' }
-      const dt = r.dot.current
-      if (dt) { dt.style.background = on ? '#cab4fb' : 'rgba(176,156,232,0.22)'; dt.style.boxShadow = on ? '0 0 12px rgba(164,137,239,0.95)' : 'none'; dt.style.height = on ? '22px' : '8px'; dt.style.opacity = on ? '1' : '0.7' }
-    })
-  }, [])
-
-  const layout = useCallback(() => {
-    const st = stageRef.current; if (!st) return
-    const s = state.current
-    const W = st.clientWidth, H = st.clientHeight
-    s.narrow = W < 880
-    s.cx = 0
-    s.cy = s.narrow ? H * 0.36 : H * 0.54
-    s.tilt = s.narrow ? 0.54 : 0.46
-    s.baseAngle = s.narrow ? -0.64 : -0.55
-    s.sunSize = s.narrow ? 120 : 180
-    const cos = Math.cos(s.baseAngle)
-    const cardW = Math.min(380, W * 0.30)
-    const cardRight = W * 0.035
-    const cardLeft = W - cardRight - cardW
-    const x0 = Math.max(s.narrow ? W * 0.18 : W * 0.17, s.sunSize * 0.5 + (s.narrow ? 54 : 130))
-    const x4 = s.narrow ? W * 0.74 : (cardLeft - W * 0.12)
-    s.rx = [0,1,2,3,4].map(i => (x0 + (x4 - x0) * (i / 4)) / cos)
-    s.ry = s.rx.map(r => r * s.tilt)
-    s.activeScale = PROGRAMS.map(p => (s.narrow ? 56 : 78) / p.size)
-    s.anchor = s.narrow ? { x: W * 0.5, y: H * 0.80 } : { x: W * 0.62, y: H * 0.50 }
-    const refs = itemRefs.current
-    refs.forEach((r, i) => {
-      const o = r.orbit.current
-      if (o) { o.style.width = (s.rx[i] * 2) + 'px'; o.style.height = (s.ry[i] * 2) + 'px'; o.style.left = s.cx + 'px'; o.style.top = s.cy + 'px' }
-      const pl = r.planet.current
-      if (pl) { pl.style.width = PROGRAMS[i].size + 'px'; pl.style.height = PROGRAMS[i].size + 'px' }
-    })
-    const sn = sunRef.current
-    if (sn) { sn.style.width = s.sunSize + 'px'; sn.style.height = s.sunSize + 'px'; sn.style.left = s.cx + 'px'; sn.style.top = s.cy + 'px' }
-  }, [])
-
-  const makeStars = useCallback(() => {
-    const st = stageRef.current, el = starsRef.current; if (!st || !el) return
-    const W = st.clientWidth, H = st.clientHeight; const sh = []
-    for (let i = 0; i < 120; i++) {
-      const x = (Math.random() * W).toFixed(0), y = (Math.random() * H).toFixed(0)
-      const bright = Math.random() > 0.84
-      const a = ((bright ? 0.7 : 0.28) * Math.random() + 0.08).toFixed(2)
-      sh.push(`${x}px ${y}px 0 ${bright ? '0.6px' : '0'} rgba(${bright ? '225,215,255' : '190,175,230'},${a})`)
-    }
-    el.style.boxShadow = sh.join(',')
-  }, [])
+  /* all animation mutable state in one object — never causes re-renders */
+  const A = useRef({
+    active:-1, t:0, last:0,
+    cx:0, cy:0, rx:[], ry:[], tilt:0.46, baseAngle:-0.55, sunSize:180,
+    narrow:false, activeScale:[], scl:[], op:[],
+  })
 
   useEffect(() => {
-    const s = state.current
-    const N = PROGRAMS.length
-    s.ang = PROGRAMS.map((_, i) => i * (2 * Math.PI / N) + 0.7)
-    s.scl = PROGRAMS.map(() => 1)
-    s.op  = PROGRAMS.map((_, i) => i === 0 ? 1 : 0.46)
-    layout(); makeStars()
-    setActive(0)
+    const a     = A.current
+    const items = IR.current
+    const N     = PROG_DATA.length
+    a.scl = PROG_DATA.map(()=>1)
+    a.op  = PROG_DATA.map((_,i)=> i===0?1:0.46)
 
-    const ro = new ResizeObserver(() => { layout(); makeStars() })
-    ro.observe(stageRef.current)
-
-    const frame = (now) => {
-      if (!s.last) s.last = now
-      let dt = (now - s.last) / 1000; s.last = now; if (dt > 0.05) dt = 0.05
-      s.t += dt
-
-      // scroll → active index
-      const pin = pinRef.current
-      if (pin) {
-        const r = pin.getBoundingClientRect()
-        const denom = (r.height - window.innerHeight) || 1
-        let p = (-r.top) / denom; p = Math.max(0, Math.min(0.99999, p))
-        const idx = Math.min(Math.floor(p * N), N - 1)
-        if (idx !== s.active) setActive(idx)
-      }
-
-      // sun breathe
-      const sn = sunRef.current
-      if (sn && s.cx != null) {
-        const sc = 1 + Math.sin(s.t * 1.3) * 0.045
-        sn.style.left = s.cx + 'px'; sn.style.top = s.cy + 'px'
-        sn.style.width = s.sunSize + 'px'; sn.style.height = s.sunSize + 'px'
-        sn.style.transform = `translate(-50%,-50%) scale(${sc.toFixed(3)})`
-      }
-
-      // planets
-      PROGRAMS.forEach((prog, i) => {
-        const r = itemRefs.current[i]
-        const isA = i === s.active
-        const ang = s.baseAngle + Math.sin(s.t * 0.5 + i * 1.3) * 0.020
-        const tO = isA ? 1 : 0.62; const tS = isA ? s.activeScale[i] : 1
-        s.scl[i] += (tS - s.scl[i]) * Math.min(1, dt * 5.5)
-        s.op[i]  += (tO - s.op[i])  * Math.min(1, dt * 5.5)
-        const x = s.cx + Math.cos(ang) * s.rx[i]
-        const y = s.cy + Math.sin(ang) * s.ry[i]
-        const pl = r.planet.current, bd = r.body.current
-        if (pl) { pl.style.left = x + 'px'; pl.style.top = y + 'px'; pl.style.opacity = s.op[i].toFixed(3); pl.style.zIndex = isA ? 6 : 2 }
-        if (bd) bd.style.transform = `scale(${s.scl[i].toFixed(3)})`
+    /* ── layout ── */
+    function layout() {
+      const st = stageRef.current; if (!st) return
+      const W = st.clientWidth, H = st.clientHeight
+      a.narrow = W < 880
+      a.cx = 0
+      a.cy = a.narrow ? H*0.36 : H*0.54
+      a.tilt      = a.narrow ? 0.54  : 0.46
+      a.baseAngle = a.narrow ? -0.64 : -0.55
+      a.sunSize   = a.narrow ? 120   : 180
+      const cos = Math.cos(a.baseAngle)
+      const cardW   = Math.min(380, W*0.30)
+      const cardLeft = W - W*0.035 - cardW
+      const x0 = Math.max(a.narrow ? W*0.18 : W*0.17, a.sunSize*0.5 + (a.narrow?54:130))
+      const x4 = a.narrow ? W*0.74 : (cardLeft - W*0.12)
+      a.rx = [0,1,2,3,4].map(i => (x0 + (x4-x0)*(i/4)) / cos)
+      a.ry = a.rx.map(r => r*a.tilt)
+      a.activeScale = PROG_DATA.map(p => (a.narrow?56:78)/p.size)
+      items.forEach((r,i) => {
+        const o = r.orbit.current
+        if (o) { o.style.width=(a.rx[i]*2)+'px'; o.style.height=(a.ry[i]*2)+'px'; o.style.left=a.cx+'px'; o.style.top=a.cy+'px' }
+        const pl = r.planet.current
+        if (pl) { pl.style.width=PROG_DATA[i].size+'px'; pl.style.height=PROG_DATA[i].size+'px' }
       })
-
-      rafRef.current = requestAnimationFrame(frame)
+      const sn = sunRef.current
+      if (sn) { sn.style.width=a.sunSize+'px'; sn.style.height=a.sunSize+'px'; sn.style.left=a.cx+'px'; sn.style.top=a.cy+'px' }
     }
-    rafRef.current = requestAnimationFrame(frame)
-    return () => { cancelAnimationFrame(rafRef.current); ro.disconnect() }
-  }, [layout, makeStars, setActive])
+
+    /* ── stars ── */
+    function makeStars() {
+      const st=stageRef.current, el=starsRef.current; if(!st||!el) return
+      const W=st.clientWidth, H=st.clientHeight, sh=[]
+      for(let i=0;i<120;i++){
+        const x=(Math.random()*W).toFixed(0), y=(Math.random()*H).toFixed(0)
+        const bright=Math.random()>0.84
+        const al=((bright?0.7:0.28)*Math.random()+0.08).toFixed(2)
+        sh.push(`${x}px ${y}px 0 ${bright?'0.6px':'0'} rgba(${bright?'225,215,255':'190,175,230'},${al})`)
+      }
+      el.style.boxShadow=sh.join(',')
+    }
+
+    /* ── setActive: direct DOM, mirrors reference exactly ── */
+    function setActive(idx) {
+      a.active = idx
+      items.forEach((r,i) => {
+        const on = i===idx
+        const c=r.card.current
+        if(c){
+          const tx = a.narrow
+            ? `translateX(-50%) translateY(${on?'0px':'16px'})`
+            : `translateY(calc(-50% + ${on?0:16}px))`
+          c.style.opacity=on?'1':'0'; c.style.transform=tx; c.style.pointerEvents=on?'auto':'none'
+        }
+        const o=r.orbit.current
+        if(o){ o.style.borderColor=on?'rgba(198,176,248,0.52)':'rgba(176,156,232,0.10)'; o.style.boxShadow=on?'0 0 46px rgba(140,104,232,0.20)':'none' }
+        const nm=r.num.current; if(nm) nm.style.opacity=on?'0':'0.6'
+        const rg=r.ring.current
+        if(rg){ rg.style.borderColor=on?'rgba(238,229,255,0.95)':'rgba(216,198,255,0)'; rg.style.boxShadow=on?'0 0 20px rgba(170,126,240,0.85), inset 0 0 9px rgba(238,229,255,0.42)':'none' }
+        const dt=r.dot.current
+        if(dt){ dt.style.background=on?'#cab4fb':'rgba(176,156,232,0.22)'; dt.style.boxShadow=on?'0 0 12px rgba(164,137,239,0.95)':'none'; dt.style.height=on?'22px':'8px'; dt.style.opacity=on?'1':'0.7' }
+      })
+    }
+
+    /* ── rAF frame loop ── */
+    let raf
+    function frame(now) {
+      if(!a.last) a.last=now
+      let dt=(now-a.last)/1000; a.last=now; if(dt>0.05) dt=0.05
+      a.t+=dt
+
+      /* scroll → active */
+      const pin=pinRef.current
+      if(pin){
+        const r=pin.getBoundingClientRect()
+        const denom=(r.height-window.innerHeight)||1
+        let p=(-r.top)/denom; p=Math.max(0,Math.min(0.99999,p))
+        let idx=Math.floor(p*N); if(idx<0)idx=0; if(idx>N-1)idx=N-1
+        if(idx!==a.active) setActive(idx)
+      }
+
+      /* sun breathe */
+      const sn=sunRef.current
+      if(sn){ const sc=1+Math.sin(a.t*1.3)*0.045; sn.style.left=a.cx+'px'; sn.style.top=a.cy+'px'; sn.style.transform=`translate(-50%,-50%) scale(${sc.toFixed(3)})` }
+
+      /* planets */
+      for(let i=0;i<N;i++){
+        const r=items[i], isA=i===a.active
+        const ang=a.baseAngle+Math.sin(a.t*0.5+i*1.3)*0.020
+        const tO=isA?1:0.62, tS=isA?a.activeScale[i]:1
+        a.scl[i]+=(tS-a.scl[i])*Math.min(1,dt*5.5)
+        a.op[i] +=(tO-a.op[i]) *Math.min(1,dt*5.5)
+        const x=a.cx+Math.cos(ang)*a.rx[i], y=a.cy+Math.sin(ang)*a.ry[i]
+        const pl=r.planet.current, bd=r.body.current
+        if(pl){ pl.style.left=x+'px'; pl.style.top=y+'px'; pl.style.opacity=a.op[i].toFixed(3); pl.style.zIndex=isA?6:2 }
+        if(bd) bd.style.transform=`scale(${a.scl[i].toFixed(3)})`
+      }
+      raf=requestAnimationFrame(frame)
+    }
+
+    layout(); makeStars(); setActive(0)
+    const ro=new ResizeObserver(()=>{layout();makeStars()})
+    ro.observe(stageRef.current)
+    raf=requestAnimationFrame(frame)
+    return ()=>{ cancelAnimationFrame(raf); ro.disconnect() }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ── assign DOM refs via callback refs so they work without React.createRef ── */
+  const setRef = (i, key) => el => { IR.current[i][key].current = el }
 
   return (
     <section className="prog-section" id="programs">
-      {/* header above the pin */}
+
+      {/* faint grid overlay */}
+      <div className="prog-grid-overlay" aria-hidden="true"></div>
+
+      {/* header */}
       <div className="prog-header-wrap">
         <div className="prog-kicker">What we run · 05</div>
         <div className="prog-head-row">
@@ -1538,35 +1535,28 @@ function ProgramsSection() {
         </div>
       </div>
 
-      {/* pinned orrery */}
+      {/* 560vh scroll driver */}
       <div ref={pinRef} className="prog-pin-driver">
         <div ref={stageRef} className="prog-stage">
 
           {/* starfield */}
           <div ref={starsRef} className="prog-stars" aria-hidden="true"></div>
 
-          {/* orrery field */}
-          <div className="prog-orrery-field">
-            {/* orbit rings */}
-            {PROGRAMS.map((_, i) => (
-              <div key={i} ref={itemRefs.current[i].orbit} className="prog-orbit" aria-hidden="true"></div>
+          {/* orrery field — floats gently */}
+          <div className="prog-orrery-field" aria-hidden="true">
+            {PROG_DATA.map((_,i)=>(
+              <div key={i} ref={setRef(i,'orbit')} className="prog-orbit"></div>
             ))}
-
-            {/* sun */}
-            <div ref={sunRef} className="prog-sun" aria-hidden="true"></div>
-
-            {/* planets */}
-            {PROGRAMS.map((p, i) => (
-              <div key={i} ref={itemRefs.current[i].planet} className="prog-planet">
-                <div ref={itemRefs.current[i].body} className="prog-planet-body">
-                  <div ref={itemRefs.current[i].ring} className="prog-planet-ring"></div>
-                  {p.hasRing && (
-                    <div className="prog-planet-saturn-ring" aria-hidden="true"></div>
-                  )}
-                  <div className="prog-planet-sphere" style={{ background: p.fill, boxShadow: p.shadow }}></div>
-                  <div className="prog-planet-gloss" aria-hidden="true"></div>
+            <div ref={sunRef} className="prog-sun"></div>
+            {PROG_DATA.map((p,i)=>(
+              <div key={i} ref={setRef(i,'planet')} className="prog-planet">
+                <div ref={setRef(i,'body')} className="prog-planet-body">
+                  <div ref={setRef(i,'ring')} className="prog-planet-ring"></div>
+                  {p.hasRing && <div className="prog-planet-saturn-ring"></div>}
+                  <div className="prog-planet-sphere" style={{background:p.fill,boxShadow:p.shadow}}></div>
+                  <div className="prog-planet-gloss"></div>
                 </div>
-                <div ref={itemRefs.current[i].num} className="prog-planet-num">{p.idx}</div>
+                <div ref={setRef(i,'num')} className="prog-planet-num">{p.idx}</div>
               </div>
             ))}
           </div>
@@ -1575,28 +1565,21 @@ function ProgramsSection() {
           <div className="prog-scrim" aria-hidden="true"></div>
 
           {/* detail cards */}
-          {PROGRAMS.map((p, i) => (
-            <div key={i} ref={itemRefs.current[i].card} className="prog-card">
+          {PROG_DATA.map((p,i)=>(
+            <div key={i} ref={setRef(i,'card')} className="prog-card">
               <div className="prog-card-eyebrow">{p.eyebrow}</div>
               <h3 className="prog-card-title">{p.name}</h3>
               <p className="prog-card-desc">{p.desc}</p>
               <ul className="prog-card-bullets">
-                {p.points.map(b => (
-                  <li key={b}><span className="prog-card-pip"></span>{b}</li>
-                ))}
+                {p.bullets.map(b=>(<li key={b}><span className="prog-card-pip"></span>{b}</li>))}
               </ul>
-              <a href="#apply" className="prog-card-cta">
-                {p.cta}
-                <span className="prog-card-cta-icon">↗</span>
-              </a>
+              <a href="#apply" className="prog-card-cta">{p.cta}<span className="prog-card-cta-icon">↗</span></a>
             </div>
           ))}
 
           {/* progress rail */}
           <div className="prog-rail" aria-hidden="true">
-            {PROGRAMS.map((_, i) => (
-              <div key={i} ref={itemRefs.current[i].dot} className="prog-dot"></div>
-            ))}
+            {PROG_DATA.map((_,i)=>(<div key={i} ref={setRef(i,'dot')} className="prog-dot"></div>))}
           </div>
 
           {/* scroll hint */}

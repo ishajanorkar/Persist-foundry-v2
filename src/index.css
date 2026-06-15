@@ -1956,22 +1956,24 @@ body::before {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 880px) {
+  /* on narrow: card is anchored bottom-centre via JS (data-narrow attr) */
   .prog-card {
     right: auto;
     left: 50%;
     top: auto;
     bottom: 80px;
-    transform: translateX(-50%) translateY(16px);
-    width: min(340px, 86vw);
+    width: min(320px, 88vw);
+    /* transform set entirely by JS on narrow */
   }
-  .prog-card { transition: opacity 0.6s ease, transform 0.6s ease; }
-  .prog-card[style*="opacity: 1"],
-  .prog-card[style*="opacity:1"] { transform: translateX(-50%) translateY(0); }
-  .prog-scrim { background: linear-gradient(180deg, transparent 40%, rgba(10,6,19,0.7) 70%, rgba(10,6,19,0.92) 90%); }
-  .prog-rail { right: 14px; }
+  .prog-scrim { background: linear-gradient(180deg, transparent 35%, rgba(10,6,19,0.65) 65%, rgba(10,6,19,0.90) 88%); }
+  .prog-rail { right: 12px; }
   .prog-header-wrap { padding: clamp(60px,8vw,90px) 22px 20px; }
   .prog-head-row { flex-direction: column; gap: 16px; }
   .prog-sub { max-width: 100%; }
+  .prog-card-title { font-size: clamp(26px, 6vw, 42px); }
+  .prog-card-desc  { font-size: 14px; }
+  .prog-card-bullets li { font-size: 13px; }
+  .prog-scroll-hint { display: none; }
 }
 
 /* ================== PORTFOLIO v2 ================== */
