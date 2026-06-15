@@ -1514,21 +1514,21 @@ function ProgramsSection() {
       {/* faint grid overlay */}
       <div className="prog-grid-overlay" aria-hidden="true"></div>
 
-      {/* header */}
-      <div className="prog-header-wrap">
-        <div className="prog-kicker">What we run · 05</div>
-        <div className="prog-head-row">
-          <h2 className="prog-title">Five&nbsp;rooms.<em> One&nbsp;bet.</em></h2>
-          <p className="prog-sub">Every founder meets us through one of five doors. Same conviction behind each — a different way in. <span className="prog-sub-hint">Scroll to traverse the system.</span></p>
-        </div>
-      </div>
-
       {/* 560vh scroll driver */}
       <div ref={pinRef} className="prog-pin-driver">
         <div ref={stageRef} className="prog-stage">
 
           {/* starfield */}
           <div ref={starsRef} className="prog-stars" aria-hidden="true"></div>
+
+          {/* header — overlaid on top of the orrery so they share one background */}
+          <div className="prog-header-wrap">
+            <div className="prog-kicker">What we run · 05</div>
+            <div className="prog-head-row">
+              <h2 className="prog-title">Five&nbsp;rooms.<em> One&nbsp;bet.</em></h2>
+              <p className="prog-sub">Every founder meets us through one of five doors. Same conviction behind each — a different way in. <span className="prog-sub-hint">Scroll to traverse the system.</span></p>
+            </div>
+          </div>
 
           {/* orrery field — floats gently */}
           <div className="prog-orrery-field" aria-hidden="true">

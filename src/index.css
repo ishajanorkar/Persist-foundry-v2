@@ -1491,11 +1491,13 @@ body::before {
 }
 
 .prog-header-wrap {
-  position: relative;
+  position: absolute;
+  top: 0; left: 0; right: 0;
   max-width: 1240px;
   margin: 0 auto;
   padding: clamp(80px,10vw,118px) clamp(24px,4vw,56px) 30px;
-  z-index: 2;
+  z-index: 8;
+  pointer-events: none;
 }
 .prog-kicker {
   font-family: var(--mono);
@@ -1789,7 +1791,7 @@ body::before {
   }
   .prog-scrim { background: linear-gradient(180deg, transparent 35%, rgba(10,6,19,0.65) 65%, rgba(10,6,19,0.90) 88%); }
   .prog-rail { right: 12px; }
-  .prog-header-wrap { padding: clamp(60px,8vw,90px) 22px 20px; }
+  .prog-header-wrap { padding: clamp(56px,7vw,80px) 22px 20px; }
   .prog-head-row { flex-direction: column; gap: 16px; }
   .prog-sub { max-width: 100%; }
   .prog-card-title { font-size: clamp(26px, 6vw, 42px); }
