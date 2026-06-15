@@ -708,44 +708,42 @@ export default function Home() {
       <section className="impact" id="impact">
         <div className="impact-inner">
 
-          {/* backstory */}
+          {/* backstory row */}
           <div className="impact-backstory">
-            <p className="impact-backstory-body">
-              Founded in 2016, Persist began as one founder's answer to a broken system —
-              inspired by the Thiel Fellowship's model but built to be open to everyone.
-              What started as a PayPal-to-Ethereum exchange became proof that the right
-              ecosystem changes everything.
-            </p>
-            <blockquote className="impact-backstory-quote">
-              "Every venture was a stepping stone toward building the ecosystem I always needed."
-              <cite>— Jack Jay, Founder &amp; CEO</cite>
-            </blockquote>
+            <div className="impact-backstory-label">
+              <span className="impact-backstory-pip"></span>
+              Backstory
+            </div>
+            <div className="impact-backstory-content">
+              <p className="impact-backstory-heading">
+                We started Persist in 2016 to rethink founder support: building alongside founders, not from the sidelines.
+              </p>
+              <p className="impact-backstory-body">
+                Inspired by the Thiel Fellowship but built to be open to everyone, Persist began as one founder's answer to a broken system. What started as a PayPal-to-Ethereum exchange became proof that the right ecosystem changes everything. Nine years and thirty companies later, we stay true to our DNA — founder-first and deeply involved. Because when ambitious founders and the right support come together, exceptional companies are born.
+              </p>
+            </div>
           </div>
 
-          <div className="impact-header">
-            <div className="impact-eyebrow">
-              Nine years, in numbers
-            </div>
-            <div className="impact-year-range">2016 — 2025</div>
-          </div>
-          <div className="impact-grid">
+          {/* stats row */}
+          <div className="impact-stats-row">
             <div className="impact-stat">
-              <div className="impact-num" data-target="30">0<span className="symbol">+</span></div>
               <div className="impact-label">Companies built</div>
+              <div className="impact-num" data-target="30">0<span className="symbol">+</span></div>
             </div>
             <div className="impact-stat">
-              <div className="impact-num" data-target="117" data-prefix="$">0<span className="symbol">M</span></div>
               <div className="impact-label">Net asset value</div>
+              <div className="impact-num" data-target="117" data-prefix="$">0<span className="symbol">M</span></div>
             </div>
             <div className="impact-stat">
-              <div className="impact-num" data-target="400">0<span className="symbol">+</span></div>
               <div className="impact-label">Operators &amp; allies</div>
+              <div className="impact-num" data-target="400">0<span className="symbol">+</span></div>
             </div>
             <div className="impact-stat">
-              <div className="impact-num" data-target="67">0<span className="symbol">B</span></div>
               <div className="impact-label">Impressions across portfolio</div>
+              <div className="impact-num" data-target="67">0<span className="symbol">B</span></div>
             </div>
           </div>
+
         </div>
       </section>
 
