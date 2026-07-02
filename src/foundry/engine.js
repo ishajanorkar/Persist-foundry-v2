@@ -171,12 +171,45 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     if (p >= 0.40) { tetherRevealed = true; lockupRow.classList.add('is-revealed') }
   }
 
+  // count-up of the threshold stats (30+, $117M, 400+, 67B) as that beat
+  // scrolls in. Each value is split into prefix / number / suffix so the
+  // "$" and "+"/"M"/"B" are preserved while only the number animates.
+  const statData = Array.from(document.querySelectorAll('#threshold .stat__num')).map((el) => {
+    // Cache the original final value once; a re-init (StrictMode/HMR) must not
+    // re-parse an already-zeroed element, which would make the target 0.
+    if (!el.dataset.countFinal) el.dataset.countFinal = el.textContent.trim()
+    const m = el.dataset.countFinal.match(/^(\D*)(\d[\d.]*)(\D*)$/)
+    return { el, prefix: m ? m[1] : '', target: m ? parseFloat(m[2]) : 0, suffix: m ? m[3] : '' }
+  })
+  if (!reduceMotion) statData.forEach((s) => { s.el.textContent = s.prefix + '0' + s.suffix })
+  let thresholdCounted = false
+  let countRaf = null
+  function countUpThreshold() {
+    if (thresholdCounted) return
+    thresholdCounted = true
+    const dur = 1700
+    const t0 = performance.now()
+    function frame(now) {
+      if (killed) return
+      const t = Math.min(1, (now - t0) / dur)
+      const e = 1 - Math.pow(1 - t, 3) // easeOutCubic
+      statData.forEach((s) => { s.el.textContent = s.prefix + Math.round(s.target * e) + s.suffix })
+      if (t < 1) countRaf = requestAnimationFrame(frame)
+    }
+    countRaf = requestAnimationFrame(frame)
+  }
+  cleanups.push(() => { if (countRaf) cancelAnimationFrame(countRaf) })
+  function maybeCountThreshold(p) {
+    if (!thresholdCounted && p >= 0.84) countUpThreshold()
+  }
+
   window.PF.heroProgress = 0
   function onScrub(p) {
     window.PF.heroProgress = p
     drawFrame(progressToFrame(p))
     updateBeats(p)
     maybeRevealTether(p)
+    maybeCountThreshold(p)
     if (window.PF.onHeroProgress) window.PF.onHeroProgress(p)
   }
 
