@@ -1303,7 +1303,7 @@ body::before {
 
 /* ================== FILTER ================== */
 .filter-section {
-  padding: clamp(200px, 24vw, 400px) 48px 140px;
+  padding: clamp(200px, 24vw, 400px) clamp(24px, 5vw, 80px) 140px;
   background: var(--bone);
   color: var(--ink);
   position: relative;
@@ -1518,7 +1518,7 @@ body::before {
   position: relative;
   max-width: 1240px;
   margin: 0 auto;
-  padding: clamp(90px,10vw,118px) clamp(24px,4vw,56px) clamp(48px,5vw,64px);
+  padding: clamp(90px,10vw,118px) clamp(24px,5vw,80px) clamp(48px,5vw,64px);
   z-index: 2;
 }
 .prog-kicker {
@@ -1842,7 +1842,7 @@ body::before {
   gap: 60px;
   align-items: end;
   margin-bottom: 100px;
-  padding: 0 48px;
+  padding: 0 clamp(24px, 5vw, 80px);
 }
 .portfolio-v2-title {
   font-family: var(--serif);
@@ -1897,7 +1897,7 @@ body::before {
   grid-template-columns: 1.15fr 1fr;
   gap: 80px;
   align-items: center;
-  padding: 90px 48px;
+  padding: 90px clamp(24px, 5vw, 80px);
   border-top: 1px solid rgba(20,16,30,0.1);
   opacity: 0;
   transform: translateY(60px);
@@ -2050,7 +2050,7 @@ body::before {
 /* Portfolio CTA */
 .portfolio-v2-cta {
   border-top: 1px solid rgba(20,16,30,0.1);
-  padding: 72px 48px 8px;
+  padding: 72px clamp(24px, 5vw, 80px) 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2162,7 +2162,7 @@ body::before {
 
 /* ================== BACKED v2 ================== */
 .backed-v2 {
-  padding: 150px 48px;
+  padding: 150px clamp(24px, 5vw, 80px);
   background: linear-gradient(160deg, #EDE8FA 0%, #E8E2F7 40%, #EDE8FA 100%);
   color: var(--ink);
   border-top: 1px solid rgba(120,84,213,0.15);
@@ -2257,7 +2257,7 @@ body::before {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  padding: 14vh clamp(20px, 4vw, 56px) 12vh;
+  padding: 14vh clamp(24px, 5vw, 80px) 12vh;
   background:
     radial-gradient(60% 40% at 50% 72%, rgba(139,92,246,.20) 0%, transparent 60%),
     radial-gradient(140% 80% at 50% 0%, #1a0e2f 0%, #0B0613 55%, #06030c 100%);
@@ -2548,7 +2548,7 @@ body::before {
   display: grid;
   grid-template-columns: 1.6fr 1fr 1fr 1fr;
   gap: 48px;
-  padding: 72px 56px 64px;
+  padding: 72px clamp(24px, 5vw, 80px) 64px;
   border-bottom: 1px solid var(--hairline);
 }
 
@@ -2717,7 +2717,7 @@ body::before {
 /* bottom bar */
 .footer-bottom {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 20px 56px;
+  padding: 20px clamp(24px, 5vw, 80px);
   font-size: 10.5px; letter-spacing: 0.14em;
   color: rgba(199,184,245,0.3);
   text-transform: none;
@@ -2909,7 +2909,7 @@ body::before {
 }
 
 @media (max-width: 640px) {
-  .filter-section { padding: 80px 22px; }
+  .filter-section { padding: 80px 24px; }
   .filter-divider { display: none; }
   .filter-grid { grid-template-columns: 1fr; gap: 16px; }
 
@@ -2926,7 +2926,7 @@ body::before {
   .portfolio-row-stats { gap: 20px; }
   .portfolio-v2-cta-link { width: 100%; justify-content: center; }
 
-  .backed-v2 { padding: 80px 22px; }
+  .backed-v2 { padding: 80px 24px; }
   .backed-v2-header { margin-bottom: 50px; }
   .backed-v2-list { grid-template-columns: repeat(3, 1fr); }
   .backed-v2-cell { padding: 40px 20px; }
