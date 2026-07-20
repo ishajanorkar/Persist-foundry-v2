@@ -173,8 +173,11 @@ export default function ManifestoSection() {
                 <clipPath id="mlt-inf-clip">{paths(INF_PATHS)}</clipPath>
               </defs>
 
-              {/* 1 — resting full P∞: solid, fully visible logo (not a ghost) */}
-              <g fill="url(#mlt-grad)" opacity="0.92">
+              {/* 1 — resting full P∞: a dim but clearly visible unfilled guide.
+                   The bright color is painted ON scroll by the wipe (group 2)
+                   + finale fills (groups 4/5), so this stays low so the
+                   progressive fill reads. Was 0.09 (too faint / "blending"). */}
+              <g fill="#A78BFA" opacity="0.16">
                 {paths(P_PATHS)}
                 {paths(INF_PATHS)}
               </g>
