@@ -5,7 +5,7 @@ const LINKS = [
   { label: 'Home',         to: '/' },
   { label: 'About',        to: '/about' },
   { label: 'Our Team',     to: '/team' },
-  { label: 'Portfolio',    id: 'portfolio' },
+  { label: 'Portfolio',    to: '/portfolio' },
   { label: 'Careers',      id: 'offer' },
   { label: 'Work With Us', href: '#', dropdown: true },
   { label: 'Blog',         href: '#' },

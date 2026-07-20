@@ -1,0 +1,118 @@
+/*
+  Shared design tokens + chrome required by Portfolio / PortfolioCompany.
+  Import this BEFORE portfolio-page.css.
+  Safe to skip if the target site already defines these variables and utilities.
+*/
+
+:root {
+  --void: #07050F;
+  --night: #0F0A1F;
+  --night-2: #18102E;
+  --violet: #7854D5;
+  --violet-soft: #9B7FE4;
+  --violet-deep: #4A2E9F;
+  --violet-glow: rgba(120, 84, 213, 0.4);
+  --brand: #6145A9;
+  --brand-glow: rgba(97, 69, 169, 0.45);
+  --lilac: #C7B8F5;
+  --paper: #F4F1FA;
+  --bone: #EAE4F4;
+  --ink: #14101E;
+  --ink-soft: #2E2840;
+  --stone: #6B5F88;
+  --stone-soft: #A599C2;
+  --hairline: rgba(199, 184, 245, 0.12);
+  --hairline-strong: rgba(199, 184, 245, 0.25);
+  --serif: "Lora", "Georgia", serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: "Geist Mono", "JetBrains Mono", monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.serif {
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-weight: 400;
+}
+
+.sans {
+  font-family: var(--sans);
+  font-weight: 400;
+}
+
+/* Custom cursor used by both portfolio pages */
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  background: var(--brand);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: normal;
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+    width 0.3s,
+    height 0.3s,
+    background 0.3s,
+    opacity 0.3s;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 16px var(--brand-glow);
+}
+
+.cursor.is-hover {
+  width: 48px;
+  height: 48px;
+  background: transparent;
+  border: 1.5px solid var(--brand);
+  box-shadow: 0 0 20px var(--brand-glow);
+}
+
+@media (max-width: 968px) {
+  .cursor {
+    display: none;
+  }
+}
+
+/* Scroll progress bar on portfolio index */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 1px;
+  width: 0%;
+  background: rgba(199, 184, 245, 0.35);
+  z-index: 101;
+  transition: width 0.05s linear;
+}
+
+/* Optional: hide native cursor on desktop if matching source site */
+body.pf-page {
+  background: var(--void);
+  color: var(--paper);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (min-width: 969px) {
+  body.pf-page {
+    cursor: none;
+  }
+
+  body.pf-page a,
+  body.pf-page button {
+    cursor: none;
+  }
+}

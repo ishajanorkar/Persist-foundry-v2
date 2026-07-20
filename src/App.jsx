@@ -6,6 +6,8 @@ import Home from './pages/Home'
 import Foundry from './pages/Foundry'
 import About from './pages/About'
 import Team from './pages/Team'
+import Portfolio from './pages/Portfolio'
+import PortfolioCompany from './pages/PortfolioCompany'
 
 // The cinematic Foundry landing ships its own nav + footer, so the shared
 // chrome is suppressed on that route.
@@ -22,6 +24,8 @@ function Layout() {
         <Route path="/legacy" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/team" element={<Team />} />
+        <Route path="/portfolio" element={<Portfolio />} />
+        <Route path="/portfolio/:id" element={<PortfolioCompany />} />
       </Routes>
       {!bare && <Footer />}
     </>

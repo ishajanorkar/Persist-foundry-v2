@@ -230,7 +230,7 @@ export default function Foundry() {
 
             <div className="pfolio__cta">
               <p className="pfolio__cta-label">Three of thirty. <em>The rest are just as relentless.</em></p>
-              <a className="pfolio__cta-link" href="#portfolio">See all thirty <span aria-hidden="true">→</span></a>
+              <a className="pfolio__cta-link" href="/portfolio">See all thirty <span aria-hidden="true">→</span></a>
             </div>
           </div>
         </section>

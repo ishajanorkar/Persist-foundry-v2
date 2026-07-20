@@ -857,7 +857,7 @@ export default function Home() {
 
           <div className="portfolio-v2-cta">
             <p className="portfolio-v2-cta-label">Three of thirty. <em>The rest are just as relentless.</em></p>
-            <a href="#" className="portfolio-v2-cta-link" data-magnetic>
+            <a href="/portfolio" className="portfolio-v2-cta-link" data-magnetic>
               See all thirty <span className="arrow">→</span>
             </a>
           </div>
