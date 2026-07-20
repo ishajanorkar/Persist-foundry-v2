@@ -173,8 +173,8 @@ export default function ManifestoSection() {
                 <clipPath id="mlt-inf-clip">{paths(INF_PATHS)}</clipPath>
               </defs>
 
-              {/* 1 — dim resting full P∞ (ghost guide only) */}
-              <g fill="#A78BFA" opacity="0.09">
+              {/* 1 — resting full P∞: solid, fully visible logo (not a ghost) */}
+              <g fill="url(#mlt-grad)" opacity="0.92">
                 {paths(P_PATHS)}
                 {paths(INF_PATHS)}
               </g>

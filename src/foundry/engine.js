@@ -537,8 +537,8 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${scale})`
   }
 
-  /* Keep the shared React navbar on-screen from logo drop through the
-     dock glide so the brand slot is a visible landing target. */
+  /* Reveal the shared React navbar only once the P begins traveling
+     toward the brand slot — not during the centered orbit drop. */
   function setDockNavLock(on) {
     window.PF._forceNavVisible = !!on
     const nav = document.getElementById('nav')
@@ -552,10 +552,10 @@ export default function initFoundry({ base = '/foundry' } = {}) {
   }
   function updateDockNavLock() {
     const g = window.PF._glideG || 0
-    const gRaw = window.PF._glideRaw ?? g
-    const drop = window.PF._logoDrop || 0
-    // Hold the bar visible from logo drop through the settle dwell
-    setDockNavLock((drop > 0.55 && gRaw < 0.99) || (gRaw > 0.001 && gRaw < 0.99))
+    const gRaw = window.PF._glideRaw ?? 0
+    // mapGlideProgress stays at 0 through the centered hold; g > 0 means
+    // the mark has started moving toward the nav.
+    setDockNavLock(g > 0.001 && gRaw < 0.99)
   }
 
   /* Map raw scroll progress → logo glide with a readable arc + settle dwell.

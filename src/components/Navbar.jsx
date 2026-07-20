@@ -24,7 +24,7 @@ export default function Navbar() {
     const onScroll = () => {
       const y = window.scrollY
       setScrolled(y > 60)
-      // Foundry P-dock glide: keep nav visible so the mark has a landing target
+      // Foundry P-dock glide: only force-show once the mark is moving to the nav
       const forceVisible = !!(typeof window !== 'undefined' && window.PF?._forceNavVisible)
       if (y < 120 || forceVisible) {
         setHidden(false)
