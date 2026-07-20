@@ -27,7 +27,7 @@ export default function Foundry() {
 
     // stacking portfolio cards: as the next glass card slides over, the
     // covered card recedes — scales down from its top edge, lifts slightly,
-    // and dims — leaving a staggered deck of visible card tops
+    // and dims — leaving a staggered deck of visible card tops (cards stay opaque)
     const stackCards = Array.from(document.querySelectorAll('#pfolioStack .pfolio-row'))
     const STACK_TOP = 96  // matches sticky top of card 1 in foundry.css
     const STAGGER = 16    // matches the per-card top offset in foundry.css

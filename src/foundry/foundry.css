@@ -1037,20 +1037,33 @@ body.pf-landing .pf ~ .footer {
   display: grid; grid-template-columns: 1.15fr 1fr; gap: 80px; align-items: center;
   padding: clamp(48px, 7vh, 78px) clamp(24px, 4vw, 64px);
   margin-bottom: 32px;
-  /* glass card: translucent over the card beneath, blurred through the pane */
-  background: rgba(12, 8, 22, 0.62);
-  backdrop-filter: blur(18px) saturate(1.15);
-  -webkit-backdrop-filter: blur(18px) saturate(1.15);
-  border: 1px solid rgba(185, 160, 255, 0.16);
+  /* Opaque glass: frost the starfield, never show the card underneath */
+  background:
+    linear-gradient(165deg, rgba(22, 16, 40, 0.97) 0%, rgba(10, 7, 18, 0.98) 55%, rgba(8, 5, 14, 0.99) 100%);
+  backdrop-filter: blur(22px) saturate(1.25);
+  -webkit-backdrop-filter: blur(22px) saturate(1.25);
+  border: 1px solid rgba(185, 160, 255, 0.2);
   border-radius: 22px;
   box-shadow:
-    0 24px 70px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(233, 226, 255, 0.07);
+    0 24px 70px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(233, 226, 255, 0.1);
   overflow: hidden;
+  isolation: isolate;
   transform-origin: top center;
   will-change: transform, filter;
   transition: transform 0.18s linear, filter 0.18s linear;
 }
+.pfolio-row::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: rgba(8, 5, 14, 0.92);
+  pointer-events: none;
+}
+.pfolio-row > * { position: relative; z-index: 1; }
 /* staggered rest positions: each card settles 16px lower, so the covered
    cards' top edges stay visible as a deck while the next one slides over */
 .pfolio-row:nth-child(1) { z-index: 1; top: 96px; }
@@ -1117,10 +1130,10 @@ body.pf-landing .pf ~ .footer {
   position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
   font-family: var(--pf-mono); font-size: 0.6rem; letter-spacing: 0.32em; text-transform: uppercase;
   color: rgba(233, 226, 255, 0.92);
-  background: rgba(5, 4, 9, 0.5);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  background: rgba(8, 5, 14, 0.88);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   padding: 5px 14px; border-radius: 100px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   white-space: nowrap;
 }
 .pfolio-row__corner { position: absolute; width: 20px; height: 20px; border-color: rgba(233, 226, 255, 0.5); border-style: solid; transition: border-color 0.4s ease; }
