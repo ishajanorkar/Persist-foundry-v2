@@ -30,6 +30,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
   }
   window.PF_CONFIG = PF_CONFIG
   window.PF = window.PF || {}
+  window.PF._glideG = 0
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const cleanups = []
@@ -400,7 +401,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     const heading = document.createElement('div')
     heading.className = 'orbit-heading'
     heading.innerHTML = '<span class="eyebrow">Five ways we forge</span>'
-    heading.style.cssText = 'position:absolute;top:11vh;left:50%;transform:translateX(-50%);opacity:0;text-align:center;will-change:opacity;'
+    heading.style.cssText = 'position:absolute;top:7vh;left:50%;transform:translateX(-50%);opacity:0;text-align:center;will-change:opacity;'
     wrap.appendChild(heading)
     orbitHeading = heading
 
@@ -442,16 +443,17 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     st.textContent = `
       .orbit-node__medallion{position:relative;width:92px;height:92px;border-radius:50%;
         display:flex;align-items:center;justify-content:center;
-        border:1px solid var(--pf-line);
-        background:radial-gradient(circle at 50% 32%, rgba(120,84,213,0.28), rgba(8,6,16,0.42));
-        box-shadow:0 0 34px rgba(120,84,213,0.26), inset 0 0 24px rgba(120,84,213,0.14);
+        border:1px solid rgba(233,226,255,0.6);
+        background:radial-gradient(circle at 50% 32%, rgba(185,160,255,0.5), rgba(60,45,105,0.55));
+        box-shadow:0 0 44px rgba(185,160,255,0.55), inset 0 0 26px rgba(185,160,255,0.35);
         backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
         transition:transform .4s var(--ease-out),border-color .4s,box-shadow .6s,background .4s;}
       .orbit-node__icon{width:44px;height:44px;object-fit:contain;
-        filter:drop-shadow(0 0 8px rgba(185,160,255,0.55));}
+        filter:drop-shadow(0 0 10px rgba(185,160,255,0.8)) brightness(1.15);}
       .orbit-node__dot{width:12px;height:12px;border-radius:50%;background:var(--pf-violet-bright);
         box-shadow:0 0 16px var(--pf-violet);transition:transform .3s var(--ease-out),background .3s;}
-      .orbit-node__label{transition:color .3s;font-size:0.7rem;}
+      .orbit-node__label{transition:color .3s;font-size:0.7rem;color:rgba(233,226,255,0.9);
+        text-shadow:0 1px 12px rgba(5,4,11,0.9);}
       .orbit-node:hover .orbit-node__medallion,.orbit-node:focus-visible .orbit-node__medallion{
         transform:scale(1.12);border-color:var(--pf-violet);
         background:radial-gradient(circle at 50% 32%, rgba(120,84,213,0.42), rgba(8,6,16,0.5));
@@ -473,7 +475,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
   }
 
   function layoutOrbit(expand, spin, opacity) {
-    const R = Math.min(window.innerWidth, window.innerHeight) * (window.innerWidth < 768 ? 0.34 : 0.28)
+    const R = Math.min(window.innerWidth, window.innerHeight) * (window.innerWidth < 768 ? 0.34 : 0.26)
     const n = armNodes.length
     const op = (opacity == null) ? (expand < 0.05 ? 0 : Math.min(1, expand * 1.4)) : opacity
     armNodes.forEach((node, i) => {
@@ -492,11 +494,23 @@ export default function initFoundry({ base = '/foundry' } = {}) {
   let navScale = 0.12
   function computeNavTarget() {
     const r = navSlot.getBoundingClientRect()
-    const cx = window.innerWidth / 2, cy = window.innerHeight / 2
+    // the logo's left:50% resolves against the layout viewport (excludes the
+    // scrollbar), so measure from clientWidth/Height — innerWidth would land
+    // the mark half a scrollbar off-center
+    const cx = document.documentElement.clientWidth / 2, cy = document.documentElement.clientHeight / 2
+    // subtract the nav's hide/show translateY so the target is always the
+    // SHOWN slot position — the mark's visibility is synced via .brand-hidden
+    let navTy = 0
+    const navBar = navSlot.closest('.pf-nav')
+    if (navBar) {
+      const t = getComputedStyle(navBar).transform
+      if (t && t !== 'none') navTy = new DOMMatrixReadOnly(t).m42
+    }
     navTarget.x = (r.left + r.width / 2) - cx
-    navTarget.y = (r.top + r.height / 2) - cy
+    navTarget.y = (r.top - navTy + r.height / 2) - cy
     const lw = persistLogo.offsetWidth || 280
-    const targetPx = 46
+    // land at the nav slot's rendered size so the mark sits flush with the wordmark
+    const targetPx = r.height || 30
     navScale = targetPx / lw
   }
   function setLogo(drop, glide) {
@@ -535,6 +549,10 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         const drop = Math.min(1, orbitProgress / 0.26)
         const ex = ringExpand(orbitProgress)
         const op = ringOpacity(orbitProgress)
+        // the footage's final frame has a bright star flare baked in dead
+        // center; dim the frame canvas as the logo drops in so the mark
+        // stays legible against it
+        canvas.style.filter = `brightness(${(1 - drop * 0.55).toFixed(3)})`
         if (window.PF._gliding !== true) setLogo(drop, 0)
         orbitFade = 1
         if (orbitLayer) orbitLayer.style.opacity = '1'
@@ -558,7 +576,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     }
 
     mkTrigger({
-      trigger: '#what',
+      trigger: '#portfolio',
       start: 'top 78%',
       end: 'top 12%',
       scrub: 0.5,
@@ -568,8 +586,30 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         if (orbitHeading) orbitHeading.style.opacity = '0'
         threeCanvas.style.opacity = String(Math.max(0.05, 1 - g * 1.2))
         window.PF._gliding = g > 0.001
+        window.PF._glideG = g
+        // re-measure the slot mid-glide: its position can shift after load
+        // (scrollbar, font swap, nav scrolled-state), and a stale target
+        // lands the mark off-center next to the wordmark
+        if (g > 0.001) computeNavTarget()
         setLogo(1, g)
         navSlot.style.pointerEvents = g > 0.55 ? 'auto' : 'none'
+      },
+    })
+
+    // "What you get" (#offer), the manifesto, and the filter render
+    // transparent over the fixed stage, so keep the live starfield at
+    // full strength across all three
+    mkTrigger({
+      trigger: '#offer',
+      endTrigger: '#filter',
+      start: 'top 70%',
+      end: 'bottom 30%',
+      scrub: 0.5,
+      onUpdate: (self) => {
+        const p = self.progress
+        const vis = p < 0.06 ? p / 0.06 : (p > 0.94 ? (1 - p) / 0.06 : 1)
+        threeCanvas.style.opacity = Math.max(0.05, vis).toFixed(3)
+        if (vis > 0.02) startThree()
       },
     })
 
@@ -618,10 +658,24 @@ export default function initFoundry({ base = '/foundry' } = {}) {
 
     const cue = document.getElementById('scrollCue')
     const navEl = document.getElementById('nav')
+    let lastNavY = window.scrollY
     const onWinScroll = () => {
       const y = window.scrollY
       if (cue) cue.style.opacity = y > 80 ? '0' : '1'
-      if (navEl) navEl.classList.toggle('scrolled', y > 40)
+      if (navEl) {
+        navEl.classList.toggle('scrolled', y > 40)
+        // conditional visibility: hide scrolling down, show scrolling up,
+        // always visible near the top
+        const delta = y - lastNavY
+        if (y < 120) navEl.classList.remove('nav-hidden')
+        else if (delta > 6) navEl.classList.add('nav-hidden')
+        else if (delta < -6) navEl.classList.remove('nav-hidden')
+        if (Math.abs(delta) > 6) lastNavY = y
+        // the docked brand mark is a separate fixed element — fade it in
+        // sync with the nav (only once it has substantially glided in)
+        const docked = window.PF._glideG > 0.5
+        persistLogo.classList.toggle('brand-hidden', docked && navEl.classList.contains('nav-hidden'))
+      }
     }
     on(window, 'scroll', onWinScroll, { passive: true })
 

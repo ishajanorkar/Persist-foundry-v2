@@ -1,6 +1,11 @@
 import { useEffect, useRef } from 'react'
 import '../foundry/foundry.css'
 import initFoundry from '../foundry/engine'
+import SixThingsSection from '../components/SixThingsSection'
+import ManifestoSection from '../components/ManifestoSection'
+import FilterSection from '../components/FilterSection'
+import FinalCtaSection from '../components/FinalCtaSection'
+import Footer from '../components/Footer'
 
 /* ============================================================
    PERSIST FOUNDRY — alternative cinematic landing.
@@ -17,7 +22,27 @@ export default function Foundry() {
     // init can get canceled by StrictMode/Fast-Refresh churn before it fires).
     document.body.classList.add('pf-landing')
     const cleanup = initFoundry({ base: '/foundry' })
+
+    // stacking portfolio cards: previous card scales down and dims as the
+    // next sticky card slides over it (same mechanic as the legacy landing)
+    const stackCards = Array.from(document.querySelectorAll('#pfolioStack .pfolio-row'))
+    const STACK_TOP = 100 // matches sticky top in foundry.css
+    const updateStack = () => {
+      stackCards.forEach((card, i) => {
+        const next = stackCards[i + 1]
+        if (!next) { card.style.transform = ''; card.style.filter = ''; return }
+        const overlap = Math.max(0, Math.min(1,
+          (STACK_TOP + card.offsetHeight - next.getBoundingClientRect().top) / card.offsetHeight
+        ))
+        card.style.transform = `scale(${(1 - overlap * 0.04).toFixed(4)})`
+        card.style.filter = `brightness(${(1 - overlap * 0.22).toFixed(4)})`
+      })
+    }
+    window.addEventListener('scroll', updateStack, { passive: true })
+    updateStack()
+
     return () => {
+      window.removeEventListener('scroll', updateStack)
       cleanup()
       document.body.classList.remove('pf-landing')
     }
@@ -51,8 +76,8 @@ export default function Foundry() {
           <span className="nav__word">Persist</span>
         </a>
         <div className="nav__right">
-          <a className="nav-link" href="#what">Studio</a>
-          <a className="nav-link" href="#threshold">Apply</a>
+          <a className="nav-link" href="#portfolio">Studio</a>
+          <a className="nav-link" href="#apply">Apply</a>
           <button className="sound-toggle" id="soundToggle" aria-pressed="false" aria-label="Toggle sound">
             <span id="soundLabel">Sound</span>
           </button>
@@ -67,9 +92,9 @@ export default function Foundry() {
         <section className="beat" data-beat="0" id="hero">
           <div className="beat__scrim" />
           <div className="beat__inner">
-            <p className="eyebrow">A venture studio</p>
+            <p className="eyebrow">A venture studio for the bold</p>
             <h1 className="display">Bet on <em>yourself.</em></h1>
-            <p className="lead" data-copy="hero-lead">The rest will follow. Persist Foundry forges founders into the companies they were meant to build.</p>
+            <p className="lead" data-copy="hero-lead">The rest will follow. Persist Foundry turns bold ideas into market-leading companies, and visionary founders into the leaders they were born to become.</p>
           </div>
         </section>
 
@@ -97,9 +122,9 @@ export default function Foundry() {
         <section className="beat beat--center" data-beat="2" id="threshold">
           <div className="beat__scrim" />
           <div className="beat__inner">
-            <p className="eyebrow">The threshold</p>
-            <h2 className="display">This isn't for <em>everyone.</em></h2>
-            <p className="lead lead--wide" data-copy="threshold-lead">If the fear of execution keeps your idea an idea, this is not your door. Persist backs the rare founders who move before they feel ready. The ones who would build with us or without us.</p>
+            <p className="eyebrow">Backstory</p>
+            <h2 className="display display--backstory">Building alongside founders, not from the <em>sidelines.</em></h2>
+            <p className="lead lead--wide" data-copy="threshold-lead">We started Persist in 2016 to rethink founder support. Inspired by the Thiel Fellowship but open to everyone, it began as one founder's answer to a broken system: a PayPal-to-Ethereum exchange that became proof the right ecosystem changes everything. Nine years and thirty companies later, our DNA is unchanged: founder-first and deeply involved. When ambitious founders meet the right support, exceptional companies are born.</p>
             <div className="stats stats--threshold">
               <div className="stat"><span className="stat__num">30+</span><span className="stat__label">Companies launched</span></div>
               <div className="stat"><span className="stat__num">$117M</span><span className="stat__label">Net asset value</span></div>
@@ -116,32 +141,108 @@ export default function Foundry() {
           </div>
         </section>
 
-        {/* WHAT WE DO */}
-        <section className="what" id="what">
-          <div className="what__inner">
-            <p className="eyebrow">What we do</p>
-            <h2 className="what__headline">We hand founders an <em>unfair start.</em></h2>
-            <p className="what__lead">Capital, a team, and a network most founders spend a decade earning. You get it on day one.</p>
+        {/* PORTFOLIO — stacking cases (dark port of the legacy portfolio-v2) */}
+        <section className="pfolio" id="portfolio">
+          <div className="pfolio__inner">
+            <div className="pfolio__header">
+              <div>
+                <h2 className="pfolio__title"><em>They bet.</em><br />We backed it.</h2>
+                <div className="pfolio__meta">Three of thirty.</div>
+              </div>
+              <p className="pfolio__sub">We don't pick winners. We pick people who can't stop. Here's what nine years of that looks like.</p>
+            </div>
 
-            <div className="what__grid">
-              <article className="what-card">
-                <div className="what-card__icon"><img className="logo-swap icon3d" src="/foundry/icons/3d-capital.png" alt="" data-fallback={'◆'} /></div>
-                <h3 className="what-card__title">Capital that commits</h3>
-                <p className="what-card__body">Funding and a salary, so you build full time from the very first day.</p>
+            <div className="pfolio-stack" id="pfolioStack">
+
+              <article className="pfolio-row" data-row="0">
+                <div className="pfolio-row__left">
+                  <div className="pfolio-row__tag">Robotics</div>
+                  <h3 className="pfolio-row__name"><em>Open Droids</em></h3>
+                  <p className="pfolio-row__desc">Home robots that earn their keep. Built by someone who got tired of waiting for the future to arrive.</p>
+                  <div className="pfolio-row__stats">
+                    <div>
+                      <div className="pfolio-row__stat-num">Pre-seed</div>
+                      <div className="pfolio-row__stat-label">Where they started</div>
+                    </div>
+                    <div>
+                      <div className="pfolio-row__stat-num">Series A<em>→</em></div>
+                      <div className="pfolio-row__stat-label">Where they're going</div>
+                    </div>
+                  </div>
+                </div>
+                <a className="pfolio-row__right" href="https://opendroids.com/" target="_blank" rel="noopener" aria-label="Visit Open Droids">
+                  <img className="pfolio-row__thumb" src="/assets/opendroid-thumbnail.webp" alt="Open Droids" />
+                  <span className="pfolio-row__shade" />
+                  <span className="pfolio-row__case">Case 01 / 03</span>
+                  <span className="pfolio-row__corner tl" /><span className="pfolio-row__corner tr" /><span className="pfolio-row__corner bl" /><span className="pfolio-row__corner br" />
+                </a>
               </article>
-              <article className="what-card">
-                <div className="what-card__icon"><img className="logo-swap icon3d" src="/foundry/icons/3d-studio.png" alt="" data-fallback={'▦'} /></div>
-                <h3 className="what-card__title">A studio behind you</h3>
-                <p className="what-card__body">Builders, designers, and recruiters embedded in your venture until it stands on its own.</p>
+
+              <article className="pfolio-row pfolio-row--reversed" data-row="1">
+                <div className="pfolio-row__left">
+                  <div className="pfolio-row__tag">AI Privacy</div>
+                  <h3 className="pfolio-row__name"><em>Face Search</em></h3>
+                  <p className="pfolio-row__desc">Find every place your face lives online. Built by someone who couldn't sleep until the problem was solved.</p>
+                  <div className="pfolio-row__stats">
+                    <div>
+                      <div className="pfolio-row__stat-num">400K</div>
+                      <div className="pfolio-row__stat-label">Users</div>
+                    </div>
+                    <div>
+                      <div className="pfolio-row__stat-num">$8K<em>MRR</em></div>
+                      <div className="pfolio-row__stat-label">Climbing</div>
+                    </div>
+                  </div>
+                </div>
+                <a className="pfolio-row__right" href="https://facesearchai.com/" target="_blank" rel="noopener" aria-label="Visit Face Search AI">
+                  <img className="pfolio-row__thumb" src="/assets/facesearch-ai-thumbnail.webp" alt="Face Search AI" />
+                  <span className="pfolio-row__shade" />
+                  <span className="pfolio-row__case">Case 02 / 03</span>
+                  <span className="pfolio-row__corner tl" /><span className="pfolio-row__corner tr" /><span className="pfolio-row__corner bl" /><span className="pfolio-row__corner br" />
+                </a>
               </article>
-              <article className="what-card">
-                <div className="what-card__icon"><img className="logo-swap icon3d" src="/foundry/icons/3d-network.png" alt="" data-fallback={'✷'} /></div>
-                <h3 className="what-card__title">A network that opens doors</h3>
-                <p className="what-card__body">400 advisors and the founders of Tether, in your corner from day one.</p>
+
+              <article className="pfolio-row" data-row="2">
+                <div className="pfolio-row__left">
+                  <div className="pfolio-row__tag">Talent</div>
+                  <h3 className="pfolio-row__name"><em>Swissmote</em></h3>
+                  <p className="pfolio-row__desc">Hiring the world's most overlooked builders. Built by someone who heard "no" so many times he rewrote the rules.</p>
+                  <div className="pfolio-row__stats">
+                    <div>
+                      <div className="pfolio-row__stat-num">Profitable</div>
+                      <div className="pfolio-row__stat-label">No outside capital</div>
+                    </div>
+                    <div>
+                      <div className="pfolio-row__stat-num">Global</div>
+                      <div className="pfolio-row__stat-label">Day one</div>
+                    </div>
+                  </div>
+                </div>
+                <a className="pfolio-row__right" href="https://swissmote.com/" target="_blank" rel="noopener" aria-label="Visit Swissmote">
+                  <img className="pfolio-row__thumb" src="/assets/swissmote-thimbnaail.webp" alt="Swissmote" />
+                  <span className="pfolio-row__shade" />
+                  <span className="pfolio-row__case">Case 03 / 03</span>
+                  <span className="pfolio-row__corner tl" /><span className="pfolio-row__corner tr" /><span className="pfolio-row__corner bl" /><span className="pfolio-row__corner br" />
+                </a>
               </article>
+
+            </div>
+
+            <div className="pfolio__cta">
+              <p className="pfolio__cta-label">Three of thirty. <em>The rest are just as relentless.</em></p>
+              <a className="pfolio__cta-link" href="#portfolio">See all thirty <span aria-hidden="true">→</span></a>
             </div>
           </div>
         </section>
+
+        {/* SIX THINGS — "WHAT YOU GET" horizontal pinned scroll (shared with legacy landing) */}
+        <SixThingsSection />
+
+        {/* MANIFESTO — "A note. Read slowly." scroll narrative (ported from legacy landing) */}
+        <ManifestoSection />
+
+        {/* FILTER — "Not for everyone. That's the point." twin columns (ported from legacy landing) */}
+        <FilterSection />
 
         {/* portfolio / arm detail panel (driven by hover in finale) */}
         <div className="portfolio-detail" id="armDetail">
@@ -150,46 +251,11 @@ export default function Foundry() {
           <p id="armBody" />
         </div>
 
-        {/* FINAL CTA + FOOTER */}
-        <footer className="pf-footer" id="footer">
-          <div className="footer__cta">
-            <p className="eyebrow">The only question left</p>
-            <h2 className="footer__headline">Will you <em>bet on yourself?</em></h2>
-            <p className="footer__sub">If you are still reading, you already have your answer.</p>
-            <a className="btn btn--primary btn--lg" href="mailto:hello@persist.org"><span>Start the conversation</span></a>
-          </div>
+        {/* FINAL CTA — "Once on paper changes everything." (ported from legacy landing) */}
+        <FinalCtaSection />
 
-          <div className="footer__grid">
-            <div className="footer__brand">
-              <a className="footer__lockup" href="#top"><img src="/foundry/logo/persist-logo.svg" alt="" /><span>Persist</span></a>
-              <p className="footer__tag">A venture studio for founders who move. Backed by the founders of Tether.</p>
-            </div>
-            <nav className="footer__col" aria-label="Studio">
-              <h4>Studio</h4>
-              <a href="#what">Accelerator</a>
-              <a href="#what">Co-Founder Bridge</a>
-              <a href="#what">Studio for Founders</a>
-              <a href="#what">Sub Studio Program</a>
-            </nav>
-            <nav className="footer__col" aria-label="Company">
-              <h4>Company</h4>
-              <a href="#hero">Vision</a>
-              <a href="#tether">Backing</a>
-              <a href="#threshold">Apply</a>
-            </nav>
-            <nav className="footer__col" aria-label="Connect">
-              <h4>Connect</h4>
-              <a href="mailto:hello@persist.org">hello@persist.org</a>
-              <a href="https://persist.org" target="_blank" rel="noopener">persist.org</a>
-            </nav>
-          </div>
-
-          <div className="footer__base">
-            <span>© 2026 Persist Foundry</span>
-            <span className="footer__base-tag">Bet on yourself.</span>
-            <span>Backed by Tether</span>
-          </div>
-        </footer>
+        {/* FOOTER — shared legacy footer (newsletter + link columns) */}
+        <Footer />
       </main>
 
       {/* scroll cue */}
