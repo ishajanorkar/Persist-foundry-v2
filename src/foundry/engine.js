@@ -151,6 +151,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     return 1 - (p - d) / (e - d)
   }
   function updateBeats(p) {
+    let stageO = 0
     for (let i = 0; i < beatInners.length; i++) {
       const o = bandOpacity(p, BEAT_BANDS[i])
       const { inner, scrim } = beatInners[i]
@@ -158,9 +159,15 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         inner.style.opacity = o.toFixed(3)
         inner.style.transform = `translateY(${(1 - o) * 26}px)`
       }
-      if (scrim) scrim.style.opacity = (o * 0.95).toFixed(3)
-      if (i === 1 && stageFade) stageFade.style.opacity = (o * 0.92).toFixed(3)
+      // Hero + Backstory need a fuller scrim over bright footage
+      const scrimMul = (i === 0 || i === 2) ? 1 : 0.95
+      if (scrim) scrim.style.opacity = (o * scrimMul).toFixed(3)
+      // Dim bright footage under readable beats (hero / tether / backstory)
+      if (i === 0) stageO = Math.max(stageO, o * 0.72)
+      if (i === 1) stageO = Math.max(stageO, o * 0.92)
+      if (i === 2) stageO = Math.max(stageO, o * 0.82)
     }
+    if (stageFade) stageFade.style.opacity = stageO.toFixed(3)
   }
 
   // one-by-one reveal of the Tether partner logos, fired off the same scrub
@@ -484,8 +491,13 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       const x = Math.cos(ang) * r
       const y = Math.sin(ang) * r
       const s = 0.2 + 0.8 * expand
+      const vis = Math.max(0, op) * orbitFade
       node.el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${s})`
-      node.el.style.opacity = String(Math.max(0, op) * orbitFade)
+      node.el.style.opacity = String(vis)
+      // faded-out nodes must not stay hoverable — their inline
+      // pointer-events:auto otherwise catches hovers over the sections
+      // beneath and pops the detail card from nowhere
+      node.el.style.pointerEvents = vis > 0.35 ? 'auto' : 'none'
     })
   }
 
@@ -493,6 +505,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
   let navTarget = { x: 0, y: 0 }
   let navScale = 0.12
   function computeNavTarget() {
+    if (!navSlot || !persistLogo) return
     const r = navSlot.getBoundingClientRect()
     // the logo's left:50% resolves against the layout viewport (excludes the
     // scrollbar), so measure from clientWidth/Height — innerWidth would land
@@ -501,7 +514,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     // subtract the nav's hide/show translateY so the target is always the
     // SHOWN slot position — the mark's visibility is synced via .brand-hidden
     let navTy = 0
-    const navBar = navSlot.closest('.pf-nav')
+    const navBar = navSlot.closest('.nav, .pf-nav')
     if (navBar) {
       const t = getComputedStyle(navBar).transform
       if (t && t !== 'none') navTy = new DOMMatrixReadOnly(t).m42
@@ -514,6 +527,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     navScale = targetPx / lw
   }
   function setLogo(drop, glide) {
+    if (!persistLogo) return
     const baseScale = 0.6 + 0.4 * drop
     const scale = baseScale * (1 - glide) + navScale * glide
     const x = navTarget.x * glide
@@ -521,6 +535,41 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     persistLogo.style.opacity = String(Math.min(1, drop))
     persistLogo.style.transform =
       `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${scale})`
+  }
+
+  /* Keep the shared React navbar on-screen from logo drop through the
+     dock glide so the brand slot is a visible landing target. */
+  function setDockNavLock(on) {
+    window.PF._forceNavVisible = !!on
+    const nav = document.getElementById('nav')
+    if (!nav) return
+    if (on) {
+      nav.classList.remove('is-hidden')
+      nav.classList.add('nav-dock-lock')
+    } else {
+      nav.classList.remove('nav-dock-lock')
+    }
+  }
+  function updateDockNavLock() {
+    const g = window.PF._glideG || 0
+    const gRaw = window.PF._glideRaw ?? g
+    const drop = window.PF._logoDrop || 0
+    // Hold the bar visible from logo drop through the settle dwell
+    setDockNavLock((drop > 0.55 && gRaw < 0.99) || (gRaw > 0.001 && gRaw < 0.99))
+  }
+
+  /* Map raw scroll progress → logo glide with a readable arc + settle dwell.
+     First ~12%: stay centered. Next ~48%: ease into the nav. Last ~40%: hold docked. */
+  function mapGlideProgress(p) {
+    const holdStart = 0.12
+    const settleAt = 0.60
+    if (p <= holdStart) return 0
+    if (p >= settleAt) return 1
+    const t = (p - holdStart) / (settleAt - holdStart)
+    // easeInOutCubic — slow start, clear travel, soft landing
+    return t < 0.5
+      ? 4 * t * t * t
+      : 1 - Math.pow(-2 * t + 2, 3) / 2
   }
 
   let tickerFn = null
@@ -547,6 +596,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       onUpdate: (self) => {
         orbitProgress = self.progress
         const drop = Math.min(1, orbitProgress / 0.26)
+        window.PF._logoDrop = drop
         const ex = ringExpand(orbitProgress)
         const op = ringOpacity(orbitProgress)
         // the footage's final frame has a bright star flare baked in dead
@@ -560,6 +610,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         if (orbitHeading) orbitHeading.style.opacity = String(op)
         threeCanvas.style.opacity = '1'; startThree()
         if (starSprite) starSprite.material.opacity = Math.max(0, 0.8 - drop * 0.8)
+        updateDockNavLock()
       },
     })
 
@@ -575,24 +626,32 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       gsap.ticker.add(tickerFn)
     }
 
+    // Longer scroll window + laggy scrub so the dock reads clearly;
+    // progress is remapped to hold → ease → settle in the nav.
     mkTrigger({
       trigger: '#portfolio',
-      start: 'top 78%',
-      end: 'top 12%',
-      scrub: 0.5,
+      start: 'top 95%',
+      end: 'top -40%',
+      scrub: 1.85,
       onUpdate: (self) => {
-        const g = self.progress
-        if (orbitLayer) orbitLayer.style.opacity = String(Math.max(0, 1 - g * 3))
+        const gRaw = self.progress
+        const g = mapGlideProgress(gRaw)
+        if (orbitLayer) orbitLayer.style.opacity = String(Math.max(0, 1 - gRaw * 2.4))
         if (orbitHeading) orbitHeading.style.opacity = '0'
-        threeCanvas.style.opacity = String(Math.max(0.05, 1 - g * 1.2))
-        window.PF._gliding = g > 0.001
+        // the portfolio renders transparent over the stage now — keep the
+        // live starfield at full strength so it runs unbroken from the
+        // backstory beat down through the notes section
+        threeCanvas.style.opacity = '1'
+        window.PF._gliding = gRaw > 0.001
         window.PF._glideG = g
+        window.PF._glideRaw = gRaw
         // re-measure the slot mid-glide: its position can shift after load
         // (scrollbar, font swap, nav scrolled-state), and a stale target
         // lands the mark off-center next to the wordmark
         if (g > 0.001) computeNavTarget()
         setLogo(1, g)
-        navSlot.style.pointerEvents = g > 0.55 ? 'auto' : 'none'
+        if (navSlot) navSlot.style.pointerEvents = g > 0.55 ? 'auto' : 'none'
+        updateDockNavLock()
       },
     })
 
@@ -607,9 +666,17 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       scrub: 0.5,
       onUpdate: (self) => {
         const p = self.progress
-        const vis = p < 0.06 ? p / 0.06 : (p > 0.94 ? (1 - p) / 0.06 : 1)
-        threeCanvas.style.opacity = Math.max(0.05, vis).toFixed(3)
-        if (vis > 0.02) startThree()
+        // no fade-in at the top edge — the stars are already at full
+        // strength coming out of the portfolio, so a ramp would dip them
+        // at the seam; only fade out at the bottom into the final CTA
+        const fall = p > 0.94 ? (1 - p) / 0.06 : 1
+        threeCanvas.style.opacity = Math.max(0.05, fall).toFixed(3)
+        // the baked footage (its final frames ARE a starfield) stays dimmed
+        // to 0.45 for the orbit's logo legibility — ease it back up here so
+        // the galaxy actually reads behind these transparent sections
+        const rise = Math.min(1, p / 0.15)
+        canvas.style.filter = `brightness(${(0.45 + Math.min(rise, fall) * 0.3).toFixed(3)})`
+        if (fall > 0.02) startThree()
       },
     })
 
@@ -623,8 +690,12 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     if (!THREE) { console.warn('Three.js not loaded'); return }
     // lift the hover panel out of the scroll-track stacking context
     if (armDetail && armDetail.parentElement !== document.body) {
+      // lift the panel to <body>, but on cleanup RETURN it to its original
+      // parent — removing it outright orphans the React-owned node, and the
+      // next mount (StrictMode/HMR) finds no #armDetail, killing hover cards
+      const armHome = armDetail.parentElement
       document.body.appendChild(armDetail)
-      cleanups.push(() => { if (armDetail && armDetail.parentElement) armDetail.parentElement.removeChild(armDetail) })
+      cleanups.push(() => { if (armDetail && armHome) armHome.appendChild(armDetail) })
     }
     initThree()
     buildOrbit()
@@ -658,24 +729,39 @@ export default function initFoundry({ base = '/foundry' } = {}) {
 
     const cue = document.getElementById('scrollCue')
     const navEl = document.getElementById('nav')
+    const usesSharedNav = !!(navEl && navEl.classList.contains('nav') && !navEl.classList.contains('pf-nav'))
     let lastNavY = window.scrollY
     const onWinScroll = () => {
       const y = window.scrollY
       if (cue) cue.style.opacity = y > 80 ? '0' : '1'
-      if (navEl) {
-        navEl.classList.toggle('scrolled', y > 40)
-        // conditional visibility: hide scrolling down, show scrolling up,
-        // always visible near the top
-        const delta = y - lastNavY
-        if (y < 120) navEl.classList.remove('nav-hidden')
-        else if (delta > 6) navEl.classList.add('nav-hidden')
-        else if (delta < -6) navEl.classList.remove('nav-hidden')
-        if (Math.abs(delta) > 6) lastNavY = y
-        // the docked brand mark is a separate fixed element — fade it in
-        // sync with the nav (only once it has substantially glided in)
+      if (!navEl || !persistLogo) return
+
+      // Shared React Navbar owns hide/scrolled state — only sync the docked mark.
+      if (usesSharedNav) {
         const docked = window.PF._glideG > 0.5
-        persistLogo.classList.toggle('brand-hidden', docked && navEl.classList.contains('nav-hidden'))
+        const navHidden = navEl.classList.contains('is-hidden') && !window.PF._forceNavVisible
+        persistLogo.classList.toggle('brand-hidden', docked && navHidden)
+        // Keep the docked mark glued to the slot when nav padding/height changes
+        // (is-scrolled) or when the bar reappears after being hidden.
+        if (docked && window.PF._glideG != null) {
+          computeNavTarget()
+          setLogo(1, window.PF._glideG)
+        }
+        return
       }
+
+      navEl.classList.toggle('scrolled', y > 40)
+      // conditional visibility: hide scrolling down, show scrolling up,
+      // always visible near the top
+      const delta = y - lastNavY
+      if (y < 120) navEl.classList.remove('nav-hidden')
+      else if (delta > 6) navEl.classList.add('nav-hidden')
+      else if (delta < -6) navEl.classList.remove('nav-hidden')
+      if (Math.abs(delta) > 6) lastNavY = y
+      // the docked brand mark is a separate fixed element — fade it in
+      // sync with the nav (only once it has substantially glided in)
+      const docked = window.PF._glideG > 0.5
+      persistLogo.classList.toggle('brand-hidden', docked && navEl.classList.contains('nav-hidden'))
     }
     on(window, 'scroll', onWinScroll, { passive: true })
 
@@ -705,7 +791,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       if (ring) ring.style.display = 'none'
     }
 
-    // SOUND: ambient pad + UI ticks, muted by default
+    // SOUND: ambient pad + UI ticks (toggle UI removed — muted by default)
     const toggle = document.getElementById('soundToggle')
     const label = document.getElementById('soundLabel')
     let actx = null, master = null, soundOn = false
@@ -749,11 +835,17 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         if (actx.state === 'suspended') actx.resume()
         master.gain.cancelScheduledValues(actx.currentTime)
         master.gain.linearRampToValueAtTime(0.5, actx.currentTime + 1.2)
-        toggle.classList.add('is-on'); toggle.setAttribute('aria-pressed', 'true')
+        if (toggle) {
+          toggle.classList.add('is-on')
+          toggle.setAttribute('aria-pressed', 'true')
+        }
         if (label) label.textContent = 'Sound on'
       } else {
-        if (master) master.gain.linearRampToValueAtTime(0, actx.currentTime + 0.4)
-        toggle.classList.remove('is-on'); toggle.setAttribute('aria-pressed', 'false')
+        if (master && actx) master.gain.linearRampToValueAtTime(0, actx.currentTime + 0.4)
+        if (toggle) {
+          toggle.classList.remove('is-on')
+          toggle.setAttribute('aria-pressed', 'false')
+        }
         if (label) label.textContent = 'Sound'
       }
     }
@@ -790,6 +882,14 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     if (orbitLayer && orbitLayer.parentElement) orbitLayer.parentElement.removeChild(orbitLayer)
     if (injectedStyle && injectedStyle.parentElement) injectedStyle.parentElement.removeChild(injectedStyle)
     if (renderer) { try { renderer.dispose() } catch { /* noop */ } }
-    if (window.PF) { window.PF.onHeroProgress = null; window.PF._gliding = false }
+    if (window.PF) {
+      window.PF.onHeroProgress = null
+      window.PF._gliding = false
+      window.PF._forceNavVisible = false
+      window.PF._logoDrop = 0
+      window.PF._glideRaw = 0
+    }
+    const nav = document.getElementById('nav')
+    if (nav) nav.classList.remove('nav-dock-lock')
   }
 }

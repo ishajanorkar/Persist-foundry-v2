@@ -89,8 +89,11 @@ export default function ManifestoSection() {
 
     function updateLogoTrace(p, t) {
       const pc     = Math.max(0, Math.min(1, p))
-      const pI     = ss(0.0, 0.9, pc)
-      const finale = ss(0.86, 1.0, pc)
+      // Phase 1: wipe draws ∞ left → right (0 → ~0.88)
+      const pI     = ss(0.0, 0.88, pc)
+      // Phase 2: after ∞ is drawn, P fills solid, then both lock
+      const pFill  = ss(0.78, 0.94, pc)
+      const infLock = ss(0.82, 0.96, pc)
       const wipeX  = 20 + (660 - 20) * pI
 
       if (mltSolid)   mltSolid.setAttribute('width', String(wipeX + 240))
@@ -98,11 +101,19 @@ export default function ManifestoSection() {
       if (mltEdge) {
         mltEdge.setAttribute('transform', `translate(${wipeX} 0)`)
         const breath = 0.85 + 0.15 * Math.sin(t * 0.006)
-        const fade   = ss(0.0, 0.06, pc) * (1 - ss(0.82, 0.92, pc))
+        const fade   = ss(0.0, 0.06, pc) * (1 - ss(0.72, 0.86, pc))
         mltEdge.style.opacity = String(fade * breath)
       }
-      if (mltInfGlow) mltInfGlow.style.opacity = String(finale * (0.82 + 0.18 * Math.sin(t * 0.0028)))
-      if (mltPGlow)   mltPGlow.style.opacity   = String(finale * (0.85 + 0.15 * Math.sin(t * 0.0028 + 1.1)))
+      if (mltInfGlow) {
+        const o = String(infLock)
+        mltInfGlow.style.opacity = o
+        mltInfGlow.setAttribute('opacity', o)
+      }
+      if (mltPGlow) {
+        const o = String(pFill)
+        mltPGlow.style.opacity = o
+        mltPGlow.setAttribute('opacity', o)
+      }
     }
 
     // single rAF loop: lerp + apply + logo
@@ -162,14 +173,14 @@ export default function ManifestoSection() {
                 <clipPath id="mlt-inf-clip">{paths(INF_PATHS)}</clipPath>
               </defs>
 
-              {/* 1 — dim resting full P∞ */}
+              {/* 1 — dim resting full P∞ (ghost guide only) */}
               <g fill="#A78BFA" opacity="0.09">
                 {paths(P_PATHS)}
                 {paths(INF_PATHS)}
               </g>
 
-              {/* 2 — ∞ progressively revealed by wipe */}
-              <g mask="url(#mlt-wipe)" filter="url(#mlt-bloom)" opacity="0.62">
+              {/* 2 — ∞ only: wipe fills left → right */}
+              <g mask="url(#mlt-wipe)" filter="url(#mlt-bloom)" opacity="0.72">
                 <g fill="url(#mlt-grad)">{paths(INF_PATHS)}</g>
               </g>
 
@@ -181,16 +192,16 @@ export default function ManifestoSection() {
                 </g>
               </g>
 
-              {/* 4 — P glow at finale */}
+              {/* 4 — P fills solid after ∞ wipe completes */}
               <g id="mltPGlow" opacity="0">
-                <g filter="url(#mlt-bloom-strong)" fill="#A78BFA" opacity="0.4">{paths(P_PATHS)}</g>
-                <g fill="url(#mlt-grad)" opacity="0.72">{paths(P_PATHS)}</g>
+                <g filter="url(#mlt-bloom-strong)" fill="#A78BFA" opacity="0.55">{paths(P_PATHS)}</g>
+                <g fill="url(#mlt-grad)" opacity="1">{paths(P_PATHS)}</g>
               </g>
 
-              {/* 5 — ∞ bloom at finale */}
+              {/* 5 — ∞ bloom lock once P is in */}
               <g id="mltInfGlow" opacity="0">
                 <g filter="url(#mlt-bloom-strong)" fill="#A78BFA" opacity="0.5">{paths(INF_PATHS)}</g>
-                <g fill="url(#mlt-grad)" opacity="0.72">{paths(INF_PATHS)}</g>
+                <g fill="url(#mlt-grad)" opacity="1">{paths(INF_PATHS)}</g>
               </g>
             </svg>
           </div>

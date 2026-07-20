@@ -1,129 +1,384 @@
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
-/* ── data ────────────────────────────────────────────────── */
-const TOTAL = 13
-
-const LEADERSHIP = [
+/* ── data (order + copy from persist.org/our-team) ─────────
+   Images left null — upload into /public/assets/ and set `img`.
+   Social slugs preserved where we already had them; others null
+   until LinkedIn/X URLs are confirmed (source page blocks scrapers).
+   ────────────────────────────────────────────────────────── */
+const TEAM = [
   {
-    idx: 1,
     name: 'Jack Jay',
     role: 'Chief Executive Officer',
-    bio: 'Founded Persist in 2017 after witnessing the gap between the Thiel Fellowship\'s impact and its reach. Nine years building — still reads more pitch decks than novels.',
+    bio: 'The visionary behind Persist Foundry, transforms talent recruitment and entrepreneurship with his dedication to fostering innovation and driving societal progress.',
     x: 'jackjay',
     li: 'jack-jay-jackson-jesionowski',
     img: '/assets/jackjay.jpg',
   },
   {
-    idx: 2,
-    name: 'Bhavya Bansal',
-    role: 'Chief Technology Officer',
-    bio: 'Blends technical depth with strategic vision. Keeps Persist at the frontier of automation, engineering the infrastructure founders actually rely on.',
-    x: null,
-    li: 'bhavya-bansal',
-    img: null,
-  },
-]
-
-const ADVISORS = [
-  {
-    idx: 3,
     name: 'Brock Pierce',
     role: 'Advisor',
-    bio: 'Crypto and futurism. Two decades of operator instinct and a philanthropic lens applied to every conversation — and every cap table.',
+    bio: 'Brock Pierce, advising at Persist Foundry, blends his cryptocurrency expertise with a futurist and philanthropic vision to drive innovation and impact.',
     x: 'brockpierce',
     li: 'brockpierce',
     img: null,
   },
   {
-    idx: 4,
     name: 'Jeremy Gardner',
-    role: 'Portfolio Founder & Adviser',
-    bio: 'Augur. Ausum Ventures. Built and exited his first company at 22. Now helping ours find their own version of that.',
+    role: 'Portfolio Founder',
+    bio: 'Adviser at Persist Foundry, enriches our strategies with his pioneering cryptocurrency insights, from founding Augur to early Bitcoin investments, guiding us toward innovative growth.',
     x: 'disruptepreneur',
     li: 'jeremygardner',
     img: null,
   },
   {
-    idx: 5,
     name: 'Christine Peterson',
     role: 'Advisor',
-    bio: 'Co-founded the Foresight Institute. Coined the term "open source." Has been early to almost everything that matters.',
+    bio: 'Chief Strategy Officer at Persist Foundry, former co-founder of the Foresight Institute and originator of "open source," steering us toward innovative futures.',
     x: 'christineapet',
     li: 'christine-peterson',
     img: null,
   },
   {
-    idx: 6,
-    name: 'Marvin Liao',
-    role: 'Advisor',
-    bio: '500 Startups partner. Yahoo lifer turned global investor. Quiet operator. Loud about founder pain.',
-    x: 'marvinliao',
-    li: 'marvinliao',
-    img: null,
-  },
-  {
-    idx: 7,
-    name: 'Liza Mundy',
-    role: 'Research',
-    bio: 'Bestselling author. Joined Persist to study what conviction looks like in the first 18 months.',
-    x: 'lizamundy',
-    li: 'liza-mundy',
-    img: null,
-  },
-  {
-    idx: 8,
-    name: 'Bruce Fenton',
-    role: 'Advisor',
-    bio: 'Bitcoin Foundation. Decades in capital markets. Helps founders navigate the first "no" and every one that follows.',
-    x: 'brucefenton',
-    li: 'brucefenton',
-    img: null,
-  },
-  {
-    idx: 9,
-    name: 'Naveen Jain',
-    role: 'Advisor',
-    bio: 'Moon Express. Viome. Believes the only ceiling is the one founders agree to.',
-    x: 'naveenjainceo',
-    li: 'naveenjain',
-    img: null,
-  },
-  {
-    idx: 10,
     name: 'Chris Migliano',
     role: 'Advisor',
-    bio: '20+ years in digital advertising. Launched and sold two companies to NASDAQ-listed firms. A sharp exit architect.',
+    bio: 'Advisor at Persist Ventures, Chris leverages over 20 years in digital advertising, having launched and sold two companies to NASDAQ-listed firms, enriching our strategies with his deep understanding of technology and brands.',
     x: null,
     li: null,
     img: null,
   },
-]
-
-const OPERATIONS = [
   {
-    idx: 11,
+    name: 'Sydney Thackray',
+    role: 'Advisor',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Michael Beer',
+    role: 'Advisor',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Mari Ross',
+    role: 'CPA',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Court Coursey',
+    role: 'Advisor',
+    bio: 'Managing Partner at TomorrowVentures, LLC, focusing on strategic investments and innovation in emerging industries.',
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Bryan Pope',
+    role: 'Advisor',
+    bio: 'Partner at Edge Healthcare Partners, specializing in healthcare investment banking and strategic advisory services.',
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Craig Sellars',
+    role: 'Investor',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Thomas Hessler',
+    role: 'Investor',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Claire Jing Sui',
+    role: 'Investor',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Bhavya Bansal',
+    role: 'Chief Technology Officer',
+    bio: 'Bhavya, our CTO, seamlessly blends technical expertise with strategic vision, leading our tech-forward approach through innovative thinking.',
+    x: null,
+    li: 'bhavya-bansal',
+    img: null,
+  },
+  {
     name: 'Muskan Pandey',
     role: 'Head of Operations',
-    bio: 'Combines operational excellence with an eye for emerging talent. The spine that keeps Persist moving.',
+    bio: 'As Head of Operations, Muskan combines sharp operational skills with fresh, innovative thinking reflecting our dedication to new perspectives and the growth of young talent.',
     x: null,
     li: null,
     img: null,
   },
   {
-    idx: 12,
+    name: 'Yogita Gehani',
+    role: 'Operations Manager',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Pratham Mangla',
+    role: 'Head of Project Management',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
     name: 'Akash Mishra',
     role: 'Chief Design Officer',
-    bio: 'Shapes the visual language defining every product under the Persist umbrella. Design as conviction.',
+    bio: null,
     x: null,
     li: null,
     img: null,
   },
   {
-    idx: 13,
-    name: 'Swapnil Sharma',
-    role: 'Managing Director',
-    bio: 'Champions technological innovation and team development across the portfolio. Builds from the inside out.',
+    name: 'Michael Dadzie',
+    role: 'Head of Mobile Engineering',
+    bio: 'Michael, leading mobile engineering at Persist Foundry for three years, blends technical expertise with innovation, driving our mobile solutions to new heights.',
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Shagun Yadav',
+    role: 'Assistant Project Manager',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Mohit Kumar',
+    role: 'Creative Solution Manager',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Nayan Patil',
+    role: 'CEO, Startupathon',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Jorge Martín Poza',
+    role: 'Co-founder, Palantir For Creators',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Onirudda Islam',
+    role: 'Co-founder, Meme Mates',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Felicien Bamporineza',
+    role: 'Co-founder, WestX',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Kejun (Albert) Ying',
+    role: 'Co-founder, Real Estate AI',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Ravikiran G',
+    role: 'Senior Video Editor',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Mohd Adil Sameer',
+    role: 'CTO of Facesearch AI',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Naman Jain',
+    role: 'Senior Backend & Web3 Engineer',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Shahdab Malik',
+    role: 'Full Stack Developer',
+    bio: 'Shahdab, a standout Lead Full Stack Developer, merges technical expertise with forward-looking strategies, showcasing our commitment to innovation and nurturing emerging talent.',
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Harjobandeep Singh',
+    role: 'Co-founder, GIF Studios',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Akash Laha',
+    role: 'Co-Founder, FaceSearch AI',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Haseeb Zaki',
+    role: 'Co-founder, Shorts-lol',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'JeetKumar Tirpude',
+    role: 'Co-founder, Soulmegle',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Vishesh Gupta',
+    role: 'Co-founder, Game of Creators',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Jatin Sharma',
+    role: 'Co-founder, Career Accelerator',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Ankit Sahal',
+    role: 'Co-founder, Career Accelerator',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Raghavendra Reddy N',
+    role: 'Co-Founder, Meme Mates',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Nilesh Kumar',
+    role: 'Co-founder, Deepvid ai',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Shubham Pawar',
+    role: 'Software developer',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Isha Janorkar',
+    role: 'Web Developer',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Mian Bilal',
+    role: 'Web Developer',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Mary Rose Fabillar',
+    role: 'Webflow Developer',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Lalit Choudhary',
+    role: 'Web Developer',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Mahesh Jadhav',
+    role: 'Web Developer',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Prashasti Randive',
+    role: 'Full-stack Developer',
+    bio: null,
+    x: null,
+    li: null,
+    img: null,
+  },
+  {
+    name: 'Naval Thanik',
+    role: 'Graphic Designer',
+    bio: null,
     x: null,
     li: null,
     img: null,
@@ -146,6 +401,7 @@ const XIcon = () => (
 /* ── card ────────────────────────────────────────────────── */
 function TeamCard({ person, revealDelay }) {
   const hasImg = !!person.img
+  const hasBio = !!person.bio
   const hasSocials = !!(person.li || person.x)
   return (
     <div className="tm-card tm-reveal-el" data-delay={revealDelay || '0'}>
@@ -170,7 +426,7 @@ function TeamCard({ person, revealDelay }) {
         <div className="tm-role">{person.role}</div>
         <h3 className="tm-name">{person.name}</h3>
         <div className="tm-hairline" aria-hidden="true"></div>
-        <p className="tm-bio">{person.bio}</p>
+        {hasBio && <p className="tm-bio">{person.bio}</p>}
         {hasSocials && (
           <div className="tm-socials">
             {person.li && (
@@ -289,8 +545,8 @@ export default function Team() {
           </div>
 
           <div className="tm-grid">
-            {[...LEADERSHIP, ...ADVISORS, ...OPERATIONS].map((p, i) => (
-              <TeamCard key={p.idx} person={p} revealDelay={String((i % 4) * 70)} />
+            {TEAM.map((p, i) => (
+              <TeamCard key={p.name} person={p} revealDelay={String((i % 4) * 70)} />
             ))}
           </div>
         </div>

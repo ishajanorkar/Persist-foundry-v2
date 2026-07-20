@@ -6,7 +6,7 @@ const LINKS = [
   { label: 'About',        to: '/about' },
   { label: 'Our Team',     to: '/team' },
   { label: 'Portfolio',    to: '/portfolio' },
-  { label: 'Careers',      id: 'offer' },
+  { label: 'Careers',      to: '/careers' },
   { label: 'Work With Us', href: '#', dropdown: true },
   { label: 'Blog',         href: '#' },
   { label: 'Contact Us',   id: 'apply' },
@@ -24,7 +24,9 @@ export default function Navbar() {
     const onScroll = () => {
       const y = window.scrollY
       setScrolled(y > 60)
-      if (y < 120) {
+      // Foundry P-dock glide: keep nav visible so the mark has a landing target
+      const forceVisible = !!(typeof window !== 'undefined' && window.PF?._forceNavVisible)
+      if (y < 120 || forceVisible) {
         setHidden(false)
       } else {
         setHidden(y > lastY)
@@ -61,9 +63,16 @@ export default function Navbar() {
       <nav className={`nav${scrolled ? ' is-scrolled' : ''}${hidden && !mobileOpen ? ' is-hidden' : ''}`} id="nav">
 
         {/* LOGO */}
-        <Link className="nav-logo" to="/" onClick={() => setMobileOpen(false)}>
-          <img src="/pv-favicon.png" alt="" />
-          <span>Persist</span>
+        <Link
+          className={`nav-logo${isHome ? ' nav-logo--foundry' : ''}`}
+          to="/"
+          onClick={() => setMobileOpen(false)}
+        >
+          {/* Dock target for the cinematic Persist mark (home).
+              On other pages the static favicon fills this role. */}
+          <span className="nav-logo-mark" id="navBrandSlot" aria-hidden="true" />
+          {!isHome && <img src="/pv-favicon.png" alt="" />}
+          <span className="nav-logo-word">Persist</span>
         </Link>
 
         {/* CENTER PILL — desktop only */}
@@ -125,7 +134,7 @@ export default function Navbar() {
         <div className="nav-mobile-head">
           <Link className="nav-logo" to="/" onClick={() => setMobileOpen(false)}>
             <img src="/pv-favicon.png" alt="" />
-            <span>Persist</span>
+            <span className="nav-logo-word">Persist</span>
           </Link>
           <button
             className="nav-hamburger is-open"

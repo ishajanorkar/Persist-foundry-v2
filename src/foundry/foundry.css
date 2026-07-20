@@ -135,7 +135,7 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
   z-index: 4;
   opacity: 0;
   background:
-    radial-gradient(60% 55% at 50% 46%, rgba(5,4,11,0.35) 0%, rgba(5,4,11,0.88) 60%, rgba(4,3,9,0.97) 100%);
+    radial-gradient(58% 52% at 50% 46%, rgba(5,4,11,0.55) 0%, rgba(5,4,11,0.82) 52%, rgba(4,3,9,0.96) 100%);
 }
 
 /* ---------- Top nav ---------- */
@@ -146,6 +146,7 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   padding: clamp(0.8rem, 2vh, 1.3rem) var(--gutter);
   border-bottom: 1px solid transparent;
   transition: background var(--dur-2) var(--ease-out), backdrop-filter var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out), padding var(--dur-2) var(--ease-out), transform 0.45s var(--ease-out);
@@ -166,15 +167,57 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
 .nav__mark { width: 44px; height: 44px; flex: none; display: block; }
 .nav__mark img { width: 100%; height: 100%; filter: drop-shadow(0 0 10px rgba(120,84,213,0.4)); }
 .nav__word { font-family: var(--pf-display); font-weight: 600; font-size: 1.12rem; letter-spacing: 0.01em; color: var(--pf-ink); }
+
+/* Center pill — same CTAs as the shared / vercel navbar */
+.nav__pill {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 6px;
+  background: rgba(10, 7, 20, 0.55);
+  border: 1px solid var(--pf-line-soft);
+  border-radius: 100px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.pf-nav.scrolled .nav__pill {
+  background: rgba(10, 7, 20, 0.72);
+  border-color: var(--pf-line);
+}
+.nav__pill-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 12px;
+  font-family: var(--pf-body);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--pf-ink-soft);
+  border-radius: 100px;
+  white-space: nowrap;
+  transition: color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out);
+}
+.nav__pill-chevron { opacity: 0.6; flex-shrink: 0; }
+.nav__pill-link:hover {
+  color: var(--pf-violet-white);
+  background: rgba(120, 84, 213, 0.14);
+}
+
 .nav__right {
   display: flex;
-  gap: clamp(1.1rem, 2.4vw, 2.2rem);
+  gap: clamp(0.8rem, 1.6vw, 1.4rem);
   align-items: center;
   font-family: var(--pf-mono);
   font-size: var(--fs-label);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--pf-ink-soft);
+  margin-left: auto;
 }
 .nav__right .nav-link { position: relative; transition: color var(--dur-1) var(--ease-out); }
 .nav__right .nav-link::after { content: ""; position: absolute; left: 0; bottom: -6px; width: 0; height: 1px; background: var(--pf-violet-bright); transition: width var(--dur-1) var(--ease-out); }
@@ -229,7 +272,10 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
 /* ---------- Persistent logo (center anchor) ---------- */
 .persist-logo {
   position: fixed;
-  z-index: var(--z-logo);
+  /* Must sit above the shared .nav (z-index: 100) so the glide
+     into the brand slot stays visible — same stacking as the
+     original pf-nav where --z-logo (12) > --z-nav (10). */
+  z-index: 101;
   top: 50%; left: 50%;
   width: clamp(140px, 17vw, 250px);
   transform: translate(-50%, -50%) scale(0.6);
@@ -286,6 +332,31 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
     rgba(6,4,13,0.82) 0%, rgba(6,4,13,0.4) 48%, rgba(6,4,13,0) 78%);
 }
 
+/* Hero: fog + central flare wash out copy — larger, darker veil under text */
+#hero .beat__scrim {
+  bottom: 0;
+  height: min(72vh, 780px);
+  width: min(1280px, 100%);
+  background: radial-gradient(ellipse closest-side at 50% 70%,
+    rgba(4, 3, 10, 0.94) 0%,
+    rgba(4, 3, 10, 0.78) 40%,
+    rgba(4, 3, 10, 0.35) 68%,
+    rgba(4, 3, 10, 0) 100%);
+  filter: blur(24px);
+}
+
+/* Backstory sits on the brightest globe frame — heavier center veil */
+#threshold .beat__scrim {
+  height: min(88vh, 920px);
+  width: min(1100px, 98vw);
+  background: radial-gradient(closest-side,
+    rgba(4, 3, 10, 0.92) 0%,
+    rgba(4, 3, 10, 0.72) 38%,
+    rgba(4, 3, 10, 0.28) 68%,
+    rgba(4, 3, 10, 0) 100%);
+  filter: blur(22px);
+}
+
 /* ---------- Typography blocks ---------- */
 .eyebrow {
   font-family: var(--pf-mono);
@@ -316,8 +387,16 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
   text-wrap: balance;
 }
 .display em { font-style: italic; color: var(--pf-violet-white); }
-/* longer narrative headings (backstory beat) need a step down from the hero scale */
-.display--backstory { font-size: clamp(1.8rem, 3.6vw, 3.2rem); max-width: 24ch; margin-inline: auto; }
+/* Backstory headline — matches the classic centered composition */
+.display--backstory {
+  font-size: clamp(1.9rem, 3.8vw, 3.35rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  max-width: 18ch;
+  margin: 0 auto;
+  text-align: center;
+  font-weight: 600;
+}
 
 .headline {
   font-family: var(--pf-display);
@@ -340,6 +419,97 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
   text-wrap: pretty;
 }
 .lead--wide { max-width: 60ch; font-size: clamp(0.98rem, 1.2vw, 1.18rem); line-height: 1.65; }
+
+/* Hero: pure white copy + halo so it holds over fog / flare */
+#hero .eyebrow {
+  color: #e4dbff;
+  text-shadow: 0 0 20px rgba(4, 3, 10, 0.9);
+}
+#hero .display {
+  color: #ffffff;
+  text-shadow: 0 0 48px rgba(4, 3, 10, 0.9), 0 2px 20px rgba(4, 3, 10, 0.75);
+}
+#hero .display em {
+  color: #f0eaff;
+}
+#hero .lead {
+  color: #f6f3fc;
+  text-shadow: 0 0 32px rgba(4, 3, 10, 0.95), 0 1px 14px rgba(4, 3, 10, 0.8);
+}
+
+/* Backstory: classic centered stack — label → headline → short points → stats */
+#threshold .beat__inner--threshold {
+  max-width: min(1100px, 100%);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.6rem, 3.5vh, 2.6rem);
+  text-align: center;
+}
+#threshold .eyebrow {
+  margin: 0;
+}
+#threshold .display {
+  color: #ffffff;
+  text-shadow: 0 0 42px rgba(4, 3, 10, 0.85), 0 2px 18px rgba(4, 3, 10, 0.7);
+}
+#threshold .stat__label {
+  color: #d8d0ec;
+  text-shadow: 0 0 16px rgba(4, 3, 10, 0.85);
+}
+#threshold .stats--threshold .stat__num {
+  text-shadow: 0 0 28px rgba(4, 3, 10, 0.75), 0 0 24px rgba(255, 255, 255, 0.28);
+}
+
+.threshold-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: clamp(2rem, 4.5vw, 3.5rem);
+  row-gap: clamp(0.95rem, 2vh, 1.35rem);
+  width: 100%;
+  max-width: 54rem;
+}
+.threshold-points li {
+  flex: 0 1 calc(50% - clamp(1rem, 2.2vw, 1.75rem));
+  max-width: calc(50% - clamp(1rem, 2.2vw, 1.75rem));
+  margin: 0;
+  padding: 0;
+  font-family: var(--pf-body);
+  font-size: clamp(0.88rem, 1.02vw, 1rem);
+  line-height: 1.45;
+  color: #f4f1fb;
+  text-align: center;
+  text-shadow: 0 0 24px rgba(4, 3, 10, 0.9);
+}
+.threshold-points li::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 0.45rem;
+  margin-bottom: 0.12em;
+  border-radius: 50%;
+  background: var(--pf-violet-bright);
+  box-shadow: 0 0 10px rgba(185, 160, 255, 0.65);
+  vertical-align: middle;
+}
+.threshold-points strong {
+  color: #ffffff;
+  font-weight: 600;
+  background: linear-gradient(180deg, transparent 62%, rgba(185, 160, 255, 0.28) 62%);
+}
+
+@media (max-width: 520px) {
+  .threshold-points li {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+}
 
 /* ---------- Tether logo lockup (beat 2) ---------- */
 .beat__inner--wide { max-width: 1100px; }
@@ -583,11 +753,37 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
   text-transform: uppercase;
   color: var(--pf-mono-ink);
 }
-.stats--threshold { margin: clamp(2rem, 5vh, 3.2rem) auto 0; gap: clamp(1.4rem, 4vw, 3.2rem); }
-.stats--threshold .stat__num {
-  font-size: clamp(2.1rem, 3.8vw, 3.2rem);
+/* Must beat .stats { display:flex } — single centered row of four */
+#threshold .stats.stats--threshold {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1.2rem, 2.5vh, 1.8rem) clamp(1.6rem, 4vw, 3.2rem);
+  margin: clamp(0.4rem, 1vh, 0.8rem) auto 0;
+  width: 100%;
+  max-width: 56rem;
+  justify-items: center;
+  align-items: start;
+  text-align: center;
+  flex-wrap: unset;
+  justify-content: unset;
+}
+#threshold .stats.stats--threshold .stat {
+  align-items: center;
+  min-width: 0;
+}
+#threshold .stats.stats--threshold .stat__num {
+  font-size: clamp(1.9rem, 3.2vw, 2.85rem);
   color: #ffffff;
-  text-shadow: 0 0 24px rgba(255, 255, 255, 0.35);
+}
+#threshold .stats.stats--threshold .stat__label {
+  max-width: 14ch;
+  line-height: 1.35;
+}
+@media (max-width: 640px) {
+  #threshold .stats.stats--threshold {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 22rem;
+  }
 }
 .footer__cta { text-align: center; max-width: 860px; margin: 0 auto clamp(3.5rem, 9vh, 7rem); display: flex; flex-direction: column; align-items: center; gap: var(--s-3); }
 .footer__headline { font-family: var(--pf-display); font-weight: 700; font-size: clamp(2.2rem, 5.5vw, 4.4rem); line-height: 1.02; margin: 0; text-wrap: balance; }
@@ -658,12 +854,38 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
    starfield) shows through — the same moving galaxy as the orbit
    finale. The engine raises the starfield canvas back to full opacity
    while this section is on screen. */
-.pf .st-wrap { background: rgba(5, 4, 9, 0.72); }
+.pf .st-wrap { background: rgba(5, 4, 9, 0.6); }
+.pf .st-p-body {
+  color: #efeaf8;
+  text-shadow: 0 0 22px rgba(4, 3, 10, 0.75);
+}
+.pf .st-p-title {
+  color: #ffffff;
+  text-shadow: 0 0 36px rgba(4, 3, 10, 0.7);
+}
+.pf .st-p-cat,
+.pf .st-kicker,
+.pf .st-count {
+  color: #d4c8f0;
+}
+.pf .st-hero {
+  text-shadow: 0 0 48px rgba(4, 3, 10, 0.85), 0 2px 16px rgba(4, 3, 10, 0.65);
+}
 
 /* Manifesto on this page: same treatment — transparent over the live
    starfield with the same dark veil, and a calmer headline scale */
-.pf .manifesto-stage { background: rgba(5, 4, 9, 0.72); border-top: 0; border-bottom: 0; }
-.pf .manifesto-step-headline { font-size: clamp(26px, 3.2vw, 52px); }
+.pf .manifesto-stage { background: rgba(5, 4, 9, 0.6); border-top: 0; border-bottom: 0; }
+.pf .manifesto-logo-layer svg {
+  opacity: 1;
+}
+.pf .manifesto-step-headline {
+  font-size: clamp(26px, 3.2vw, 52px);
+  color: #ffffff;
+  text-shadow:
+    0 0 48px rgba(4, 3, 10, 0.9),
+    0 0 96px rgba(4, 3, 10, 0.65),
+    0 2px 1px rgba(0, 0, 0, 0.45);
+}
 .pf .manifesto-grid-bg { display: none; }
 .pf .manifesto-counter { display: none; }
 
@@ -751,13 +973,41 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
 .pf .footer-newsletter-card {
   font-family: var(--pf-mono);
 }
+
+/* Shared App footer can also render as a sibling of .pf on non-home
+   routes; when body.pf-landing is set, keep a safety lift in case a
+   footer ever sits outside the scroll-track again. */
+body.pf-landing > #root > .footer,
+body.pf-landing .pf ~ .footer {
+  position: relative;
+  z-index: var(--z-overlay);
+  background: var(--pf-bg);
+  isolation: isolate;
+}
+
+/* Footer inside the Foundry scroll-track — opaque plane above the stage */
+.pf .footer {
+  position: relative;
+  z-index: var(--z-overlay);
+  background: var(--pf-bg);
+}
 .pf .st-grid-bg { display: none; }
+
+/* Extra scroll runway between orbit and portfolio so the P-mark can
+   ease into the nav and dwell there before the cases take over. */
+.dock-settle {
+  height: 55vh;
+  pointer-events: none;
+}
 
 /* ---------- Portfolio — stacking cases (dark port of portfolio-v2) ---------- */
 .pfolio {
   position: relative;
   z-index: var(--z-overlay);
-  background: var(--pf-bg);
+  /* transparent over the fixed stage — same veil as the six-things and
+     manifesto sections, so the starfield runs unbroken from the backstory
+     beat through the notes section */
+  background: rgba(5, 4, 9, 0.6);
   border-top: 1px solid var(--pf-line-soft);
 }
 .pfolio__inner { max-width: 1500px; margin: 0 auto; padding: clamp(5rem, 10vh, 8rem) 0 clamp(3rem, 6vh, 5rem); }
@@ -781,19 +1031,31 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
 }
 .pfolio__meta { font-family: var(--pf-mono); font-size: 0.66rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--pf-mono-ink); margin-top: 22px; }
 
-.pfolio-stack { position: relative; padding-bottom: 80px; }
+.pfolio-stack { position: relative; padding: 0 clamp(16px, 4vw, 56px) 96px; }
 .pfolio-row {
-  position: sticky; top: 100px;
+  position: sticky; top: 96px;
   display: grid; grid-template-columns: 1.15fr 1fr; gap: 80px; align-items: center;
-  padding: 90px clamp(24px, 5vw, 80px);
-  background: var(--pf-bg); /* opaque so it covers the card beneath while stacking */
+  padding: clamp(48px, 7vh, 78px) clamp(24px, 4vw, 64px);
+  margin-bottom: 32px;
+  /* glass card: translucent over the card beneath, blurred through the pane */
+  background: rgba(12, 8, 22, 0.62);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  border: 1px solid rgba(185, 160, 255, 0.16);
+  border-radius: 22px;
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(233, 226, 255, 0.07);
+  overflow: hidden;
   transform-origin: top center;
   will-change: transform, filter;
   transition: transform 0.18s linear, filter 0.18s linear;
 }
-.pfolio-row:nth-child(1) { z-index: 1; }
-.pfolio-row:nth-child(2) { z-index: 2; }
-.pfolio-row:nth-child(3) { z-index: 3; }
+/* staggered rest positions: each card settles 16px lower, so the covered
+   cards' top edges stay visible as a deck while the next one slides over */
+.pfolio-row:nth-child(1) { z-index: 1; top: 96px; }
+.pfolio-row:nth-child(2) { z-index: 2; top: 112px; }
+.pfolio-row:nth-child(3) { z-index: 3; top: 128px; }
 .pfolio-row--reversed { grid-template-columns: 1fr 1.15fr; }
 .pfolio-row--reversed .pfolio-row__left { order: 2; align-items: flex-end; text-align: right; }
 .pfolio-row--reversed .pfolio-row__right { order: 1; }
@@ -876,16 +1138,17 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
 .pfolio__cta-label { font-family: var(--pf-body); color: var(--pf-mono-ink); font-size: clamp(0.95rem, 1.1vw, 1.1rem); margin: 0; }
 .pfolio__cta-label em { font-style: italic; color: var(--pf-ink); }
 .pfolio__cta-link {
-  display: inline-flex; align-items: center; gap: 10px;
-  font-family: var(--pf-mono); font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--pf-violet-white);
+  /* Visuals come from the shared CTA system in index.css —
+     only keep foundry-specific type scale here. */
+  font-family: var(--pf-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
   padding: 1rem 2rem;
-  border: 1px solid rgba(185, 160, 255, 0.35);
-  border-radius: 100px;
-  text-decoration: none;
-  transition: background 0.3s, border-color 0.3s, transform 0.3s;
 }
-.pfolio__cta-link:hover { background: rgba(120, 84, 213, 0.18); border-color: var(--pf-violet-bright); transform: translateY(-2px); }
+.pfolio__cta-link:hover {
+  transform: translateY(-2px);
+}
 
 @media (max-width: 820px) {
   .pfolio__header { grid-template-columns: 1fr; gap: 24px; margin-bottom: 50px; }
@@ -900,6 +1163,10 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
 @media (prefers-reduced-motion: reduce) {
   .pf .scroll-cue, .pf .cursor-dot, .pf .cursor-ring { display: none; }
   .pf * { scroll-behavior: auto !important; }
+}
+
+@media (max-width: 1100px) {
+  .nav__pill { display: none; }
 }
 
 @media (max-width: 768px) {

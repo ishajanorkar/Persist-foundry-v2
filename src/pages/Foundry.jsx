@@ -11,7 +11,9 @@ import Footer from '../components/Footer'
    PERSIST FOUNDRY — alternative cinematic landing.
    1:1 port of the static design (persist-foundry-site). The full
    experience (scroll-scrubbed frame sequence + Three.js finale +
-   loader/cursor/sound) lives in ../foundry/engine.js.
+   loader/cursor) lives in ../foundry/engine.js.
+   Shared Navbar comes from App layout; Footer lives in the
+   scroll-track so it paints above the fixed cinematic stage.
    ============================================================ */
 export default function Foundry() {
   const rootRef = useRef(null)
@@ -23,19 +25,23 @@ export default function Foundry() {
     document.body.classList.add('pf-landing')
     const cleanup = initFoundry({ base: '/foundry' })
 
-    // stacking portfolio cards: previous card scales down and dims as the
-    // next sticky card slides over it (same mechanic as the legacy landing)
+    // stacking portfolio cards: as the next glass card slides over, the
+    // covered card recedes — scales down from its top edge, lifts slightly,
+    // and dims — leaving a staggered deck of visible card tops
     const stackCards = Array.from(document.querySelectorAll('#pfolioStack .pfolio-row'))
-    const STACK_TOP = 100 // matches sticky top in foundry.css
+    const STACK_TOP = 96  // matches sticky top of card 1 in foundry.css
+    const STAGGER = 16    // matches the per-card top offset in foundry.css
     const updateStack = () => {
       stackCards.forEach((card, i) => {
         const next = stackCards[i + 1]
         if (!next) { card.style.transform = ''; card.style.filter = ''; return }
+        const myTop = STACK_TOP + i * STAGGER
         const overlap = Math.max(0, Math.min(1,
-          (STACK_TOP + card.offsetHeight - next.getBoundingClientRect().top) / card.offsetHeight
+          (myTop + card.offsetHeight - next.getBoundingClientRect().top) / card.offsetHeight
         ))
-        card.style.transform = `scale(${(1 - overlap * 0.04).toFixed(4)})`
-        card.style.filter = `brightness(${(1 - overlap * 0.22).toFixed(4)})`
+        card.style.transform =
+          `translateY(${(-overlap * 10).toFixed(1)}px) scale(${(1 - overlap * 0.055).toFixed(4)})`
+        card.style.filter = `brightness(${(1 - overlap * 0.3).toFixed(4)})`
       })
     }
     window.addEventListener('scroll', updateStack, { passive: true })
@@ -68,22 +74,6 @@ export default function Foundry() {
       <div className="persist-logo" id="persistLogo">
         <img src="/foundry/logo/persist-logo.svg" alt="Persist" />
       </div>
-
-      {/* ===================== NAV ===================== */}
-      <nav className="pf-nav" id="nav">
-        <a className="nav__brand" href="#top" aria-label="Persist home">
-          <span className="nav__mark" id="navBrandSlot" />
-          <span className="nav__word">Persist</span>
-        </a>
-        <div className="nav__right">
-          <a className="nav-link" href="#portfolio">Studio</a>
-          <a className="nav-link" href="#apply">Apply</a>
-          <button className="sound-toggle" id="soundToggle" aria-pressed="false" aria-label="Toggle sound">
-            <span id="soundLabel">Sound</span>
-          </button>
-          <a className="nav__cta" href="mailto:hello@persist.org">Get in touch</a>
-        </div>
-      </nav>
 
       {/* ===================== SCROLL TRACK / BEATS ===================== */}
       <main className="scroll-track" id="scrollTrack">
@@ -121,10 +111,17 @@ export default function Foundry() {
         {/* BEAT 3 — THRESHOLD */}
         <section className="beat beat--center" data-beat="2" id="threshold">
           <div className="beat__scrim" />
-          <div className="beat__inner">
+          <div className="beat__inner beat__inner--threshold">
             <p className="eyebrow">Backstory</p>
-            <h2 className="display display--backstory">Building alongside founders, not from the <em>sidelines.</em></h2>
-            <p className="lead lead--wide" data-copy="threshold-lead">We started Persist in 2016 to rethink founder support. Inspired by the Thiel Fellowship but open to everyone, it began as one founder's answer to a broken system: a PayPal-to-Ethereum exchange that became proof the right ecosystem changes everything. Nine years and thirty companies later, our DNA is unchanged: founder-first and deeply involved. When ambitious founders meet the right support, exceptional companies are born.</p>
+            <h2 className="display display--backstory">Building alongside founders</h2>
+            <ul className="threshold-points" data-copy="threshold-lead">
+              <li>Started Persist in <strong>2016</strong> to rethink founder support</li>
+              <li>Thiel-inspired, but <strong>open to everyone</strong></li>
+              <li>A <strong>PayPal-to-Ethereum</strong> exchange that proved the model</li>
+              <li>Nine years on, still <strong>founder-first</strong> and involved</li>
+              <li><strong>Thirty companies</strong> built alongside founders</li>
+              <li>The right support births <strong>exceptional companies</strong></li>
+            </ul>
             <div className="stats stats--threshold">
               <div className="stat"><span className="stat__num">30+</span><span className="stat__label">Companies launched</span></div>
               <div className="stat"><span className="stat__num">$117M</span><span className="stat__label">Net asset value</span></div>
@@ -134,12 +131,15 @@ export default function Foundry() {
           </div>
         </section>
 
-        {/* FINALE SPACER — orbit lives here */}
-        <section className="beat beat--center" data-beat="4" id="orbit" style={{ minHeight: '200vh' }}>
+        {/* FINALE SPACER — orbit lives here; extra height so the P-dock can breathe */}
+        <section className="beat beat--center" data-beat="4" id="orbit" style={{ minHeight: '240vh' }}>
           <div className="beat__inner" style={{ opacity: 1, transform: 'none' }}>
             <p className="eyebrow" id="orbitEyebrow" style={{ marginTop: '8vh' }}>Five ways we forge</p>
           </div>
         </section>
+
+        {/* Dock settle runway — keeps the mark parked in the nav a beat longer */}
+        <div className="dock-settle" aria-hidden="true" />
 
         {/* PORTFOLIO — stacking cases (dark port of the legacy portfolio-v2) */}
         <section className="pfolio" id="portfolio">
@@ -254,7 +254,7 @@ export default function Foundry() {
         {/* FINAL CTA — "Once on paper changes everything." (ported from legacy landing) */}
         <FinalCtaSection />
 
-        {/* FOOTER — shared legacy footer (newsletter + link columns) */}
+        {/* FOOTER — inside scroll-track so it clears the fixed stage */}
         <Footer />
       </main>
 

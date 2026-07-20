@@ -8,17 +8,16 @@ import About from './pages/About'
 import Team from './pages/Team'
 import Portfolio from './pages/Portfolio'
 import PortfolioCompany from './pages/PortfolioCompany'
-
-// The cinematic Foundry landing ships its own nav + footer, so the shared
-// chrome is suppressed on that route.
-const BARE_ROUTES = ['/']
+import Careers from './pages/Careers'
 
 function Layout() {
   const { pathname } = useLocation()
-  const bare = BARE_ROUTES.includes(pathname)
+  // Foundry home embeds the footer inside its scroll-track so it sits
+  // above the fixed cinematic stage. Other routes use the shared one.
+  const foundryHome = pathname === '/'
   return (
     <>
-      {!bare && <Navbar />}
+      <Navbar />
       <Routes>
         <Route path="/" element={<Foundry />} />
         <Route path="/legacy" element={<Home />} />
@@ -26,8 +25,9 @@ function Layout() {
         <Route path="/team" element={<Team />} />
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/portfolio/:id" element={<PortfolioCompany />} />
+        <Route path="/careers" element={<Careers />} />
       </Routes>
-      {!bare && <Footer />}
+      {!foundryHome && <Footer />}
     </>
   )
 }

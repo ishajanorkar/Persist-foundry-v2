@@ -126,6 +126,7 @@ export default function Footer() {
           <div className="footer-nav-heading">Explore</div>
           <nav className="footer-nav-links">
             <Link to="/" className="footer-nav-link">Home</Link>
+            <Link to="/about" className="footer-nav-link">About</Link>
             <Link to="/portfolio" className="footer-nav-link">Portfolio</Link>
             <Link to="/team" className="footer-nav-link">Our Team</Link>
             <a href="#" className="footer-nav-link">Blog</a>
