@@ -218,16 +218,15 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       if (i === 2) thresholdO = o
     }
     if (stageFade) stageFade.style.opacity = stageO.toFixed(3)
-    // Cover the baked center glow through Backstory only.
-    // Once Five Ways owns scroll, orbit onUpdate drives the soft veil.
+    // Soft Backstory veil — track the beat like Tether's stageFade (no hard snap to black)
     if (stageFlareMask) {
       const orbitP = window.PF._orbitProgress || 0
       if (orbitP >= 0.01) {
         /* orbit handler owns the mask */
-      } else if (p >= 0.78 || thresholdO > 0.05) {
-        stageFlareMask.style.opacity = '1'
       } else {
-        stageFlareMask.style.opacity = '0'
+        const approach = Math.max(0, Math.min(1, (p - 0.68) / 0.16))
+        const hold = Math.max(thresholdO, approach)
+        stageFlareMask.style.opacity = (hold * 0.55).toFixed(3)
       }
     }
   }
@@ -1094,8 +1093,8 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         starFieldOpacity = 0
         if (threeCanvas) threeCanvas.style.opacity = '0'
         stopThree()
-        // re-cover the baked center flare while Backstory is on screen again
-        if (stageFlareMask) stageFlareMask.style.opacity = '1'
+        // re-cover the baked center flare softly while Backstory is on screen again
+        if (stageFlareMask) stageFlareMask.style.opacity = '0.55'
         if (canvas) canvas.style.filter = ''
       },
       onLeave: () => {
@@ -1112,14 +1111,14 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         const ex = ringExpand(orbitProgress)
         const op = ringOpacity(orbitProgress)
 
-        // Soften the baked flare without killing the glow — leave it readable
+        // Lift the soft veil smoothly as the zoom plays — no hard black flash
         if (stageFlareMask) {
-          const lift = Math.min(1, orbitProgress / 0.22)
-          stageFlareMask.style.opacity = (0.88 - lift * 0.72).toFixed(3)
+          const lift = Math.min(1, orbitProgress / 0.28)
+          stageFlareMask.style.opacity = Math.max(0, 0.55 * (1 - lift)).toFixed(3)
         }
         // Mild canvas dim so the flare isn’t blinding, but still glows
         const entryDim = Math.min(1, orbitProgress / 0.18)
-        const bright = Math.max(0.55, 1 - entryDim * 0.22 - drop * 0.2)
+        const bright = Math.max(0.72, 1 - entryDim * 0.14 - drop * 0.12)
         canvas.style.filter = `brightness(${bright.toFixed(3)})`
 
         if (window.PF._gliding !== true) setLogo(drop, 0)

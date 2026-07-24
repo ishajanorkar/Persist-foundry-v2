@@ -141,7 +141,7 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
     radial-gradient(58% 52% at 50% 46%, rgba(5,4,11,0.55) 0%, rgba(5,4,11,0.82) 52%, rgba(4,3,9,0.96) 100%);
 }
 
-/* Soften the baked center flare during Backstory → forge handoff */
+/* Soften the baked center flare — same gentle feel as stage-fade / Tether */
 .stage-flare-mask {
   position: absolute;
   inset: 0;
@@ -149,11 +149,10 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
   z-index: 4;
   opacity: 0;
   background: radial-gradient(
-    ellipse 70% 62% at 50% 48%,
-    rgba(4, 3, 10, 0.97) 0%,
-    rgba(4, 3, 10, 0.82) 28%,
-    rgba(4, 3, 10, 0.4) 52%,
-    rgba(4, 3, 10, 0.12) 70%,
+    ellipse 72% 64% at 50% 48%,
+    rgba(5, 4, 11, 0.42) 0%,
+    rgba(5, 4, 11, 0.22) 38%,
+    rgba(5, 4, 11, 0.08) 62%,
     transparent 82%
   );
 }
@@ -792,60 +791,72 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
 }
 
 @media (max-width: 1280px) {
-  /* Smaller laptops + tablets: stacked, centered Backstory */
+  /* Smaller laptops + tablets + phones: one centered column */
   #threshold.beat {
     min-height: 100svh;
     height: 100svh;
     max-height: 100svh;
     box-sizing: border-box;
+    align-items: center;
     justify-content: center;
+    text-align: center;
     padding:
       clamp(4.25rem, 9vh, 5.5rem)
       var(--gutter)
       clamp(0.85rem, 2.5vh, 1.5rem);
   }
   #threshold .beat__inner--threshold {
-    grid-template-columns: 1fr;
-    gap: clamp(0.85rem, 2.2vh, 1.35rem);
-    justify-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(1rem, 2.4vh, 1.5rem);
     text-align: center;
     width: 100%;
+    max-width: min(36rem, 100%);
+    margin: 0 auto;
     max-height: 100%;
   }
   .threshold-copy {
-    max-width: min(40rem, 100%);
-    width: 100%;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-self: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 34rem;
+    margin: 0 auto;
     text-align: center;
-    gap: clamp(0.45rem, 1.1vh, 0.75rem);
-    margin-inline: auto;
+    gap: clamp(0.5rem, 1.2vh, 0.85rem);
   }
   .threshold-eyebrow {
     font-size: clamp(0.65rem, 1.6vw, 0.75rem);
     letter-spacing: 0.24em;
     text-align: center;
     width: 100%;
+    margin: 0;
   }
+  #threshold .display--backstory,
   .display--backstory {
-    max-width: none;
+    max-width: 18ch;
+    width: 100%;
     white-space: normal;
     font-size: clamp(1.35rem, 3.6vw, 1.85rem);
     text-align: center;
     line-height: 1.15;
-    margin-inline: auto;
+    margin: 0 auto;
   }
   .threshold-body {
-    margin-top: 0.15rem;
-    margin-inline: auto;
-    max-width: 42ch;
+    margin: 0.15rem auto 0;
+    max-width: 36ch;
+    width: 100%;
     text-align: center;
     font-size: clamp(0.78rem, 2.2vw, 0.9rem);
-    line-height: 1.35;
+    line-height: 1.4;
   }
   .threshold-stats {
-    margin-left: auto;
-    margin-right: auto;
+    display: grid;
+    margin: 0 auto;
+    justify-content: center;
     justify-self: center;
     --bcard-w: clamp(8.5rem, 28vw, 12rem);
     --bcard-h: clamp(5.75rem, 16vw, 8rem);
@@ -854,8 +865,7 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
     width: max-content;
     max-width: 100%;
     gap: var(--bcard-gap);
-    padding-bottom: 0;
-    padding-top: 0;
+    padding: 0;
     --bcard-cross: 12px;
     --bcard-cross-half: 6px;
   }
@@ -869,15 +879,22 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
   #threshold .bcard__label {
     font-size: clamp(0.72rem, 2.2vw, 0.88rem);
     padding: 0.25rem 0.45rem;
+    justify-content: center;
+    text-align: center;
   }
   #threshold .bcard__value {
     padding: 0.25rem 0.45rem;
+    justify-content: center;
   }
   #threshold .bcard__value .stat__num {
     font-size: clamp(1.15rem, 3.5vw, 1.45rem);
+    text-align: center;
   }
 }
 @media (max-width: 1024px) {
+  #threshold .beat__inner--threshold {
+    max-width: min(34rem, 100%);
+  }
   .threshold-stats {
     --bcard-w: clamp(8.5rem, 36vw, 10.5rem);
     --bcard-h: clamp(5.75rem, 22vw, 7rem);
@@ -889,11 +906,20 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
   }
   .threshold-body {
     font-size: clamp(0.78rem, 2.6vw, 0.9rem);
+    max-width: 34ch;
   }
 }
 @media (max-width: 560px) {
   #threshold.beat {
     padding-top: clamp(4rem, 8.5vh, 5rem);
+  }
+  #threshold .beat__inner--threshold {
+    max-width: 100%;
+    gap: clamp(0.9rem, 2vh, 1.25rem);
+  }
+  .threshold-copy {
+    max-width: 100%;
+    padding: 0 0.15rem;
   }
   .threshold-stats {
     --bcard-w: clamp(7.75rem, 40vw, 9rem);
@@ -903,10 +929,11 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
   }
   .display--backstory {
     font-size: clamp(1.3rem, 6.5vw, 1.65rem);
+    max-width: 14ch;
   }
   .threshold-body {
     font-size: clamp(0.76rem, 3.4vw, 0.88rem);
-    max-width: 36ch;
+    max-width: 32ch;
   }
 }
 
@@ -2634,6 +2661,7 @@ body.pf-landing .pf ~ .footer {
 @media (max-width: 1024px) {
   .nav__right .nav-link { display: none; }
   .beat__inner { max-width: 92vw; }
+  #threshold .beat__inner--threshold { max-width: min(34rem, 100%); margin-left: auto; margin-right: auto; }
   .lead { font-size: 1.02rem; }
   .cursor-dot, .cursor-ring { display: none; }
   .beat { padding-bottom: 14vh; }
