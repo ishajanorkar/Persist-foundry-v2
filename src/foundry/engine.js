@@ -517,8 +517,10 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     const w = window.innerWidth
     // Scale the wheel down so it doesn't dominate the viewport
     let scale = 0.66
+    // Phones only use the larger mobile wheel; small laptops stay compact
+    // so the bottom-right detail panel clears the ring
     if (w <= 640) scale = 0.62
-    else if (w <= 1024) scale = 0.42
+    else if (w <= 900) scale = 0.78
     else if (w < 1100) scale = 0.48
     else if (w < 1280) scale = 0.56
     const D = Math.round(vmin * scale)
@@ -715,19 +717,21 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       .orbit-diagram{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;
         opacity:0;will-change:opacity;object-fit:contain;object-position:center;
         /* viewport-sized Group_1 — faint hairline blueprint behind the wheel */}
-      .orbit-heading{position:absolute;top:clamp(11vh,14vh,16vh);left:50%;
-        transform:translateX(-50%);z-index:4;max-width:min(26rem,78vw);opacity:0;will-change:opacity;
-        display:flex;flex-direction:column;align-items:center;gap:0.65rem;
-        pointer-events:none;text-align:center;}
+      /* Desktop/laptop: top-left copy; phones center via media query */
+      .orbit-heading{position:absolute;top:clamp(10vh,13vh,16vh);
+        left:clamp(1.4rem,var(--gutter,2.5rem),5.5rem);transform:none;
+        z-index:4;max-width:min(22rem,34vw);opacity:0;will-change:opacity;
+        display:flex;flex-direction:column;align-items:flex-start;gap:0.85rem;
+        pointer-events:none;text-align:left;}
       .orbit-heading__title{font-family:'Montserrat',var(--pf-display),system-ui,sans-serif;
         font-weight:600;font-style:normal;
-        font-size:clamp(1.05rem,1.55vw,1.35rem);line-height:1.2;letter-spacing:-0.04em;
-        color:#ffffff;text-shadow:0 2px 22px rgba(0,0,0,0.85);text-align:center;}
+        font-size:clamp(1.2rem,2.1vw,1.85rem);line-height:1.2;letter-spacing:-0.04em;
+        color:#ffffff;text-shadow:0 2px 22px rgba(0,0,0,0.85);text-align:left;}
       .orbit-heading__body{margin:0;font-family:'Montserrat',var(--pf-display),system-ui,sans-serif;
         font-weight:400;font-style:normal;
-        font-size:clamp(0.78rem,0.95vw,0.9rem);line-height:1.4;letter-spacing:-0.03em;
-        color:rgba(168,172,184,0.72);max-width:36ch;
-        text-shadow:0 1px 14px rgba(0,0,0,0.75);text-align:center;}
+        font-size:clamp(0.8rem,0.95vw,0.95rem);line-height:1.4;letter-spacing:-0.03em;
+        color:rgba(168,172,184,0.72);max-width:34ch;
+        text-shadow:0 1px 14px rgba(0,0,0,0.75);text-align:left;}
       /* wheel dead-center — primary focal point of the section */
       .orbit-donut{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
         transform-origin:center;will-change:transform,opacity;pointer-events:none;z-index:2;}
@@ -799,31 +803,49 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         color:rgba(250,250,252,0.96);max-width:10ch;
         text-shadow:0 1px 10px rgba(0,0,0,0.75);transition:color .3s;}
       .orbit-petal:hover .orbit-petal__label,.orbit-petal.is-featured .orbit-petal__label{color:#fff;}
-      @media (max-width:1024px){
-        .orbit-heading{
-          left:50%;transform:translateX(-50%);
-          max-width:min(22rem,86vw);top:clamp(5.5rem,12vh,7.5rem);
-          align-items:center;text-align:center;
-        }
-        .orbit-heading__title{font-size:clamp(0.98rem,3.8vw,1.2rem);}
-        .orbit-heading__body{max-width:32ch;font-size:clamp(0.75rem,2.8vw,0.86rem);}
+      @media (max-width:1100px) and (min-width:901px){
+        .orbit-heading{max-width:min(18rem,30vw);gap:0.65rem;}
+        .orbit-heading__title{font-size:clamp(0.95rem,1.6vw,1.2rem);}
+        .orbit-heading__body{font-size:clamp(0.72rem,0.9vw,0.82rem);max-width:30ch;}
         .orbit-petal__icon{width:22px;height:22px;}
         .orbit-petal__label{
-          font-size:clamp(0.52rem,1.35vw,0.62rem);
-          line-height:1.15;max-width:9ch;letter-spacing:-0.03em;
+          font-size:clamp(0.55rem,0.95vw,0.7rem);
+          max-width:9ch;line-height:1.15;
         }
         .orbit-petal__content{gap:8px;}
+      }
+      @media (max-width:900px){
+        .orbit-heading{
+          left:50%;transform:translateX(-50%);
+          max-width:min(20rem,84vw);top:clamp(5.5rem,12vh,7.5rem);
+          align-items:center;text-align:center;gap:0.55rem;
+        }
+        .orbit-heading__title{
+          font-size:clamp(0.82rem,2.8vw,1rem);
+          text-align:center;
+        }
+        .orbit-heading__body{
+          max-width:30ch;font-size:clamp(0.66rem,2.2vw,0.76rem);
+          text-align:center;
+        }
+        .orbit-petal__icon{width:18px;height:18px;}
+        .orbit-petal__label{
+          font-size:clamp(0.44rem,1.15vw,0.54rem);
+          line-height:1.12;max-width:8.5ch;letter-spacing:-0.03em;
+        }
+        .orbit-petal__content{gap:6px;}
       }
       @media (max-width:640px){
         .orbit-heading{
           left:50%;transform:translateX(-50%);
           top:clamp(5.25rem,11.5vh,7rem);
-          gap:0.7rem;max-width:min(20rem,88vw);
+          gap:0.55rem;max-width:min(18rem,88vw);
           align-items:center;text-align:center;
         }
         .orbit-heading__title,.orbit-heading__body{text-align:center;}
-        .orbit-heading__body{max-width:28ch;font-size:0.88rem;}
-        .orbit-petal__label{font-size:0.5rem;max-width:8ch;}
+        .orbit-heading__title{font-size:clamp(0.78rem,4.2vw,0.95rem);}
+        .orbit-heading__body{max-width:26ch;font-size:0.7rem;}
+        .orbit-petal__label{font-size:0.44rem;max-width:8ch;}
       }`
     document.head.appendChild(st)
     injectedStyle = st
