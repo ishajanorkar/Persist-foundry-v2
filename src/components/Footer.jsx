@@ -39,8 +39,6 @@ export default function Footer() {
             <span className="footer-logo-name">Persist</span>
           </Link>
 
-          <p className="footer-tagline">Forged in persistence.</p>
-
           <div className="footer-newsletter-wrap">
             {/* ── form state ── */}
             <form
@@ -144,7 +142,6 @@ export default function Footer() {
         <div className="footer-nav-col">
           <div className="footer-nav-heading">Opportunities</div>
           <nav className="footer-nav-links">
-            <a href="#apply" className="footer-nav-link">Apply — Cohort 2026</a>
             <Link to="/apply-for-a-full-time-position" className="footer-nav-link">Job Application</Link>
             <Link to="/apply-to-cofoundathon" className="footer-nav-link">Co-Foundathon</Link>
             <Link to="/investor-application" className="footer-nav-link">Investor Application</Link>
@@ -167,7 +164,6 @@ export default function Footer() {
       {/* ── bottom bar ── */}
       <div className="footer-bottom">
         <span>© 2026 Persist Foundry · All rights reserved</span>
-        <span className="footer-bottom-right">persist.foundry</span>
       </div>
     </footer>
   )

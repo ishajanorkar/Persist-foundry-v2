@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { gsap } from 'gsap'
 import '../foundry/foundry.css'
 import initFoundry from '../foundry/engine'
 import FilterSection from '../components/FilterSection'
@@ -17,6 +18,8 @@ import UnfairStartSection from '../components/UnfairStartSection'
    ============================================================ */
 export default function Foundry() {
   const rootRef = useRef(null)
+  const ctaRevealRef = useRef(null)
+  const asideRevealRef = useRef(null)
 
   useEffect(() => {
     // useEffect already runs after the DOM is committed/laid out, so the
@@ -39,6 +42,41 @@ export default function Foundry() {
     }
   }, [])
 
+  // Soft line-rise for hero CTA + aside — plays once after loader, after headline starts
+  useEffect(() => {
+    const ctaInner = ctaRevealRef.current
+    const asideInner = asideRevealRef.current
+    if (!ctaInner || !asideInner) return
+
+    gsap.set([ctaInner, asideInner], { yPercent: 115, opacity: 0 })
+
+    let tl = null
+    let played = false
+    const play = () => {
+      if (played) return
+      played = true
+      tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      tl.to(ctaInner, { yPercent: 0, opacity: 1, duration: 0.85 }, 0.5)
+        .to(asideInner, { yPercent: 0, opacity: 1, duration: 0.95 }, 0.72)
+    }
+
+    const loaderDone = document.querySelector('.pf-loader.done')
+    let fallback = 0
+    if (loaderDone) {
+      play()
+    } else {
+      document.addEventListener('pf:ready', play, { once: true })
+      fallback = window.setTimeout(play, 2800)
+    }
+
+    return () => {
+      document.removeEventListener('pf:ready', play)
+      if (fallback) window.clearTimeout(fallback)
+      if (tl) tl.kill()
+      else gsap.killTweensOf([ctaInner, asideInner])
+    }
+  }, [])
+
   return (
     <div className="pf" ref={rootRef}>
       {/* ===================== LOADER ===================== */}
@@ -53,6 +91,8 @@ export default function Foundry() {
         <canvas id="hero-canvas" />
         <canvas id="three-canvas" />
         <div className="stage-fade" id="stageFade" />
+        {/* Covers the baked center flare on Backstory; lifts when Five Ways enters */}
+        <div className="stage-flare-mask" id="stageFlareMask" aria-hidden="true" />
       </div>
 
       {/* persistent Persist mark: center anchor -> glides to nav */}
@@ -80,15 +120,24 @@ export default function Foundry() {
               >
                 Back yourself to win big.
               </ScrollFloat>
-              <a className="btn-primary" href="#apply" data-magnetic>
-                Apply For Fellowship
-                <svg viewBox="0 0 16 16" fill="none" width="15" height="15" aria-hidden="true">
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </a>
+              <div className="hero-cta-reveal">
+                <a
+                  ref={ctaRevealRef}
+                  className="btn-primary hero-cta-reveal__inner"
+                  href="#apply"
+                  data-magnetic
+                >
+                  Apply For Fellowship
+                  <svg viewBox="0 0 16 16" fill="none" width="15" height="15" aria-hidden="true">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </a>
+              </div>
             </div>
             <p className="hero-aside" data-copy="hero-lead">
-              The rest will follow. Persist Foundry forges founders into the companies they were meant to build.
+              <span ref={asideRevealRef} className="hero-aside-reveal__inner">
+                The rest will follow. Persist forges founders into the companies they were meant to build.
+              </span>
             </p>
           </div>
         </section>
@@ -172,27 +221,51 @@ export default function Foundry() {
 
             <div className="threshold-stats" aria-label="Persist by the numbers">
               <article className="bcard">
-                <span className="bcard__mid bcard__mid--l" aria-hidden="true" />
-                <span className="bcard__mid bcard__mid--r" aria-hidden="true" />
-                <div className="bcard__label">Companies<br />launched</div>
+                <img className="bcard__cross bcard__cross--tl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img className="bcard__cross bcard__cross--tr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img className="bcard__cross bcard__cross--bl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img className="bcard__cross bcard__cross--br" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <div className="bcard__label">
+                  <img className="bcard__cross bcard__cross--ml" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                  <img className="bcard__cross bcard__cross--mr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                  Companies<br />launched
+                </div>
                 <div className="bcard__value"><span className="stat__num">30+</span></div>
               </article>
               <article className="bcard">
-                <span className="bcard__mid bcard__mid--l" aria-hidden="true" />
-                <span className="bcard__mid bcard__mid--r" aria-hidden="true" />
-                <div className="bcard__label">Net Asset<br />Value</div>
+                <img className="bcard__cross bcard__cross--tl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img className="bcard__cross bcard__cross--tr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img className="bcard__cross bcard__cross--bl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img className="bcard__cross bcard__cross--br" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <div className="bcard__label">
+                  <img className="bcard__cross bcard__cross--ml" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                  <img className="bcard__cross bcard__cross--mr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                  Net Asset<br />Value
+                </div>
                 <div className="bcard__value"><span className="stat__num">$117M</span></div>
               </article>
               <article className="bcard">
-                <span className="bcard__mid bcard__mid--l" aria-hidden="true" />
-                <span className="bcard__mid bcard__mid--r" aria-hidden="true" />
-                <div className="bcard__label">Advisor<br />network</div>
+                <img className="bcard__cross bcard__cross--tl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img className="bcard__cross bcard__cross--tr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img className="bcard__cross bcard__cross--bl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img className="bcard__cross bcard__cross--br" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <div className="bcard__label">
+                  <img className="bcard__cross bcard__cross--ml" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                  <img className="bcard__cross bcard__cross--mr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                  Advisor<br />network
+                </div>
                 <div className="bcard__value"><span className="stat__num">400+</span></div>
               </article>
               <article className="bcard">
-                <span className="bcard__mid bcard__mid--l" aria-hidden="true" />
-                <span className="bcard__mid bcard__mid--r" aria-hidden="true" />
-                <div className="bcard__label">Portfolio<br />impressions</div>
+                <img className="bcard__cross bcard__cross--tl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img className="bcard__cross bcard__cross--tr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img className="bcard__cross bcard__cross--bl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img className="bcard__cross bcard__cross--br" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <div className="bcard__label">
+                  <img className="bcard__cross bcard__cross--ml" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                  <img className="bcard__cross bcard__cross--mr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                  Portfolio<br />impressions
+                </div>
                 <div className="bcard__value"><span className="stat__num">67B</span></div>
               </article>
             </div>

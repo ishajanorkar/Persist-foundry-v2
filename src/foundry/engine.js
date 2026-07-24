@@ -188,6 +188,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     .filter((el) => +el.dataset.beat < 4)
     .map((el) => ({ inner: el.querySelector('.beat__inner'), scrim: el.querySelector('.beat__scrim') }))
   const stageFade = document.getElementById('stageFade')
+  const stageFlareMask = document.getElementById('stageFlareMask')
 
   function bandOpacity(p, b) {
     const [a, c, d, e] = b
@@ -198,6 +199,8 @@ export default function initFoundry({ base = '/foundry' } = {}) {
   }
   function updateBeats(p) {
     let stageO = 0
+    let thresholdO = 0
+    const isMobile = window.matchMedia('(max-width: 1024px)').matches
     for (let i = 0; i < beatInners.length; i++) {
       const o = bandOpacity(p, BEAT_BANDS[i])
       const { inner, scrim } = beatInners[i]
@@ -205,24 +208,51 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         inner.style.opacity = o.toFixed(3)
         inner.style.transform = `translateY(${(1 - o) * 26}px)`
       }
-      // Hero + Backstory need a fuller scrim over bright footage
-      const scrimMul = (i === 0 || i === 2) ? 1 : 0.95
+      // Soft hero wash on mobile (match Funded-by depth); light on desktop
+      const scrimMul = i === 2 ? 0 : i === 0 ? (isMobile ? 0.7 : 0.45) : 0.95
       if (scrim) scrim.style.opacity = (o * scrimMul).toFixed(3)
-      // Dim bright footage under readable beats (hero / tether / backstory)
-      if (i === 0) stageO = Math.max(stageO, o * 0.72)
+      // Soft stage fade on hero / tether; none on backstory
+      if (i === 0) stageO = Math.max(stageO, o * (isMobile ? 0.38 : 0.18))
       if (i === 1) stageO = Math.max(stageO, o * 0.92)
-      if (i === 2) stageO = Math.max(stageO, o * 0.82)
+      // i === 2 (threshold/backstory): intentionally no stage fade
+      if (i === 2) thresholdO = o
     }
     if (stageFade) stageFade.style.opacity = stageO.toFixed(3)
+    // Cover the baked center glow through Backstory only.
+    // Once Five Ways owns scroll, orbit onUpdate drives the soft veil.
+    if (stageFlareMask) {
+      const orbitP = window.PF._orbitProgress || 0
+      if (orbitP >= 0.01) {
+        /* orbit handler owns the mask */
+      } else if (p >= 0.78 || thresholdO > 0.05) {
+        stageFlareMask.style.opacity = '1'
+      } else {
+        stageFlareMask.style.opacity = '0'
+      }
+    }
   }
 
-  // one-by-one reveal of the Tether partner logos, fired off the same scrub
-  // progress that drives the Tether beat (band ~0.34–0.60, full at 0.42–0.52).
-  const lockupRow = document.querySelector('.lockup__row')
+  // Slide-in reveal for Tether heading + logos when the beat enters view
+  // (band ~0.34–0.60; fire as the section fades in).
+  const lockup = document.querySelector('#tether .lockup')
   let tetherRevealed = false
   function maybeRevealTether(p) {
-    if (tetherRevealed || !lockupRow) return
-    if (p >= 0.40) { tetherRevealed = true; lockupRow.classList.add('is-revealed') }
+    if (tetherRevealed || !lockup) return
+    if (p >= 0.36) {
+      tetherRevealed = true
+      lockup.classList.add('is-revealed')
+    }
+  }
+
+  // Subtle rise-in for Backstory header + body when the beat enters view
+  const thresholdCopy = document.querySelector('#threshold .threshold-copy')
+  let thresholdCopyRevealed = false
+  function maybeRevealThresholdCopy(p) {
+    if (thresholdCopyRevealed || !thresholdCopy) return
+    if (p >= 0.82) {
+      thresholdCopyRevealed = true
+      thresholdCopy.classList.add('is-revealed')
+    }
   }
 
   // count-up of the threshold stats (30+, $117M, 400+, 67B) as that beat
@@ -263,6 +293,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     drawFrame(progressToFrame(p))
     updateBeats(p)
     maybeRevealTether(p)
+    maybeRevealThresholdCopy(p)
     maybeCountThreshold(p)
     if (window.PF.onHeroProgress) window.PF.onHeroProgress(p)
   }
@@ -435,12 +466,12 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     stars.position.z = z * 14
     if (stars.material) stars.material.opacity = 0.55 + (1 - z) * 0.4
 
-    // big center star grows / approaches as zoom rises, then softens
+    // big center star grows / approaches as zoom rises — present but not blown out
     if (starSprite) {
-      const s = 3.6 + z * 22
+      const s = 2.8 + z * 16
       starSprite.scale.set(s, s, 1)
-      starSprite.position.z = 1.5 + z * 6
-      starSprite.material.opacity = Math.max(0, (0.95 - z * 0.55) * starFieldOpacity)
+      starSprite.position.z = 1.5 + z * 5.5
+      starSprite.material.opacity = Math.max(0, (0.62 - z * 0.32) * starFieldOpacity)
     }
 
     camera.position.z = 14 - z * 9.5
@@ -455,18 +486,15 @@ export default function initFoundry({ base = '/foundry' } = {}) {
   function stopThree() { running = false; if (raf) cancelAnimationFrame(raf); raf = null }
 
   window.PF.onHeroProgress = function (p) {
-    // late hero → threshold: bring the starfield online before the orbit beat
-    const a = THREE.MathUtils
-      ? THREE.MathUtils.clamp((p - 0.78) / (0.98 - 0.78), 0, 1)
-      : Math.max(0, Math.min(1, (p - 0.78) / 0.20))
-    // once the orbit section owns the zoom, don't fight its opacity
-    if ((window.PF._orbitProgress || 0) < 0.04) {
-      starFieldOpacity = a
-      threeCanvas.style.opacity = starFieldOpacity.toFixed(3)
-      if (a > 0 && starZoom < 0.35) starZoom = a * 0.32
+    // Starfield + center flare sprite only belong to Five Ways (#orbit).
+    // Keep them fully off through Backstory so that glow never shows early.
+    const orbitP = window.PF._orbitProgress || 0
+    if (orbitP < 0.02) {
+      starFieldOpacity = 0
+      if (threeCanvas) threeCanvas.style.opacity = '0'
+      stopThree()
+      return
     }
-    if (a > 0.01 || starFieldOpacity > 0.02) startThree()
-    else stopThree()
   }
 
   /* ---- ORBIT: build the five arms as a segmented glass donut ---- */
@@ -687,19 +715,19 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       .orbit-diagram{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;
         opacity:0;will-change:opacity;object-fit:contain;object-position:center;
         /* viewport-sized Group_1 — faint hairline blueprint behind the wheel */}
-      .orbit-heading{position:absolute;top:clamp(14vh,18vh,20vh);left:clamp(1.5rem,7vw,5.5rem);
-        z-index:4;max-width:min(15rem,18vw);opacity:0;will-change:opacity;
-        display:flex;flex-direction:column;align-items:flex-start;gap:0.95rem;
-        pointer-events:none;}
+      .orbit-heading{position:absolute;top:clamp(11vh,14vh,16vh);left:50%;
+        transform:translateX(-50%);z-index:4;max-width:min(26rem,78vw);opacity:0;will-change:opacity;
+        display:flex;flex-direction:column;align-items:center;gap:0.65rem;
+        pointer-events:none;text-align:center;}
       .orbit-heading__title{font-family:'Montserrat',var(--pf-display),system-ui,sans-serif;
         font-weight:600;font-style:normal;
-        font-size:clamp(1.35rem,2.4vw,32px);line-height:1.2;letter-spacing:-0.04em;
-        color:#ffffff;text-shadow:0 2px 22px rgba(0,0,0,0.85);}
+        font-size:clamp(1.05rem,1.55vw,1.35rem);line-height:1.2;letter-spacing:-0.04em;
+        color:#ffffff;text-shadow:0 2px 22px rgba(0,0,0,0.85);text-align:center;}
       .orbit-heading__body{margin:0;font-family:'Montserrat',var(--pf-display),system-ui,sans-serif;
         font-weight:400;font-style:normal;
-        font-size:clamp(0.88rem,1.15vw,16px);line-height:1.4;letter-spacing:-0.03em;
-        color:rgba(168,172,184,0.72);max-width:22ch;
-        text-shadow:0 1px 14px rgba(0,0,0,0.75);}
+        font-size:clamp(0.78rem,0.95vw,0.9rem);line-height:1.4;letter-spacing:-0.03em;
+        color:rgba(168,172,184,0.72);max-width:36ch;
+        text-shadow:0 1px 14px rgba(0,0,0,0.75);text-align:center;}
       /* wheel dead-center — primary focal point of the section */
       .orbit-donut{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
         transform-origin:center;will-change:transform,opacity;pointer-events:none;z-index:2;}
@@ -728,6 +756,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
           transparent 0%, transparent 28%, rgba(0,0,0,0.3) 38%,
           rgba(0,0,0,0.85) 50%, #000 60%);}
       .orbit-petal{position:absolute;inset:0;z-index:1;padding:0;border:0;cursor:pointer;
+        isolation:isolate;
         /* idle glass — darker charcoal, frosted so blueprint softens behind */
         background:linear-gradient(160deg,
           rgba(48,46,56,0.82) 0%,
@@ -736,7 +765,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         -webkit-backdrop-filter:blur(16px) saturate(1.2);
         backdrop-filter:blur(16px) saturate(1.2);
         box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
-        /* active purple lives on this same clipped layer — never a full-donut child rect */
+        /* active purple lives on ::before — opacity fade stays inside clip-path */
         --orbit-active-fill:radial-gradient(circle at 50% 50%,
           rgb(18,14,28) 0%,
           rgb(28,20,48) 28%,
@@ -745,16 +774,12 @@ export default function initFoundry({ base = '/foundry' } = {}) {
           rgb(145,108,190) 60%,
           rgb(190,168,220) 66%,
           rgb(235,230,245) 72%,
-          rgb(255,255,255) 78%);
-        filter:none;
-        transition:background .35s var(--ease-out),
-          backdrop-filter .35s var(--ease-out), -webkit-backdrop-filter .35s var(--ease-out);}
-      .orbit-petal:hover,.orbit-petal.is-featured{
-        background:var(--orbit-active-fill);
-        -webkit-backdrop-filter:none;
-        backdrop-filter:none;
-        box-shadow:none;}
-      /* glow on the rim SVG only — filter on the petal uncips and flashes a rectangle */
+          rgb(255,255,255) 78%);}
+      .orbit-petal::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+        background:var(--orbit-active-fill);opacity:0;
+        transition:opacity .35s var(--ease-out);}
+      .orbit-petal:hover::before,.orbit-petal.is-featured::before{opacity:1;}
+      /* glow on the rim SVG only — never filter the petal (uncips a rectangle) */
       .orbit-seg-lines{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:visible;
         fill:none;}
       .orbit-seg-rim{fill:none;stroke:rgba(220,224,234,0.5);stroke-width:1;
@@ -777,11 +802,11 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       @media (max-width:1024px){
         .orbit-heading{
           left:50%;transform:translateX(-50%);
-          max-width:min(22rem,86vw);top:8vh;
+          max-width:min(22rem,86vw);top:clamp(5.5rem,12vh,7.5rem);
           align-items:center;text-align:center;
         }
-        .orbit-heading__title,.orbit-heading__body{text-align:center;}
-        .orbit-heading__body{max-width:32ch;}
+        .orbit-heading__title{font-size:clamp(0.98rem,3.8vw,1.2rem);}
+        .orbit-heading__body{max-width:32ch;font-size:clamp(0.75rem,2.8vw,0.86rem);}
         .orbit-petal__icon{width:22px;height:22px;}
         .orbit-petal__label{
           font-size:clamp(0.52rem,1.35vw,0.62rem);
@@ -792,6 +817,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       @media (max-width:640px){
         .orbit-heading{
           left:50%;transform:translateX(-50%);
+          top:clamp(5.25rem,11.5vh,7rem);
           gap:0.7rem;max-width:min(20rem,88vw);
           align-items:center;text-align:center;
         }
@@ -845,6 +871,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
   }
   function clearCard() {
     clearTimeout(swapTO)
+    hoverActive = false
     if (!armDetail) return
     armDetail.classList.remove('show', 'is-swapping')
     if (armContent) armContent.classList.remove('is-fading')
@@ -889,10 +916,16 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     clearCard()
   }
 
-  // Scroll no longer drives the detail panel — hover/focus only.
+  // Hover/focus shows the panel; scroll past the active wheel always dismisses it
+  // (mobile touch can leave hoverActive stuck true without a mouseleave).
   function updateFeatured(p, op) {
     lastProg = p
     lastOp = op
+    const inActiveWheel = op > 0.35 && p > 0.30 && p < 0.94
+    if (!inActiveWheel && (featuredIndex !== -1 || armDetail?.classList.contains('show'))) {
+      clearCard()
+      return
+    }
     if (!hoverActive && (featuredIndex !== -1 || armDetail?.classList.contains('show'))) {
       clearCard()
     }
@@ -920,6 +953,8 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     // sections beneath (which would pop the detail card from nowhere)
     orbitDonut.style.pointerEvents = vis > 0.35 ? 'auto' : 'none'
     if (orbitRing) orbitRing.style.pointerEvents = vis > 0.35 ? 'auto' : 'none'
+    // Fixed body panel must not outlive the wheel (esp. after touch hover)
+    if (vis <= 0.35 && armDetail?.classList.contains('show')) clearCard()
   }
 
   /* ---- LOGO drop + nav glide ---- */
@@ -1007,10 +1042,14 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     let spinDrift = 0
     let orbitProgress = 0
 
-    function ringExpand(p) { return Math.min(1, Math.max(0, p) / 0.30) }
+    function ringExpand(p) {
+      // Wheel expands only after the star zoom phase
+      return Math.min(1, Math.max(0, (p - 0.26) / 0.28))
+    }
     function ringOpacity(p) {
-      if (p <= 0.14 || p >= 0.94) return 0
-      if (p < 0.30) return (p - 0.14) / 0.16
+      // Keep the 5-forge wheel hidden until the zoom-out has mostly played
+      if (p <= 0.30 || p >= 0.94) return 0
+      if (p < 0.46) return (p - 0.30) / 0.16
       if (p <= 0.74) return 1
       return 1 - (p - 0.74) / 0.20
     }
@@ -1020,50 +1059,74 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     }
 
     mkTrigger({
+      // Start early so the star zoom plays while leaving Backstory, before the wheel
       trigger: '#orbit',
-      start: 'top 75%',
+      start: 'top bottom',
       end: 'bottom bottom',
       scrub: 0.5,
       onLeaveBack: () => {
         // scrolled back up out of the section — fully hide the wheel
         if (orbitLayer) orbitLayer.style.opacity = '0'
         clearCard()
-        starZoom = Math.min(starZoom, 0.3)
+        starZoom = 0
+        starFieldOpacity = 0
+        if (threeCanvas) threeCanvas.style.opacity = '0'
+        stopThree()
+        // re-cover the baked center flare while Backstory is on screen again
+        if (stageFlareMask) stageFlareMask.style.opacity = '1'
+        if (canvas) canvas.style.filter = ''
+      },
+      onLeave: () => {
+        // scrolled past Five Ways — drop the fixed detail so it can't overlay portfolio
+        clearCard()
       },
       onUpdate: (self) => {
         orbitProgress = self.progress
         window.PF._orbitProgress = orbitProgress
         spin = currentSpin()
-        const drop = Math.min(1, orbitProgress / 0.26)
+        // Logo drop begins as the zoom settles / wheel approaches
+        const drop = Math.min(1, Math.max(0, (orbitProgress - 0.18) / 0.28))
         window.PF._logoDrop = drop
         const ex = ringExpand(orbitProgress)
         const op = ringOpacity(orbitProgress)
-        // the footage's final frame has a bright star flare baked in dead
-        // center; dim the frame canvas as the logo drops in so the mark
-        // stays legible against it
-        canvas.style.filter = `brightness(${(1 - drop * 0.55).toFixed(3)})`
+
+        // Soften the baked flare without killing the glow — leave it readable
+        if (stageFlareMask) {
+          const lift = Math.min(1, orbitProgress / 0.22)
+          stageFlareMask.style.opacity = (0.88 - lift * 0.72).toFixed(3)
+        }
+        // Mild canvas dim so the flare isn’t blinding, but still glows
+        const entryDim = Math.min(1, orbitProgress / 0.18)
+        const bright = Math.max(0.55, 1 - entryDim * 0.22 - drop * 0.2)
+        canvas.style.filter = `brightness(${bright.toFixed(3)})`
+
         if (window.PF._gliding !== true) setLogo(drop, 0)
         orbitFade = 1
         if (orbitLayer) {
-          orbitLayer.style.opacity = op > 0.01 || orbitProgress > 0.02 ? '1' : '0'
+          // Layer visible for stars/backdrop once zoom starts; wheel opacity is separate
+          orbitLayer.style.opacity = orbitProgress > 0.01 ? '1' : '0'
           const bd = orbitLayer.querySelector('.orbit-backdrop')
           const diag = orbitLayer.querySelector('.orbit-diagram')
-          // grid + diagram ease in as the star zoom settles
-          const uiReveal = Math.min(1, Math.max(0, (orbitProgress - 0.08) / 0.28))
+          // Backdrop after zoom is underway
+          const uiReveal = Math.min(1, Math.max(0, (orbitProgress - 0.22) / 0.28))
           if (bd) bd.style.opacity = String(uiReveal * 0.94)
-          // keep blueprint soft / recessed like the Hover_State mock
           if (diag) diag.style.opacity = String(uiReveal * 0.28)
         }
         layoutOrbit(ex, spin, op)
-        if (orbitHeading) orbitHeading.style.opacity = String(Math.min(1, Math.max(0, (orbitProgress - 0.12) / 0.22)))
+        if (orbitHeading) {
+          orbitHeading.style.opacity = String(Math.min(1, Math.max(0, (orbitProgress - 0.32) / 0.2)))
+        }
 
-        // starfield: zoom out hard as the section opens, keep a soft field behind the grid
-        const zoomT = Math.min(1, orbitProgress / 0.42)
-        // easeOutCubic so the rush happens early then settles
+        // ── Star zoom FIRST (progress 0 → ~0.28), then wheel fades in ──
+        const zoomT = Math.min(1, orbitProgress / 0.28)
         starZoom = 1 - Math.pow(1 - zoomT, 3)
-        const holdStars = 0.22 + (1 - Math.min(1, op)) * 0.55
-        starFieldOpacity = Math.max(0.12, holdStars * (0.35 + (1 - zoomT) * 0.65))
-        if (orbitProgress > 0.02) startThree()
+        // Visible glow during zoom; settle softer once the wheel arrives
+        const zoomBoost = (1 - zoomT) * 0.55
+        const holdStars = 0.28 + zoomBoost + (1 - Math.min(1, op)) * 0.2
+        starFieldOpacity = Math.max(0.12, Math.min(0.85, holdStars))
+        if (orbitProgress > 0.01) startThree()
+        if (threeCanvas) threeCanvas.style.opacity = starFieldOpacity.toFixed(3)
+
         updateFeatured(orbitProgress, op)
         updateDockNavLock()
       },
@@ -1073,7 +1136,7 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       tickerFn = () => {
         // keep the ring + moon turning while the section is in view,
         // independent of the Three.js starfield render loop
-        if (armNodes.length && orbitProgress > 0.08 && orbitProgress < 0.96) {
+        if (armNodes.length && orbitProgress > 0.32 && orbitProgress < 0.96) {
           spinDrift += 0.0012
           spin = currentSpin()
           const ex = ringExpand(orbitProgress)
@@ -1105,8 +1168,8 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         window.PF._gliding = gRaw > 0.001
         window.PF._glideG = g
         window.PF._glideRaw = gRaw
-        // leaving the orbit for the dock — drop any anchored arm card
-        if (gRaw > 0.02 && !hoverActive && armDetail.classList.contains('show')) clearCard()
+        // leaving the orbit for the dock — always drop the fixed arm card
+        if (gRaw > 0.02 && armDetail?.classList.contains('show')) clearCard()
         // re-measure the slot mid-glide: its position can shift after load
         // (scrollbar, font swap, nav scrolled-state), and a stale target
         // lands the mark off-center next to the wordmark

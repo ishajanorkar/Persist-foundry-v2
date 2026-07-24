@@ -1,4 +1,4 @@
-﻿:root {
+ï»¿:root {
   --void: #07050F;
   --night: #0F0A1F;
   --night-2: #18102E;
@@ -20,7 +20,7 @@
   --warm: #F3AA62;
   --warm-soft: #FFD49A;
   --warm-glow: rgba(243, 170, 98, 0.45);
-  /* Sitewide type ΓÇö match Foundry home (Montserrat) */
+  /* Sitewide type ÎÃÃ¶ match Foundry home (Montserrat) */
   --display: 'Montserrat', system-ui, -apple-system, sans-serif;
   --serif: 'Montserrat', system-ui, -apple-system, sans-serif;
   --sans: 'Montserrat', system-ui, -apple-system, sans-serif;
@@ -35,8 +35,17 @@
   initial-value: 0deg;
 }
 
+@property --nav-glass-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 @keyframes cta-border-spin {
   to { --cta-angle: 360deg; }
+}
+@keyframes nav-glass-border-spin {
+  to { --nav-glass-angle: 360deg; }
 }
 @keyframes cta-sheen {
   0%   { left: -130%; }
@@ -110,12 +119,16 @@ body::before {
 .nav {
   position: fixed; top: 0; left: 0; right: 0;
   z-index: 100;
-  padding: 22px 40px;
+  /* Horizontal inset shared with Foundry --gutter */
+  padding: 16px var(--gutter, 40px);
   display: flex; align-items: center;
+  /* Full bar stays clear — glass lives only on the center pill */
   background: transparent;
   border-bottom: 1px solid transparent;
-  transition: padding 0.4s ease, background 0.4s ease, border-color 0.4s ease,
-              box-shadow 0.4s ease, transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: padding 0.4s ease, transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .nav.is-hidden { transform: translateY(-110%); }
 /* Keep the bar visible while the Foundry P-mark docks into the brand slot */
@@ -124,42 +137,51 @@ body::before {
   transform: none !important;
 }
 .nav.is-scrolled {
-  padding: 14px 40px;
-  background: rgba(7, 5, 15, 0.85);
-  backdrop-filter: blur(28px) saturate(160%);
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
-  border-bottom-color: rgba(199, 184, 245, 0.08);
-  box-shadow: 0 2px 40px rgba(0, 0, 0, 0.3);
+  padding: 12px var(--gutter, 40px);
 }
 
 /* LOGO */
 .nav-logo {
-  display: inline-flex; align-items: center; gap: 6px;
+  display: inline-flex; align-items: center; gap: 3px;
   text-decoration: none;
   flex-shrink: 0;
   z-index: 1;
   line-height: 1;
   position: relative;
 }
-.nav-logo img {
-  width: 30px; height: 30px;
+.nav-logo img,
+.nav-logo-p {
+  width: 36px; height: 36px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 10px rgba(120, 84, 213, 0.55));
+}
+.nav-logo-p--static {
+  width: 36px;
+  height: 36px;
 }
 /* Dock target for the Foundry cinematic P-mark.
-   On the home page this is an empty in-flow slot the mark glides into.
-   On other pages it collapses (favicon is shown instead). */
+   White P sits here from load; cinematic mark lands on top when docked. */
 .nav-logo-mark {
   display: none;
+  position: relative;
   flex: none;
-  width: 44px;
-  height: 44px;
-  pointer-events: none;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
 }
 .nav-logo--foundry .nav-logo-mark {
-  display: block;
+  display: inline-flex;
+  pointer-events: none;
+}
+.nav-logo-mark .nav-logo-p {
+  width: 36px;
+  height: 36px;
+  transition: opacity 0.35s ease;
+}
+.nav-logo--foundry.is-mark-docked .nav-logo-mark .nav-logo-p {
+  opacity: 0;
 }
 .nav-logo-word {
   font-family: 'Montserrat', system-ui, sans-serif;
@@ -171,33 +193,78 @@ body::before {
   display: block;
 }
 
-/* CENTER PILL */
+/* CENTER PILL — dark liquid-glass capsule + traveling light rim
+   Blur only samples what’s behind this tube while the nav is visible. */
 .nav-pill {
   position: absolute;
   left: 50%; transform: translateX(-50%);
   display: flex; align-items: center;
   gap: 2px;
-  background: rgba(7, 5, 15, 0.52);
-  border: 1px solid rgba(199, 184, 245, 0.11);
+  background: rgba(10, 8, 18, 0.72);
+  border: 1px solid transparent;
   border-radius: 100px;
   padding: 5px 6px;
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 4px 24px rgba(0,0,0,0.2);
-  transition: border-color 0.3s;
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 6px 28px rgba(0, 0, 0, 0.40);
+  isolation: isolate;
+  overflow: hidden;
+  transition: background 0.3s, box-shadow 0.3s, opacity 0.35s ease,
+              backdrop-filter 0.35s ease;
+}
+/* When the nav slides away, drop the blur so it isn’t sampling off-screen */
+.nav.is-hidden .nav-pill {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  opacity: 0;
+}
+.nav-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--nav-glass-angle),
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.04) 38%,
+    rgba(255, 255, 255, 0.16) 46%,
+    rgba(255, 255, 255, 0.72) 50%,
+    rgba(255, 255, 255, 0.20) 54%,
+    rgba(255, 255, 255, 0.05) 62%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  animation: nav-glass-border-spin 3.6s linear infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 .nav.is-scrolled .nav-pill {
-  background: rgba(7, 5, 15, 0.7);
-  border-color: rgba(199, 184, 245, 0.14);
+  background: rgba(8, 6, 16, 0.82);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 8px 32px rgba(0, 0, 0, 0.48);
 }
 .nav-pill-link {
   position: relative;
+  z-index: 1;
   padding: 7px 15px;
   border-radius: 100px;
   font-size: 12.5px;
   font-family: var(--sans);
   font-weight: 400;
-  color: rgba(165, 153, 194, 0.75);
+  color: rgba(185, 178, 205, 0.78);
   text-decoration: none;
   white-space: nowrap;
   letter-spacing: 0.01em;
@@ -205,17 +272,21 @@ body::before {
   display: inline-flex; align-items: center; gap: 4px;
 }
 .nav-pill-chevron { opacity: 0.6; flex-shrink: 0; }
-.nav-pill-link:hover { color: var(--paper); background: rgba(120, 84, 213, 0.14); }
-.nav-pill-link.is-active {
+.nav-pill-link:hover {
   color: var(--paper);
-  background: rgba(120, 84, 213, 0.24);
-  box-shadow: inset 0 1px 0 rgba(199,184,245,0.1), 0 0 12px rgba(120,84,213,0.15);
+  background: rgba(46, 35, 75, 0.55);
+}
+.nav-pill-link.is-active {
+  color: #ffffff;
+  background: rgba(46, 35, 75, 0.88);
+  box-shadow: inset 0 1px 0 rgba(199, 184, 245, 0.12);
 }
 
 .nav-dropdown {
   position: relative;
   display: inline-flex;
   align-items: center;
+  z-index: 1;
 }
 .nav-dropdown-trigger {
   appearance: none;
@@ -265,11 +336,11 @@ body::before {
 .nav-dropdown:hover .nav-dropdown-trigger,
 .nav-dropdown:focus-within .nav-dropdown-trigger {
   color: var(--paper);
-  background: rgba(120, 84, 213, 0.14);
+  background: rgba(46, 35, 75, 0.55);
 }
 .nav-dropdown.is-active .nav-dropdown-trigger {
-  color: var(--paper);
-  background: rgba(120, 84, 213, 0.24);
+  color: #ffffff;
+  background: rgba(46, 35, 75, 0.88);
 }
 .nav-dropdown-link {
   display: block;
@@ -291,7 +362,7 @@ body::before {
   background: rgba(120, 84, 213, 0.18);
 }
 
-/* Work With Us ΓÇö mobile submenu */
+/* Work With Us ÎÃÃ¶ mobile submenu */
 .nav-mobile-group {
   display: flex;
   flex-direction: column;
@@ -349,7 +420,7 @@ body::before {
   color: var(--paper);
 }
 
-/* RIGHT ΓÇö CTA + HAMBURGER */
+/* RIGHT ÎÃÃ¶ CTA + HAMBURGER */
 
 
 
@@ -3174,19 +3245,22 @@ body::before {
 
 /* ?? Small laptop + tablet + phone: switch to hamburger ?? */
 @media (max-width: 1200px) {
-  .nav { padding: 16px 24px; }
-  .nav.is-scrolled { padding: 12px 24px; }
+  :root { --gutter: 24px; }
+  .nav { padding: 16px var(--gutter, 24px); }
+  .nav.is-scrolled { padding: 12px var(--gutter, 24px); }
   .nav-pill { display: none; }
   .nav-cta { display: none; }
   .nav-hamburger { display: flex; }
-  .nav-logo img { width: 26px; height: 26px; }
-  .nav-logo span { font-size: 18px; }
+  .nav-logo img,
+  .nav-logo-p { width: 30px; height: 30px; }
+  .nav-logo-word { font-size: 18px; }
 }
 
 /* ?? Large tablet / phone ?? */
 @media (max-width: 968px) {
-  .nav { padding: 16px 22px; }
-  .nav.is-scrolled { padding: 12px 22px; }
+  :root { --gutter: 22px; }
+  .nav { padding: 16px var(--gutter, 22px); }
+  .nav.is-scrolled { padding: 12px var(--gutter, 22px); }
 
   /* Hero panels */
   .scrub-block { height: 280vh; }
@@ -3437,8 +3511,9 @@ body::before {
   .panel-1-headline { font-size: clamp(36px, 14vw, 50px); }
   .panel-2-headline { font-size: clamp(28px, 12.5vw, 44px); }
   .panel-3-headline { font-size: clamp(20px, 8.5vw, 34px); }
-  .nav-logo img { width: 24px; height: 24px; }
-  .nav-logo span { font-size: 16px; }
+  .nav-logo img,
+  .nav-logo-p { width: 28px; height: 28px; }
+  .nav-logo-word { font-size: 16px; }
 }
 
 /* ?? Short-viewport phones: shrink mobile menu links so all fit + scroll ?? */

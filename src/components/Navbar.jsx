@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { WORK_WITH_US_LINKS } from "../data/applicationForms";
 
@@ -18,6 +18,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [workOpen, setWorkOpen] = useState(false);
+  const [markDocked, setMarkDocked] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === "/";
 
@@ -30,6 +31,8 @@ export default function Navbar() {
       const forceVisible = !!(
         typeof window !== "undefined" && window.PF?._forceNavVisible
       );
+      const glide = Number(window.PF?._glideG || 0);
+      setMarkDocked(isHome && glide > 0.82);
       if (y < 120 || forceVisible) {
         setHidden(false);
       } else {
@@ -40,7 +43,7 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isHome]);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -82,18 +85,32 @@ export default function Navbar() {
       >
         {/* LOGO */}
         <Link
-          className={`nav-logo${isHome ? " nav-logo--foundry" : ""}`}
+          className={`nav-logo${isHome ? " nav-logo--foundry" : ""}${markDocked ? " is-mark-docked" : ""}`}
           to="/"
           onClick={closeMobile}
         >
           {/* Dock target for the cinematic Persist mark (home).
-              On other pages the static favicon fills this role. */}
+              White P sits here from the start; floating mark lands on top. */}
           <span
             className="nav-logo-mark"
             id="navBrandSlot"
             aria-hidden="true"
-          />
-          {!isHome && <img src="/pv-favicon.png" alt="" />}
+          >
+            <img
+              className="nav-logo-p"
+              src="/foundry/logo/persist-mark-white.svg"
+              alt=""
+              draggable="false"
+            />
+          </span>
+          {!isHome && (
+            <img
+              className="nav-logo-p nav-logo-p--static"
+              src="/foundry/logo/persist-mark-white.svg"
+              alt=""
+              draggable="false"
+            />
+          )}
           <span className="nav-logo-word">Persist</span>
         </Link>
 
@@ -222,7 +239,12 @@ export default function Navbar() {
       >
         <div className="nav-mobile-head">
           <Link className="nav-logo" to="/" onClick={closeMobile}>
-            <img src="/pv-favicon.png" alt="" />
+            <img
+              className="nav-logo-p nav-logo-p--static"
+              src="/foundry/logo/persist-mark-white.svg"
+              alt=""
+              draggable="false"
+            />
             <span className="nav-logo-word">Persist</span>
           </Link>
           <button
