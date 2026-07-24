@@ -145,7 +145,9 @@ export default function Footer() {
           <div className="footer-nav-heading">Opportunities</div>
           <nav className="footer-nav-links">
             <a href="#apply" className="footer-nav-link">Apply — Cohort 2026</a>
-            <a href="#" className="footer-nav-link">Work With Us</a>
+            <Link to="/apply-for-a-full-time-position" className="footer-nav-link">Job Application</Link>
+            <Link to="/apply-to-cofoundathon" className="footer-nav-link">Co-Foundathon</Link>
+            <Link to="/investor-application" className="footer-nav-link">Investor Application</Link>
             <Link to="/careers" className="footer-nav-link">Careers</Link>
             <Link to="/contact" className="footer-nav-link">Contact Us</Link>
           </nav>

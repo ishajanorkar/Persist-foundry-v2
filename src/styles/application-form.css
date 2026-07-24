@@ -1,0 +1,292 @@
+/* ======================================================
+   APPLICATION FORMS (.ap-*)
+   Visual language aligned with About (.ab-*).
+   ====================================================== */
+
+.ap-page {
+  position: relative;
+  min-height: 100vh;
+  background: #050609;
+  padding: clamp(6rem, 12vh, 8rem) 0 clamp(4rem, 10vh, 6.5rem);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.ap-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.18;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent calc(12.5% - 1px),
+    rgba(255, 255, 255, 0.09) calc(12.5% - 1px),
+    rgba(255, 255, 255, 0.09) 12.5%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+}
+
+.ap-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.ap-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.85s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ap-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ap-header {
+  text-align: left;
+  margin-bottom: clamp(2rem, 4vh, 2.75rem);
+}
+
+.ap-eyebrow {
+  margin: 0 0 1.25rem;
+  font-family: var(--montserrat);
+  font-size: clamp(0.68rem, 0.9vw, 0.75rem);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #ffffff8f;
+}
+
+.ap-title {
+  margin: 0 0 1.1rem;
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: #fffaf1;
+}
+
+.ap-subtitle {
+  margin: 0;
+  max-width: 42ch;
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 1.18vw, 1.1rem);
+  line-height: 1.65;
+  color: #a9a7a4;
+}
+
+.ap-panel {
+  position: relative;
+  padding: clamp(1.75rem, 3.5vw, 2.5rem);
+  background: #41414122;
+  border: 1px solid #fffbf11f;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+}
+
+.ap-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.ap-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.ap-label {
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 400;
+  font-size: clamp(0.82rem, 1vw, 0.92rem);
+  line-height: 1.45;
+  color: #fffaf1cc;
+}
+
+.ap-input {
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 300;
+  font-size: 0.95rem;
+  color: #fffaf1;
+  background: rgba(5, 6, 9, 0.55);
+  border: 1px solid rgba(255, 250, 241, 0.14);
+  border-radius: 0;
+  padding: 0.85rem 1rem;
+  outline: none;
+  width: 100%;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.ap-input::placeholder {
+  color: rgba(255, 250, 241, 0.32);
+}
+.ap-input:focus {
+  border-color: rgba(255, 250, 241, 0.45);
+  box-shadow: 0 0 0 1px rgba(255, 250, 241, 0.12);
+}
+.ap-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ap-help {
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 300;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: #a9a7a4;
+}
+
+.ap-error {
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 300;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #e8b4b8;
+  background: rgba(120, 30, 40, 0.2);
+  border: 1px solid rgba(232, 180, 184, 0.28);
+  padding: 0.75rem 0.9rem;
+}
+
+.ap-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 1rem 1.5rem;
+  border: 1px solid rgba(255, 250, 241, 0.45);
+  border-radius: 0;
+  background: transparent;
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 300;
+  font-size: clamp(1rem, 1.2vw, 1.15rem);
+  letter-spacing: -0.02em;
+  color: #fffaf1cc;
+  cursor: pointer;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+.ap-submit:hover:not(:disabled) {
+  color: #d7cbb7;
+  border-color: #d7cbb7;
+  background: rgba(255, 250, 241, 0.04);
+}
+.ap-submit:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.ap-spinner {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid rgba(255, 250, 241, 0.25);
+  border-top-color: #fffaf1;
+  border-radius: 50%;
+  animation: ap-spin 0.7s linear infinite;
+}
+@keyframes ap-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ap-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  color: #fffaf1cc;
+}
+.ap-success strong {
+  display: block;
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+  color: #fffaf1;
+  margin-bottom: 0.35rem;
+}
+.ap-success span {
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 300;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #a9a7a4;
+}
+
+.ap-again {
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  letter-spacing: -0.02em;
+  color: #fffaf1cc;
+  background: none;
+  border: none;
+  border-bottom: 0.5px solid #fffaf1cc;
+  padding: 0 0 4px;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+.ap-again:hover {
+  color: #d7cbb7;
+  border-color: #d7cbb7;
+}
+
+@media (max-width: 968px) {
+  .ap-page {
+    padding: clamp(5.5rem, 10vh, 7rem) 0 clamp(3.5rem, 8vh, 5rem);
+  }
+  .ap-panel {
+    padding: 1.75rem 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .ap-page {
+    padding: 5.5rem 0 3.5rem;
+  }
+  .ap-header {
+    margin-bottom: 1.75rem;
+  }
+  .ap-title {
+    font-size: 1.65rem;
+  }
+  .ap-panel {
+    padding: 1.5rem 1.15rem;
+  }
+  .ap-submit {
+    font-size: 1rem;
+  }
+}

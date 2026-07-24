@@ -10,6 +10,7 @@ import Portfolio from './pages/Portfolio'
 import PortfolioCompany from './pages/PortfolioCompany'
 import Careers from './pages/Careers'
 import Contact from './pages/Contact'
+import ApplicationForm from './pages/ApplicationForm'
 
 function Layout() {
   const { pathname } = useLocation()
@@ -28,6 +29,18 @@ function Layout() {
         <Route path="/portfolio/:id" element={<PortfolioCompany />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/contact" element={<Contact />} />
+        <Route
+          path="/apply-for-a-full-time-position"
+          element={<ApplicationForm formKey="fullTime" />}
+        />
+        <Route
+          path="/apply-to-cofoundathon"
+          element={<ApplicationForm formKey="cofoundathon" />}
+        />
+        <Route
+          path="/investor-application"
+          element={<ApplicationForm formKey="investor" />}
+        />
       </Routes>
       {!foundryHome && <Footer />}
     </>

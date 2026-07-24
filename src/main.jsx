@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import './styles/portfolio-tokens.css'
 import './styles/portfolio-page.css'
+import './styles/about-page.css'
+import './styles/application-form.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(

@@ -1,0 +1,858 @@
+/* ======================================================
+   ABOUT PAGE (.ab-*)
+   Tokens from :root in index.css — no new colors/fonts.
+   ====================================================== */
+
+.ab-inner {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.ab-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.85s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ab-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ab-eyebrow {
+  margin: 0 0 1.25rem;
+  font-family: var(--montserrat);
+  font-size: clamp(0.68rem, 0.9vw, 0.75rem);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #ffffff8f;
+}
+.ab-eyebrow--center {
+  text-align: center;
+}
+.ab-eyebrow::before {
+  display: none !important;
+}
+
+/* Corner ticks */
+.ab-corner-ticks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.ab-corner-ticks img {
+  position: absolute;
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+.ab-corner-ticks__tl {
+  top: -11px;
+  left: -11px;
+}
+.ab-corner-ticks__tr {
+  top: -11px;
+  right: -11px;
+}
+.ab-corner-ticks__bl {
+  bottom: -11px;
+  left: -11px;
+}
+.ab-corner-ticks__br {
+  bottom: -11px;
+  right: -11px;
+}
+
+/* HERO — copy overlays the centered model (matches Figma composition) */
+.ab-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(6rem, 12vh, 8rem) clamp(1.25rem, 4vw, 2.5rem)
+    clamp(3rem, 8vh, 5rem);
+  background: #050609;
+  overflow: hidden;
+}
+/* Figma: 674×561.79, top ~108–132, centered on 1440 */
+.ab-hero__model-wrap {
+  position: absolute;
+  top: clamp(5rem, 12vh, 8.25rem);
+  left: 50%;
+  width: min(674px, 90vw);
+  transform: translateX(-50%);
+  z-index: 0;
+  pointer-events: none;
+}
+.ab-hero__model {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 674 / 561.79;
+  will-change: transform;
+  opacity: 0.8;
+}
+.ab-hero__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  text-align: center;
+  margin-top: clamp(0rem, 2vh, 1rem);
+  padding-bottom: clamp(2rem, 8vh, 4rem);
+}
+.ab-hero__headline {
+  margin: 0 auto 1.35rem;
+  max-width: 20ch;
+  font-family: var(--montserrat);
+  font-size: clamp(2.1rem, 5.2vw, 3.75rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--paper);
+  text-shadow: 0 2px 28px rgba(5, 6, 9, 0.55);
+}
+.ab-hero__sub {
+  margin: 0 auto;
+  max-width: 46ch;
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  font-size: clamp(0.95rem, 2.8vw, 1.25rem);
+  line-height: 150%;
+  letter-spacing: 0;
+  color: #fffaf1cc;
+  text-shadow: 0 2px 20px rgba(5, 6, 9, 0.45);
+}
+
+/* ORIGIN — full-bleed portrait, left narrative, overlapping quote card */
+.ab-origin {
+  position: relative;
+  overflow: hidden;
+  background: #0d0d0f;
+  min-height: min(100vh, 980px);
+}
+.ab-origin__photo-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+.ab-origin__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  opacity: 0.15;
+  will-change: transform;
+}
+.ab-origin__photo-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(13, 13, 15, 0.55) 0%,
+    rgba(13, 13, 15, 0.25) 45%,
+    rgba(13, 13, 15, 0.4) 100%
+  );
+}
+
+/* Subtle vertical grid (matches mock) */
+.ab-origin__grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent calc(12.5% - 1px),
+    rgba(255, 255, 255, 0.09) calc(12.5% - 1px),
+    rgba(255, 255, 255, 0.09) 12.5%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+}
+.ab-origin__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(5.5rem, 14vh, 9rem) clamp(1.25rem, 4vw, 3.5rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.78fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: center;
+  min-height: inherit;
+}
+.ab-origin__copy {
+  max-width: 37rem;
+}
+.ab-origin__eyebrow {
+  color: rgba(255, 250, 241, 0.56);
+  margin-bottom: 1.5rem;
+}
+.ab-origin__headline {
+  margin: 0 0 1.75rem;
+  max-width: 20ch;
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-size: clamp(2rem, 2.9vw, 3.1rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: #fffaf1;
+}
+.ab-origin__body {
+  margin: 0 0 1.35rem;
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 1.05vw, 1.05rem);
+  line-height: 1.7;
+  color: rgba(255, 250, 241, 0.72);
+}
+.ab-origin__body:last-child {
+  margin-bottom: 0;
+}
+
+.ab-quote-card {
+  position: relative;
+  justify-self: end;
+  align-self: center;
+  width: 100%;
+  max-width: 520px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  background: #41414122;
+  border: 1px solid #fffbf11f;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+}
+.ab-quote-card__avatar {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 12%;
+  margin: 0 0 1rem;
+  border: 1px solid rgba(255, 250, 241, 0.35);
+}
+.ab-quote-card__quote {
+  margin: 0 0 1.5rem;
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 1.6vw, 1.4rem);
+  line-height: 1.55;
+  color: #eee5d5;
+}
+.ab-quote-card__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+.ab-quote-card__name {
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fffaf1;
+}
+.ab-quote-card__role {
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-size: 0.76rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: rgba(255, 250, 241, 0.55);
+}
+
+/* BELIEF */
+.ab-belief {
+  background: #050609;
+  padding: clamp(5rem, 12vh, 8rem) 0;
+}
+.ab-belief__headline {
+  margin: 0 0 clamp(2.5rem, 6vh, 3.5rem);
+  font-family: var(--montserrat);
+  font-size: clamp(1.85rem, 2.5vw, 2.85rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: var(--paper);
+  max-width: 24ch;
+}
+.ab-belief__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+.ab-belief-card {
+  position: relative;
+  padding: clamp(1.75rem, 3vw, 2.25rem);
+  background: #41414122;
+  border: 1px solid #fffbf11f;
+  backdrop-filter: blur(40px);
+  min-height: 100%;
+}
+.ab-belief-card__num {
+  display: block;
+  margin-bottom: 1.5rem;
+  font-family: var(--montserrat);
+  font-size: clamp(1.6rem, 2.8vw, 2rem);
+  font-weight: 100;
+  letter-spacing: 0.04em;
+  color: #d7cbb7;
+  line-height: 1;
+}
+.ab-belief-card.is-visible .ab-belief-card__num {
+  animation: ab-num-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes ab-num-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.ab-belief-card__title {
+  margin: 0 0 0.85rem;
+  font-family: var(--montserrat);
+  font-size: clamp(1.15rem, 1.25vw, 1.35rem);
+  font-weight: 500;
+  color: #fffaf1;
+  line-height: 1.25;
+}
+.ab-belief-card__body {
+  margin: 0;
+  font-family: var(--montserrat);
+  font-size: clamp(0.7rem, 0.85vw, 0.98rem);
+  line-height: 1.65;
+  color: rgba(234, 228, 244, 0.72);
+}
+
+/* INSIDE — hands at corners, glass copy panel centered (matches Figma) */
+.ab-inside {
+  position: relative;
+  min-height: min(92vh, 900px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #000;
+  padding: clamp(4rem, 10vh, 7rem) clamp(1.25rem, 4vw, 2.5rem);
+}
+.ab-inside__hands {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.ab-inside__hand {
+  position: absolute;
+  width: min(48vw, 800px);
+  height: auto;
+  object-fit: contain;
+  will-change: transform, opacity;
+  filter: blur(0.5px) saturate(1.15) brightness(0.85);
+  transition: none;
+  transform: translate3d(0, 0, 0);
+  opacity: 0.6;
+}
+.ab-inside__hand--right {
+  top: -2%;
+  left: -4%;
+}
+.ab-inside__hand--left {
+  bottom: -4%;
+  right: -4%;
+}
+.ab-inside__glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 220px;
+  height: 220px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(243, 170, 98, 0.35) 0%,
+    rgba(120, 84, 213, 0.18) 40%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.ab-inside__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.ab-inside__panel {
+  width: min(1280px, 100%);
+  padding: clamp(4rem, 14vh, 10rem) clamp(2rem, 10vw, 10rem);
+  text-align: center;
+  background: #2c2c2c47;
+  backdrop-filter: blur(18.6px);
+  border: 1px solid rgba(255, 250, 241, 0.05);
+}
+.ab-inside__eyebrow {
+  color: #ffffff8f;
+  margin-bottom: 1.5rem;
+}
+.ab-inside__headline {
+  margin: 0 auto 1.5rem;
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-size: clamp(1.5rem, 2.87vw, 3rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: #fffaf1;
+}
+.ab-inside__body {
+  margin: 0 auto;
+  font-family: "Montserrat", var(--montserrat), sans-serif;
+  font-weight: 400;
+  font-size: clamp(0.95rem, 1.05vw, 1.05rem);
+  line-height: 1.7;
+  color: #a9a7a4;
+}
+
+/* PEOPLE */
+.ab-people {
+  background: #010102;
+  padding: clamp(5rem, 12vh, 8rem) 0;
+}
+.ab-people__headline {
+  margin: 0 0 clamp(2.5rem, 6vh, 3.5rem);
+  font-family: var(--montserrat);
+  font-size: clamp(1.85rem, 2.5vw, 3rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: #fffaf1;
+}
+.ab-people__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  border-top: 1px solid rgba(199, 184, 245, 0.12);
+  border-bottom: 1px solid rgba(199, 184, 245, 0.12);
+}
+.ab-people-col {
+  position: relative;
+  padding: clamp(1.75rem, 3vw, 2.5rem) clamp(1.25rem, 2.5vw, 2rem);
+  border-right: 1px solid rgba(199, 184, 245, 0.12);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  border: 1px solid #fffbf11f;
+  backdrop-filter: blur(40px);
+  background: #41414122;
+}
+.ab-people-col:last-child {
+  border-right: none;
+}
+.ab-people-col__label {
+  margin: 0 0 0.5rem;
+  font-family: var(--montserrat);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #ffffff8f;
+}
+.ab-people-col__title {
+  margin: 0 0 1rem;
+  font-family: var(--montserrat);
+  font-size: clamp(1.2rem, 1.45vw, 1.45rem);
+  font-weight: 600;
+  color: #fffaf1;
+}
+.ab-people-col__body {
+  margin: 2rem 0 1.5rem;
+  flex: 1;
+  font-family: var(--montserrat);
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  line-height: 1.65;
+  color: #a9a7a4;
+}
+.ab-people-col__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--montserrat);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #fffaf1;
+  text-decoration: none;
+  padding-bottom: 2px;
+  align-self: flex-start;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+.ab-people-col__link:hover {
+  color: var(--lilac);
+  border-color: var(--lilac);
+}
+
+/* MISSION */
+.ab-mission {
+  position: relative;
+  min-height: min(80vh, 720px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: clamp(5rem, 12vh, 8rem) clamp(1.25rem, 4vw, 2.5rem);
+}
+.ab-mission__photo-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+.ab-mission__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+.ab-mission__overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7, 5, 15, 0.55) 0%,
+      rgba(74, 46, 159, 0.75) 45%,
+      rgba(7, 5, 15, 0.75) 100%
+    ),
+    rgba(8, 0, 25, 0.28);
+  mix-blend-mode: multiply;
+  /* background: linear-gradient(0deg, #050609, #050609),
+linear-gradient(0deg, rgba(8, 0, 25, 0.75), rgba(8, 0, 25, 0.75)); */
+}
+.ab-mission__content {
+  position: relative;
+  z-index: 1;
+  max-width: 58rem;
+  text-align: center;
+}
+.ab-mission__headline {
+  margin: 0 0 1.35rem;
+  font-family: var(--montserrat);
+  font-size: clamp(1.85rem, 4vw, 3.15rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: #fffaf1;
+}
+.ab-mission__body {
+  margin: 0 auto;
+  font-family: var(--montserrat);
+  font-size: clamp(0.95rem, 1.18vw, 1.25rem);
+  line-height: 1.7;
+  color: #a9a7a4;
+  font-weight: 300;
+}
+
+/* FINAL CTA */
+.ab-cta {
+  background: #050609;
+  padding: clamp(5.5rem, 14vh, 9rem) 0;
+  text-align: left;
+}
+.ab-cta__inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+}
+.ab-cta__headline {
+  margin: 0 0 1.1rem;
+  font-family: var(--montserrat);
+  font-size: clamp(2rem, 3.7vw, 3.8rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #fffaf1;
+  will-change: transform;
+}
+.ab-cta__body {
+  margin: 0 auto 2.25rem;
+  font-family: var(--montserrat);
+  font-size: clamp(0.95rem, 1.18vw, 1.25rem);
+  line-height: 1.65;
+  color: #a9a7a4;
+  font-weight: 300;
+}
+.ab-cta__link {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  font-family: var(--montserrat);
+  font-size: clamp(1.15rem, 1.55vw, 1.8rem);
+  font-weight: 300;
+  color: #fffaf1cc;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+  border-bottom: 0.5px solid #fffaf1cc;
+  padding-bottom: 4px;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+.ab-cta__link:hover {
+  color: #d7cbb7;
+  border-color: #d7cbb7;
+}
+
+/* RESPONSIVE */
+@media (max-width: 968px) {
+  .ab-hero {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 5.5rem clamp(1.25rem, 4vw, 2rem) 3rem;
+    align-items: center;
+    justify-content: center;
+  }
+  .ab-hero__model {
+    width: 150%;
+    height: auto;
+    object-fit: cover;
+    object-position: center;
+  }
+  .ab-hero__model-wrap {
+    top: 50%;
+    width: min(560px, 88vw);
+    transform: translate(-50%, -50%);
+    left: 30%;
+  }
+  .ab-hero__inner {
+    margin-top: 0;
+    padding-bottom: 0;
+  }
+  .ab-hero__headline {
+    max-width: 22ch;
+    font-size: clamp(1.85rem, 6vw, 2.75rem);
+  }
+  .ab-hero__sub {
+    font-size: clamp(0.95rem, 3.4vw, 1.15rem);
+    text-shadow: 0 2px 24px rgba(5, 6, 9, 0.7);
+  }
+  .ab-inside__panel {
+    padding: clamp(2.5rem, 7vh, 4rem) clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .ab-inside__hand {
+    width: min(58vw, 380px);
+  }
+}
+
+@media (max-width: 820px) {
+  .ab-origin {
+    min-height: 0;
+  }
+  .ab-origin__photo {
+    inset: 0;
+    height: 100%;
+    opacity: 0.22;
+    filter: grayscale(0.45) brightness(0.4) contrast(1.05);
+  }
+  .ab-origin__photo-scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(5, 6, 9, 0.7) 0%,
+      rgba(5, 6, 9, 0.82) 45%,
+      rgba(5, 6, 9, 0.94) 100%
+    );
+  }
+  .ab-origin__inner {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 2.75rem;
+    padding-top: clamp(4.5rem, 10vh, 6rem);
+    padding-bottom: clamp(4rem, 10vh, 6rem);
+  }
+  .ab-origin__headline {
+    max-width: 16ch;
+  }
+  .ab-quote-card {
+    justify-self: stretch;
+    max-width: none;
+  }
+  .ab-belief__grid {
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+  }
+  .ab-people__grid {
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+    border: none;
+  }
+  .ab-people-col {
+    border-right: none;
+    padding: clamp(1.5rem, 4vw, 2rem) clamp(1.25rem, 3vw, 1.75rem);
+  }
+  .ab-people-col:last-child {
+    border-bottom: none;
+  }
+  .ab-people-col__body {
+    margin: 1.25rem 0;
+  }
+  .ab-inside__hand {
+    /* width: min(62vw, 340px); */
+  }
+  .ab-inside__panel {
+    padding: clamp(2rem, 6vh, 3.5rem) clamp(1.25rem, 4vw, 2rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .ab-hero {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 5rem 1.25rem 2.5rem;
+  }
+  .ab-hero__model-wrap {
+    top: 52%;
+    width: min(420px, 92vw);
+    transform: translate(-50%, -50%);
+  }
+  .ab-hero__inner {
+    margin-top: 0;
+    padding-bottom: 0;
+  }
+  .ab-origin__headline {
+    max-width: 14ch;
+    font-size: clamp(1.65rem, 7vw, 2.1rem);
+  }
+  .ab-origin__body {
+    font-size: 0.95rem;
+  }
+  .ab-quote-card {
+    padding: 1.35rem 1.15rem;
+  }
+  .ab-belief {
+    padding: clamp(3.5rem, 10vh, 5rem) 0;
+  }
+  .ab-belief-card {
+    padding: 1.35rem 1.15rem;
+  }
+  .ab-inside {
+    min-height: 70vh;
+    padding: clamp(3rem, 8vh, 4.5rem) 1.15rem;
+  }
+  .ab-inside__hand {
+    width: min(85vw, 880px);
+  }
+  .ab-inside__hand--right {
+    top: 15%;
+    left: -10%;
+  }
+  .ab-inside__hand--left {
+    bottom: 20%;
+    right: -20%;
+  }
+  .ab-inside__panel {
+    padding: clamp(1.75rem, 5vh, 2.75rem) 1.15rem;
+  }
+  .ab-mission {
+    min-height: 62vh;
+    padding: clamp(3.5rem, 10vh, 5rem) 1.25rem;
+  }
+  .ab-mission__content {
+    max-width: 100%;
+  }
+  .ab-mission__overlay {
+    inset: -1%;
+  }
+  .ab-cta {
+    padding: clamp(3.5rem, 10vh, 5.5rem) 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .ab-hero__sub {
+    margin-bottom: 0;
+  }
+  .ab-belief-card,
+  .ab-quote-card {
+    padding: 1.25rem 1rem;
+  }
+  .ab-corner-ticks img {
+    width: 16px;
+    height: 16px;
+  }
+  .ab-corner-ticks__tl {
+    top: -8px;
+    left: -8px;
+  }
+  .ab-corner-ticks__tr {
+    top: -8px;
+    right: -8px;
+  }
+  .ab-corner-ticks__bl {
+    bottom: -8px;
+    left: -8px;
+  }
+  .ab-corner-ticks__br {
+    bottom: -8px;
+    right: -8px;
+  }
+  .ab-cta__link {
+    font-size: 1.1rem;
+  }
+  .ab-people-col {
+    padding: 1.25rem 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ab-reveal {
+    transition: opacity 0.35s ease;
+    transform: none;
+  }
+  .ab-reveal.is-visible {
+    transform: none;
+  }
+  .ab-belief-card.is-visible .ab-belief-card__num {
+    animation: none;
+  }
+  .ab-hero__model,
+  .ab-origin__photo,
+  .ab-mission__photo,
+  .ab-cta__headline {
+    transform: none !important;
+  }
+}
