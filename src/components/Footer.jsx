@@ -129,7 +129,14 @@ export default function Footer() {
             <Link to="/about" className="footer-nav-link">About</Link>
             <Link to="/portfolio" className="footer-nav-link">Portfolio</Link>
             <Link to="/team" className="footer-nav-link">Our Team</Link>
-            <a href="#" className="footer-nav-link">Blog</a>
+            <a
+              href="https://ww.persist.org/free-courses"
+              className="footer-nav-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Blog
+            </a>
           </nav>
         </div>
 
@@ -139,8 +146,8 @@ export default function Footer() {
           <nav className="footer-nav-links">
             <a href="#apply" className="footer-nav-link">Apply — Cohort 2026</a>
             <a href="#" className="footer-nav-link">Work With Us</a>
-            <a href="#" className="footer-nav-link">Investor Application</a>
-            <a href="#" className="footer-nav-link">Contact Us</a>
+            <Link to="/careers" className="footer-nav-link">Careers</Link>
+            <Link to="/contact" className="footer-nav-link">Contact Us</Link>
           </nav>
         </div>
 

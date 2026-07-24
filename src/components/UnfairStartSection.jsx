@@ -5,8 +5,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 gsap.registerPlugin(ScrollTrigger)
 
 /* ─────────────────────────────────────────────────────────────
-   UNFAIR START — desktop: horizontal pinned scroll (2 slides × 3).
-   Tablet/phone (≤1024): single header + 2-column grid of all cards.
+   UNFAIR START — desktop: sticky panel + 1:1 horizontal scrub
+   (2 slides). No GSAP pin — avoids overflow-x / reverse-scroll stick.
+   Tablet/phone (≤1024): single header + 2×3 grid of all cards.
 ───────────────────────────────────────────────────────────── */
 
 const SLIDES = [
@@ -87,6 +88,7 @@ const SLIDES = [
 
 const ALL_CARDS = SLIDES.flatMap((slide) => slide.cards)
 const HEADER = SLIDES[0]
+const SLIDE_COUNT = SLIDES.length
 
 function PropCard({ card }) {
   return (
@@ -129,25 +131,30 @@ export default function UnfairStartSection() {
     const mm = gsap.matchMedia()
 
     mm.add('(min-width: 1025px)', () => {
-      const getShift = () => Math.max(0, track.scrollWidth - pin.clientWidth)
-
+      // Sticky panel (CSS) + 1:1 scrub — no GSAP pin, no dwell padding.
+      // xPercent: move one full slide-width per remaining slide.
       const tween = gsap.to(track, {
-        x: () => -getShift(),
+        xPercent: -100 * (SLIDE_COUNT - 1) / SLIDE_COUNT,
         ease: 'none',
+        force3D: true,
         scrollTrigger: {
           trigger: root,
           start: 'top top',
-          end: () => `+=${Math.round(getShift() * 1.15 + pin.clientHeight * 0.35)}`,
-          pin: pin,
-          scrub: 0.55,
-          anticipatePin: 1,
+          end: 'bottom bottom',
+          scrub: true,
           invalidateOnRefresh: true,
         },
       })
 
+      const refresh = () => ScrollTrigger.refresh()
+      requestAnimationFrame(refresh)
+      const t = window.setTimeout(refresh, 120)
+
       return () => {
+        window.clearTimeout(t)
         tween.scrollTrigger?.kill()
         tween.kill()
+        gsap.set(track, { clearProps: 'transform' })
       }
     })
 

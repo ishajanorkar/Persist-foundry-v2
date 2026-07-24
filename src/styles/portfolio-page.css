@@ -48,7 +48,7 @@ body.pf-page .footer-top { padding-top: 48px; }
 .pf-page-title {
   font-family: var(--serif);
   font-size: clamp(34px, 4.2vw, 52px);
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: -0.03em;
   color: var(--paper);
   line-height: 1.05;
@@ -407,7 +407,7 @@ body.pf-page .footer-top { padding-top: 48px; }
 .pf-detail-title {
   font-family: var(--serif);
   font-size: clamp(42px, 6vw, 72px);
-  font-weight: 400;
+  font-weight: 600;
   line-height: 0.98;
   letter-spacing: -0.03em;
   color: var(--paper);

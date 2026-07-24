@@ -9,6 +9,7 @@ import Team from './pages/Team'
 import Portfolio from './pages/Portfolio'
 import PortfolioCompany from './pages/PortfolioCompany'
 import Careers from './pages/Careers'
+import Contact from './pages/Contact'
 
 function Layout() {
   const { pathname } = useLocation()
@@ -26,6 +27,7 @@ function Layout() {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/portfolio/:id" element={<PortfolioCompany />} />
         <Route path="/careers" element={<Careers />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
       {!foundryHome && <Footer />}
     </>

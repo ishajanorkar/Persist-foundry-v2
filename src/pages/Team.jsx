@@ -139,7 +139,7 @@ const TEAM = [
     name: 'Akash Mishra',
     role: 'Chief Design Officer',
     bio: null,
-    x: null,
+    x: 'akash1_mishra',
     li: 'akash-mishra-xd',
     img: '/assets/team/akash-mishra.png',
   },

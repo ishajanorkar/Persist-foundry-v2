@@ -8,8 +8,8 @@ const LINKS = [
   { label: 'Portfolio',    to: '/portfolio' },
   { label: 'Careers',      to: '/careers' },
   { label: 'Work With Us', href: '#', dropdown: true },
-  { label: 'Blog',         href: '#' },
-  { label: 'Contact Us',   id: 'apply' },
+  { label: 'Blog',         href: 'https://ww.persist.org/free-courses', external: true },
+  { label: 'Contact Us',   to: '/contact' },
 ]
 
 export default function Navbar() {
@@ -78,7 +78,7 @@ export default function Navbar() {
         {/* CENTER PILL — desktop only */}
         <div className="nav-pill" aria-label="Navigation">
           {LINKS.map((link) => {
-            const { label, id, href, to, dropdown } = link
+            const { label, id, href, to, dropdown, external } = link
             const active = isActive(link)
             if (to) {
               return (
@@ -98,6 +98,7 @@ export default function Navbar() {
                 href={id ? (isHome ? `#${id}` : `/#${id}`) : href}
                 className={`nav-pill-link${active ? ' is-active' : ''}`}
                 onClick={id ? (e) => { e.preventDefault(); go(id) } : undefined}
+                {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               >
                 {label}
                 {dropdown && (
@@ -146,7 +147,7 @@ export default function Navbar() {
         </div>
 
         <nav className="nav-mobile-links">
-          {LINKS.map(({ label, id, href, to, dropdown }, i) => {
+          {LINKS.map(({ label, id, href, to, dropdown, external }, i) => {
             if (to) {
               return (
                 <Link
@@ -168,6 +169,7 @@ export default function Navbar() {
                 className={`nav-mobile-link${mobileOpen ? ' is-visible' : ''}`}
                 style={{ transitionDelay: mobileOpen ? `${80 + i * 55}ms` : '0ms' }}
                 onClick={() => { if (id) go(id); else setMobileOpen(false) }}
+                {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               >
                 <span className="nav-mobile-num">{String(i + 1).padStart(2, '0')}</span>
                 {label}

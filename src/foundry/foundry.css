@@ -34,8 +34,8 @@
 
   /* ---- Typography ---- */
   --pf-display: 'Montserrat', system-ui, -apple-system, sans-serif;
-  --pf-body:    'Space Grotesk', system-ui, -apple-system, sans-serif;
-  --pf-mono:    'Space Grotesk', system-ui, sans-serif;
+  --pf-body:    'Montserrat', system-ui, -apple-system, sans-serif;
+  --pf-mono:    'Montserrat', system-ui, -apple-system, sans-serif;
 
   /* fluid type scale */
   --fs-display:  clamp(2.2rem, 5vw, 4.6rem);
@@ -82,7 +82,8 @@ body.pf-landing {
   font-family: var(--pf-body);
   font-size: var(--fs-body);
   line-height: var(--lh-body);
-  overflow-x: hidden;
+  /* clip (not hidden) — keeps sticky / pin transforms working */
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -1709,10 +1710,8 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
 }
 
 /* ---------- Type consistency across ported legacy sections ----------
-   The hero sets the page voice: Montserrat (--pf-display) for headings,
-   Space Grotesk (--pf-body / --pf-mono) for body copy and labels. The
-   sections ported from the legacy landing bring Lora + Geist Mono with
-   them — remap every text style so one family system runs the page. */
+   One family system for the Foundry page: Montserrat for headings,
+   body copy, and labels (weights differentiate roles). */
 
 /* headings + display numerals → Montserrat */
 .pf .st-hero, .pf .st-count, .pf .st-p-title, .pf .st-ghost, .pf .st-m-n,
@@ -1721,13 +1720,13 @@ body.pf-landing ::selection { background: var(--pf-violet); color: #fff; }
   font-weight: 600;
 }
 
-/* body copy → Space Grotesk */
+/* body copy → Montserrat */
 .pf .st-p-body {
   font-family: var(--pf-body);
   font-weight: 400;
 }
 
-/* small uppercase labels → the page's mono voice */
+/* small uppercase labels → Montserrat */
 .pf .st-kicker, .pf .st-p-cat, .pf .st-m-cat,
 .pf .manifesto-label, .pf .manifesto-hint {
   font-family: var(--pf-mono);
@@ -1817,6 +1816,13 @@ body.pf-landing .pf ~ .footer {
   background: rgba(5, 4, 9, 0.55);
   border-top: 1px solid var(--pf-line-soft);
 }
+/* Desktop: tall runway + sticky viewport panel (no GSAP pin).
+   Extra 100vw ≈ one slide of horizontal travel → continuous 1:1 scrub. */
+@media (min-width: 1025px) {
+  .vprop {
+    height: calc(100vh + 100vw);
+  }
+}
 .vprop__pin {
   position: relative;
   height: 100vh;
@@ -1824,12 +1830,19 @@ body.pf-landing .pf ~ .footer {
   width: 100%;
   overflow: hidden;
 }
+@media (min-width: 1025px) {
+  .vprop__pin {
+    position: sticky;
+    top: 0;
+  }
+}
 .vprop__track {
   display: flex;
   flex-wrap: nowrap;
   height: 100%;
   width: max-content;
   will-change: transform;
+  backface-visibility: hidden;
 }
 .vprop-slide {
   position: relative;
@@ -1881,8 +1894,8 @@ body.pf-landing .pf ~ .footer {
   color: rgba(170, 176, 190, 0.62);
 }
 .vprop-slide--no-head {
-  /* second slide — no repeated section title */
-  padding-top: clamp(2.5rem, 6vh, 3.75rem);
+  /* second slide — no repeated section title; keep clear of sticky nav */
+  padding-top: clamp(5rem, 10vh, 6.5rem);
 }
 
 .vprop-slide__stage {
@@ -2121,7 +2134,11 @@ body.pf-landing .pf ~ .footer {
 }
 
 @media (max-width: 1024px) {
+  .vprop {
+    height: auto;
+  }
   .vprop__pin {
+    position: relative;
     height: auto;
     min-height: 0;
     overflow: visible;
