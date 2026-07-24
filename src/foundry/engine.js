@@ -20,12 +20,58 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       pad: 4,
       anchors: { hero: 10, tether: 100, what: 160, threshold: 285 },
     },
+    // order matters — clockwise from top-right (seam at top, Co-Founder at bottom)
     arms: [
-      { id: 'accelerator', title: 'Accelerator',          body: 'A focused program that turns founder potential into a funded company. A salary to kickstart the team, mentorship from a 400 person network, and a deadline that forges.' },
-      { id: 'cofounder',   title: 'Co-Founder Bridge',     body: 'We match founders with the missing other half. The technical, the commercial, the one who stakes the next year beside you.' },
-      { id: 'companies',   title: 'Studio for Companies',  body: 'Operating muscle for companies ready to scale. Builders, designers, recruiters, and internal tools, embedded until the venture stands on its own.' },
-      { id: 'founders',    title: 'Studio for Founders',   body: 'Zero to one for the founder with nothing but a bet. We provide the salary and the hands to build the first version with you, not for you.' },
-      { id: 'substudio',   title: 'Sub Studio Program',    body: 'Specialist studios under one roof. Deep craft on demand, so your team stays small and your edges stay sharp.' },
+      {
+        id: 'substudio', title: 'Sub Studio Program',
+        body: 'Specialist studios under one roof. Deep craft on demand, so your team stays small and your edges stay sharp.',
+        points: [
+          'Specialist craft studios under one roof',
+          'Deep expertise on demand without headcount',
+          'Keep the core team small and sharp',
+          'Plug-in talent for the hard edges',
+        ],
+      },
+      {
+        id: 'accelerator', title: 'Accelerator',
+        body: 'A focused program that turns founder potential into a funded company. A salary to kickstart the team, mentorship from a 400 person network, and a deadline that forges.',
+        points: [
+          'Custom prototype engineering with tailored solutions',
+          'Validation & positioning audit with detailed insights',
+          'First-customer playbooks with step-by-step guidance',
+          'Access to foundational capital and strategic funding',
+        ],
+      },
+      {
+        id: 'cofounder', title: 'Co-Founder Bridge',
+        body: 'We match founders with the missing other half. The technical, the commercial, the one who stakes the next year beside you.',
+        points: [
+          'Matched with your complementary other half',
+          'Technical and commercial pairing',
+          'Shared stake for the next year together',
+          'Chemistry screened by operators who have done it',
+        ],
+      },
+      {
+        id: 'companies', title: 'Studio for Companies',
+        body: 'Operating muscle for companies ready to scale. Builders, designers, recruiters, and internal tools, embedded until the venture stands on its own.',
+        points: [
+          'Embedded builders, designers, recruiters',
+          'Internal tools shipped alongside the team',
+          'Operating muscle until the venture stands alone',
+          'Scale without bloating the permanent headcount',
+        ],
+      },
+      {
+        id: 'founders', title: 'Studio for Founders',
+        body: 'Zero to one for the founder with nothing but a bet. We provide the salary and the hands to build the first version with you, not for you.',
+        points: [
+          'Salary so you can leave the job and build',
+          'Hands that build the first version with you',
+          'Zero-to-one partnership, not consulting',
+          'A bet on the founder, not just the idea',
+        ],
+      },
     ],
   }
   window.PF_CONFIG = PF_CONFIG
@@ -307,9 +353,14 @@ export default function initFoundry({ base = '/foundry' } = {}) {
   const armKicker = document.getElementById('armKicker')
   const armTitle = document.getElementById('armTitle')
   const armBody = document.getElementById('armBody')
+  const armIcon = document.getElementById('armIcon')
+  const armList = document.getElementById('armList')
 
   let renderer, scene, camera, stars, starSprite, raf = null, running = false
   let parX = 0, parY = 0
+  /** 0 → far field; 1 → zoomed toward viewer (scroll-driven in the orbit section) */
+  let starZoom = 0
+  let starFieldOpacity = 0
 
   function makeStarTexture() {
     const c = document.createElement('canvas')
@@ -332,30 +383,32 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100)
     camera.position.z = 14
 
-    const N = window.innerWidth < 768 ? 320 : 700
+    const N = window.innerWidth < 768 ? 420 : 900
     const geo = new THREE.BufferGeometry()
     const pos = new Float32Array(N * 3)
     for (let i = 0; i < N; i++) {
-      const r = 6 + Math.random() * 30
+      // spherical-ish cloud so a camera/star zoom reads as flying through space
+      const r = 4 + Math.random() * 36
       const a = Math.random() * Math.PI * 2
-      const z = -Math.random() * 30
-      pos[i * 3]     = Math.cos(a) * r * (0.4 + Math.random() * 0.6)
-      pos[i * 3 + 1] = Math.sin(a) * r * (0.3 + Math.random() * 0.5)
-      pos[i * 3 + 2] = z
+      const elev = (Math.random() - 0.5) * Math.PI * 0.85
+      pos[i * 3]     = Math.cos(a) * Math.cos(elev) * r
+      pos[i * 3 + 1] = Math.sin(elev) * r * 0.72
+      pos[i * 3 + 2] = Math.sin(a) * Math.cos(elev) * r - 8
     }
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3))
     const starTex = makeStarTexture()
     const mat = new THREE.PointsMaterial({
-      size: 0.5, map: starTex, transparent: true, depthWrite: false,
-      blending: THREE.AdditiveBlending, color: 0xcfc6f0, opacity: 0.9,
+      size: 0.42, map: starTex, transparent: true, depthWrite: false,
+      blending: THREE.AdditiveBlending, color: 0xe8e4f8, opacity: 0.95,
+      sizeAttenuation: true,
     })
     stars = new THREE.Points(geo, mat)
     scene.add(stars)
 
     const sMat = new THREE.SpriteMaterial({ map: starTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 1 })
     starSprite = new THREE.Sprite(sMat)
-    starSprite.scale.set(5, 5, 1)
-    starSprite.position.set(0, 0, 2)
+    starSprite.scale.set(4.2, 4.2, 1)
+    starSprite.position.set(0, 0, 1.5)
     scene.add(starSprite)
 
     on(window, 'resize', onResizeThree, { passive: true })
@@ -373,10 +426,28 @@ export default function initFoundry({ base = '/foundry' } = {}) {
   }
   function render() {
     if (!running) return
-    stars.rotation.z += 0.0006
-    camera.position.x += (parX * 1.6 - camera.position.x) * 0.04
-    camera.position.y += (-parY * 1.0 - camera.position.y) * 0.04
+    const z = starZoom
+    // slow drift + scroll zoom: field expands toward the camera
+    stars.rotation.z += 0.00045
+    stars.rotation.y += 0.00018
+    const fieldScale = 1 + z * 2.8
+    stars.scale.setScalar(fieldScale)
+    stars.position.z = z * 14
+    if (stars.material) stars.material.opacity = 0.55 + (1 - z) * 0.4
+
+    // big center star grows / approaches as zoom rises, then softens
+    if (starSprite) {
+      const s = 3.6 + z * 22
+      starSprite.scale.set(s, s, 1)
+      starSprite.position.z = 1.5 + z * 6
+      starSprite.material.opacity = Math.max(0, (0.95 - z * 0.55) * starFieldOpacity)
+    }
+
+    camera.position.z = 14 - z * 9.5
+    camera.position.x += (parX * 1.2 - camera.position.x) * 0.04
+    camera.position.y += (-parY * 0.85 - camera.position.y) * 0.04
     camera.lookAt(0, 0, 0)
+    if (threeCanvas) threeCanvas.style.opacity = String(starFieldOpacity)
     renderer.render(scene, camera)
     raf = requestAnimationFrame(render)
   }
@@ -384,121 +455,471 @@ export default function initFoundry({ base = '/foundry' } = {}) {
   function stopThree() { running = false; if (raf) cancelAnimationFrame(raf); raf = null }
 
   window.PF.onHeroProgress = function (p) {
+    // late hero → threshold: bring the starfield online before the orbit beat
     const a = THREE.MathUtils
-      ? THREE.MathUtils.clamp((p - 0.82) / (0.985 - 0.82), 0, 1)
-      : Math.max(0, Math.min(1, (p - 0.82) / 0.165))
-    threeCanvas.style.opacity = a.toFixed(3)
-    if (a > 0.01) startThree(); else stopThree()
-    if (starSprite) starSprite.material.opacity = 1 - a * 0.15
+      ? THREE.MathUtils.clamp((p - 0.78) / (0.98 - 0.78), 0, 1)
+      : Math.max(0, Math.min(1, (p - 0.78) / 0.20))
+    // once the orbit section owns the zoom, don't fight its opacity
+    if ((window.PF._orbitProgress || 0) < 0.04) {
+      starFieldOpacity = a
+      threeCanvas.style.opacity = starFieldOpacity.toFixed(3)
+      if (a > 0 && starZoom < 0.35) starZoom = a * 0.32
+    }
+    if (a > 0.01 || starFieldOpacity > 0.02) startThree()
+    else stopThree()
   }
 
-  /* ---- ORBIT: build the five arms ---- */
+  /* ---- ORBIT: build the five arms as a segmented glass donut ---- */
   const armNodes = []
   let orbitLayer = null
   let orbitHeading = null
+  let orbitDonut = null
+  let orbitRing = null
+  let orbitMoon = null
+  let orbitSegLines = null
   let orbitFade = 1
   let injectedStyle = null
+  const ORBIT_GAP_DEG = 3.2  // gap between petals (matches Frame reference)
+
+  // recompute donut geometry: clip each petal to an annular sector with rounded
+  // corners, place its icon+label at the segment's mid-radius, size the core.
+  function layoutDonut() {
+    if (!orbitDonut) return
+    const vmin = Math.min(window.innerWidth, window.innerHeight)
+    const w = window.innerWidth
+    // Scale the wheel down so it doesn't dominate the viewport
+    let scale = 0.66
+    if (w <= 640) scale = 0.62
+    else if (w <= 1024) scale = 0.42
+    else if (w < 1100) scale = 0.48
+    else if (w < 1280) scale = 0.56
+    const D = Math.round(vmin * scale)
+    const Ro = D / 2
+    const Ri = Ro * 0.52
+    const cx = Ro, cy = Ro
+    const rc = Ri + (Ro - Ri) * 0.52
+    orbitDonut.style.width = orbitDonut.style.height = D + 'px'
+    if (orbitRing) {
+      orbitRing.style.width = orbitRing.style.height = D + 'px'
+    }
+
+    const n = armNodes.length
+    const seg = 360 / n
+    // -90 puts 0deg at the top; +seg/2 offset leaves a seam at top-center and
+    // seats a full petal at the bottom (matches the reference layout)
+    const rad = (deg) => (deg - 90) * Math.PI / 180
+    const P = (r, a) => [cx + r * Math.cos(a), cy + r * Math.sin(a)]
+    const f = (v) => v.toFixed(1)
+    let linesHTML = ''
+
+    armNodes.forEach(({ el }, i) => {
+      const center = i * seg + seg / 2
+      const a0 = rad(center - seg / 2 + ORBIT_GAP_DEG / 2)
+      const a1 = rad(center + seg / 2 - ORBIT_GAP_DEG / 2)
+      // clip defines the single even segment shape (active fill bleeds to this edge)
+      const RoC = Ro
+      const RiC = Ri
+      const crC = (RoC - RiC) * 0.2
+      const daOC = crC / RoC
+      const daIC = crC / RiC
+      const [oxS, oyS] = P(RoC, a0 + daOC)
+      const [oxE, oyE] = P(RoC, a1 - daOC)
+      const [ixE, iyE] = P(RiC, a1 - daIC)
+      const [ixS, iyS] = P(RiC, a0 + daIC)
+      const [rA1o_x, rA1o_y] = P(RoC - crC, a1)
+      const [rA1i_x, rA1i_y] = P(RiC + crC, a1)
+      const [rA0i_x, rA0i_y] = P(RiC + crC, a0)
+      const [rA0o_x, rA0o_y] = P(RoC - crC, a0)
+      const [coE_x, coE_y] = P(RoC, a1)
+      const [ciE_x, ciE_y] = P(RiC, a1)
+      const [ciS_x, ciS_y] = P(RiC, a0)
+      const [coS_x, coS_y] = P(RoC, a0)
+      const d =
+        `M${f(oxS)} ${f(oyS)} ` +
+        `A${f(RoC)} ${f(RoC)} 0 0 1 ${f(oxE)} ${f(oyE)} ` +
+        `Q${f(coE_x)} ${f(coE_y)} ${f(rA1o_x)} ${f(rA1o_y)} ` +
+        `L${f(rA1i_x)} ${f(rA1i_y)} ` +
+        `Q${f(ciE_x)} ${f(ciE_y)} ${f(ixE)} ${f(iyE)} ` +
+        `A${f(RiC)} ${f(RiC)} 0 0 0 ${f(ixS)} ${f(iyS)} ` +
+        `Q${f(ciS_x)} ${f(ciS_y)} ${f(rA0i_x)} ${f(rA0i_y)} ` +
+        `L${f(rA0o_x)} ${f(rA0o_y)} ` +
+        `Q${f(coS_x)} ${f(coS_y)} ${f(oxS)} ${f(oyS)} Z`
+      el.style.clipPath = `path('${d}')`
+      el.style.webkitClipPath = `path('${d}')`
+      // Active fill is full-bleed inside the clip (no nested card). Only icons need mid-arc placement.
+      const [px, py] = P(rc, rad(center))
+      const content = el.querySelector('.orbit-petal__content')
+      if (content) { content.style.left = px + 'px'; content.style.top = py + 'px' }
+
+      // hairline rim on top of the clipped glass (Frame-accurate)
+      linesHTML += `<path class="orbit-seg-rim" d="${d}" />`
+    })
+    if (orbitSegLines) {
+      orbitSegLines.setAttribute('viewBox', `0 0 ${D} ${D}`)
+      orbitSegLines.setAttribute('width', String(D))
+      orbitSegLines.setAttribute('height', String(D))
+      orbitSegLines.innerHTML = linesHTML
+    }
+
+    const core = orbitDonut.querySelector('.orbit-core')
+    if (core) { const c = Math.round(Ri * 2 * 0.78); core.style.width = core.style.height = c + 'px' }
+
+    // SVG art only fills ~42% of the 2000² box — target visual P ≈ 22% of core
+    if (persistLogo && core) {
+      const corePx = parseFloat(core.style.width) || (Ri * 2 * 0.78)
+      const markPx = Math.max(56, Math.round(corePx * 0.52))
+      persistLogo.dataset.orbitMarkPx = String(markPx)
+    }
+  }
+
   function buildOrbit() {
+    // drop any leftover injected styles / layers from a prior HMR pass
+    document.querySelectorAll('style[data-orbit-styles]').forEach((n) => n.remove())
+    document.querySelectorAll('#orbitLayer').forEach((n) => n.remove())
+
     const wrap = document.createElement('div')
     wrap.id = 'orbitLayer'
-    wrap.style.cssText = 'position:fixed;inset:0;z-index:7;pointer-events:none;will-change:opacity;'
+    // start hidden — the layer is only revealed inside the #orbit section
+    // (opacity is driven by the scroll trigger), so it never bleeds over the hero
+    wrap.style.cssText = 'position:fixed;inset:0;z-index:7;pointer-events:none;will-change:opacity;opacity:0;'
     document.body.appendChild(wrap)
     orbitLayer = wrap
 
+    // charcoal technical backdrop (grid) — stars show through via partial alpha
+    const backdrop = document.createElement('div')
+    backdrop.className = 'orbit-backdrop'
+    wrap.appendChild(backdrop)
+
+    // Group_1 blueprint — two offset circles, axes, square nodes, corner circles
+    const diagram = document.createElement('img')
+    diagram.className = 'orbit-diagram'
+    diagram.src = '/foundry/orbit-diagram.png'
+    diagram.alt = ''
+    diagram.setAttribute('aria-hidden', 'true')
+    diagram.draggable = false
+    wrap.appendChild(diagram)
+
     const heading = document.createElement('div')
     heading.className = 'orbit-heading'
-    heading.innerHTML = '<span class="eyebrow">Five ways we forge</span>'
-    heading.style.cssText = 'position:absolute;top:7vh;left:50%;transform:translateX(-50%);opacity:0;text-align:center;will-change:opacity;'
+    heading.innerHTML =
+      '<span class="orbit-heading__title">Five Ways We Forge</span>' +
+      '<p class="orbit-heading__body">Whether you bring an idea, half a team, or a company already moving, there is a door built for where you stand.</p>'
     wrap.appendChild(heading)
     orbitHeading = heading
 
     const oldEyebrow = document.getElementById('orbitEyebrow')
     if (oldEyebrow && oldEyebrow.parentElement) oldEyebrow.parentElement.style.display = 'none'
 
+    const donut = document.createElement('div')
+    donut.className = 'orbit-donut'
+    donut.id = 'orbitDonut'
+    wrap.appendChild(donut)
+    orbitDonut = donut
+
+    // eclipse moon: exact asset from design — full silver disc + amber corona
+    // rotates as one rigid bitmap so colors/shade never remesh while spinning
+    const core = document.createElement('div')
+    core.className = 'orbit-core'
+    core.innerHTML =
+      '<span class="orbit-core__moon" aria-hidden="true">' +
+        '<img class="orbit-core__eclipse" src="/foundry/orbit-eclipse.png" alt="" draggable="false" />' +
+      '</span>'
+    donut.appendChild(core)
+    orbitMoon = core.querySelector('.orbit-core__moon')
+
+    // spinning ring holds petals + segment strokes so the glass moon can
+    // share the same rotation while the core body and P mark stay put
+    const ring = document.createElement('div')
+    ring.className = 'orbit-ring'
+    donut.appendChild(ring)
+    orbitRing = ring
+
+    // segment border-lines drawn on top of the frosted petals
+    const lines = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    lines.setAttribute('class', 'orbit-seg-lines')
+    ring.appendChild(lines)
+    orbitSegLines = lines
+
+    // line icons drawn to match the reference wheel (thin, rounded strokes)
+    const ICONS = {
+      // Saturn / planet — Studio for Founders
+      founders: '<circle cx="12" cy="12" r="5.4"/><ellipse cx="12" cy="12" rx="10.2" ry="3.7" transform="rotate(-22 12 12)"/>',
+      // stacked layers — Sub Studio Program
+      substudio: '<path d="M12 3.2 3 8l9 4.8L21 8 12 3.2Z"/><path d="M3 12l9 4.8L21 12"/><path d="M3 15.9l9 4.8 9-4.8"/>',
+      // upward rocket — Accelerator
+      accelerator: '<path d="M12 2.8c2.4 3.4 3.6 6.8 3.6 9.6 0 2.6-1.1 4.5-3.6 6-2.5-1.5-3.6-3.4-3.6-6 0-2.8 1.2-6.2 3.6-9.6Z"/><path d="M9.1 14.2 6.2 19.4M14.9 14.2l2.9 5.2"/><path d="M10.4 11h3.2"/><circle cx="12" cy="9.2" r="1.1"/>',
+      // suspension bridge — Co-Founder Bridge
+      cofounder: '<path d="M3 19h18"/><path d="M5 19V8M19 19V8"/><path d="M5 8c4 4.4 10 4.4 14 0"/><path d="M9 19v-4.6M12 19v-6M15 19v-4.6"/>',
+      // buildings — Studio for Companies
+      companies: '<path d="M3 20.5h18"/><path d="M5.5 20.5V8l5-2.6v15.1"/><path d="M10.5 20.5V11l7.9 2.5v7"/><path d="M8 9.2v0M8 12.1v0M14 15v0M14 17.6v0"/>',
+    }
+
     PF_CONFIG.arms.forEach((arm) => {
-      const node = document.createElement('button')
-      node.className = 'orbit-node'
-      node.dataset.id = arm.id
-      node.innerHTML =
-        '<span class="orbit-node__medallion">' +
-          `<img class="orbit-node__icon" src="${base}/icons/${arm.id}.png" alt="" />` +
-          '<span class="orbit-node__dot"></span>' +
-        '</span>' +
-        `<span class="orbit-node__label">${arm.title}</span>`
-      node.style.cssText = [
-        'position:absolute', 'left:50%', 'top:50%', 'transform:translate(-50%,-50%) scale(0.2)',
-        'opacity:0', 'pointer-events:auto', 'background:none', 'border:0', 'cursor:pointer',
-        'display:flex', 'flex-direction:column', 'align-items:center', 'gap:12px',
-        'font-family:var(--pf-mono)', 'font-size:0.66rem', 'letter-spacing:0.18em',
-        'text-transform:uppercase', 'color:var(--pf-ink-soft)', 'white-space:nowrap', 'will-change:transform,opacity',
-      ].join(';')
-      wrap.appendChild(node)
-      armNodes.push({ el: node, arm })
+      const petal = document.createElement('button')
+      petal.className = 'orbit-petal'
+      petal.dataset.id = arm.id
+      const iconSvg = ICONS[arm.id] || ''
+      petal.innerHTML =
+        '<span class="orbit-petal__content">' +
+          `<span class="orbit-petal__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${iconSvg}</svg></span>` +
+          `<span class="orbit-petal__label">${arm.title}</span>` +
+        '</span>'
+      ring.appendChild(petal)
+      armNodes.push({ el: petal, arm, iconSvg })
 
-      const icon = node.querySelector('.orbit-node__icon')
-      const dot = node.querySelector('.orbit-node__dot')
-      icon.addEventListener('load', () => { if (icon.naturalWidth) dot.style.display = 'none' })
-      icon.addEventListener('error', () => { icon.remove() })
-
-      node.addEventListener('mouseenter', () => showArm(arm))
-      node.addEventListener('mouseleave', hideArm)
-      node.addEventListener('focus', () => showArm(arm))
-      node.addEventListener('blur', hideArm)
+      petal.addEventListener('mouseenter', () => showArm(arm, petal))
+      petal.addEventListener('mouseleave', hideArm)
+      petal.addEventListener('focus', () => showArm(arm, petal))
+      petal.addEventListener('blur', hideArm)
     })
 
     const st = document.createElement('style')
+    st.setAttribute('data-orbit-styles', '1')
     st.textContent = `
-      .orbit-node__medallion{position:relative;width:92px;height:92px;border-radius:50%;
-        display:flex;align-items:center;justify-content:center;
-        border:1px solid rgba(233,226,255,0.6);
-        background:radial-gradient(circle at 50% 32%, rgba(185,160,255,0.5), rgba(60,45,105,0.55));
-        box-shadow:0 0 44px rgba(185,160,255,0.55), inset 0 0 26px rgba(185,160,255,0.35);
-        backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
-        transition:transform .4s var(--ease-out),border-color .4s,box-shadow .6s,background .4s;}
-      .orbit-node__icon{width:44px;height:44px;object-fit:contain;
-        filter:drop-shadow(0 0 10px rgba(185,160,255,0.8)) brightness(1.15);}
-      .orbit-node__dot{width:12px;height:12px;border-radius:50%;background:var(--pf-violet-bright);
-        box-shadow:0 0 16px var(--pf-violet);transition:transform .3s var(--ease-out),background .3s;}
-      .orbit-node__label{transition:color .3s;font-size:0.7rem;color:rgba(233,226,255,0.9);
-        text-shadow:0 1px 12px rgba(5,4,11,0.9);}
-      .orbit-node:hover .orbit-node__medallion,.orbit-node:focus-visible .orbit-node__medallion{
-        transform:scale(1.12);border-color:var(--pf-violet);
-        background:radial-gradient(circle at 50% 32%, rgba(120,84,213,0.42), rgba(8,6,16,0.5));
-        box-shadow:0 0 52px rgba(120,84,213,0.6), inset 0 0 28px rgba(120,84,213,0.25);}
-      .orbit-node:hover .orbit-node__dot,.orbit-node:focus-visible .orbit-node__dot{transform:scale(1.4);background:#fff;}
-      .orbit-node:hover .orbit-node__label,.orbit-node:focus-visible .orbit-node__label{color:var(--pf-violet-white);}`
+      /* black field + faint grid — alpha lets the zooming starfield read through */
+      .orbit-backdrop{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:0;
+        will-change:opacity;background-color:rgba(0,0,0,0.78);
+        background-image:
+          linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+        background-size:36px 36px, 36px 36px;
+        background-position:center;}
+      .orbit-diagram{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;
+        opacity:0;will-change:opacity;object-fit:contain;object-position:center;
+        /* viewport-sized Group_1 — faint hairline blueprint behind the wheel */}
+      .orbit-heading{position:absolute;top:clamp(14vh,18vh,20vh);left:clamp(1.5rem,7vw,5.5rem);
+        z-index:4;max-width:min(15rem,18vw);opacity:0;will-change:opacity;
+        display:flex;flex-direction:column;align-items:flex-start;gap:0.95rem;
+        pointer-events:none;}
+      .orbit-heading__title{font-family:'Montserrat',var(--pf-display),system-ui,sans-serif;
+        font-weight:600;font-style:normal;
+        font-size:clamp(1.35rem,2.4vw,32px);line-height:1.2;letter-spacing:-0.04em;
+        color:#ffffff;text-shadow:0 2px 22px rgba(0,0,0,0.85);}
+      .orbit-heading__body{margin:0;font-family:'Montserrat',var(--pf-display),system-ui,sans-serif;
+        font-weight:400;font-style:normal;
+        font-size:clamp(0.88rem,1.15vw,16px);line-height:1.4;letter-spacing:-0.03em;
+        color:rgba(168,172,184,0.72);max-width:22ch;
+        text-shadow:0 1px 14px rgba(0,0,0,0.75);}
+      /* wheel dead-center — primary focal point of the section */
+      .orbit-donut{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+        transform-origin:center;will-change:transform,opacity;pointer-events:none;z-index:2;}
+      .orbit-ring{position:absolute;inset:0;transform-origin:center;
+        will-change:transform;pointer-events:none;}
+      .orbit-core{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+        border-radius:50%;pointer-events:none;z-index:3;overflow:visible;
+        background:#c3c3c3;
+        box-shadow:
+          0 0 0 1px rgba(255,255,255,0.12),
+          0 0 28px 10px rgba(255,255,255,0.14),
+          0 0 56px 18px rgba(255,255,255,0.08),
+          0 0 48px 14px rgba(0,0,0,0.45),
+          0 0 80px 20px rgba(255,200,140,0.1);}
+      .orbit-core__moon{position:absolute;inset:0;border-radius:50%;pointer-events:none;
+        transform-origin:center;will-change:transform;overflow:hidden;}
+      .orbit-core__eclipse{position:absolute;inset:0;width:100%;height:100%;
+        display:block;object-fit:cover;border-radius:50%;pointer-events:none;
+        user-select:none;-webkit-user-drag:none;
+        filter:saturate(0.55) brightness(1.08) contrast(0.94);
+        opacity:0.95;
+        -webkit-mask-image:radial-gradient(circle at 50% 50%,
+          transparent 0%, transparent 28%, rgba(0,0,0,0.3) 38%,
+          rgba(0,0,0,0.85) 50%, #000 60%);
+        mask-image:radial-gradient(circle at 50% 50%,
+          transparent 0%, transparent 28%, rgba(0,0,0,0.3) 38%,
+          rgba(0,0,0,0.85) 50%, #000 60%);}
+      .orbit-petal{position:absolute;inset:0;z-index:1;padding:0;border:0;cursor:pointer;
+        /* idle glass — darker charcoal, frosted so blueprint softens behind */
+        background:linear-gradient(160deg,
+          rgba(48,46,56,0.82) 0%,
+          rgba(32,30,40,0.88) 48%,
+          rgba(22,20,28,0.92) 100%);
+        -webkit-backdrop-filter:blur(16px) saturate(1.2);
+        backdrop-filter:blur(16px) saturate(1.2);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+        /* active purple lives on this same clipped layer — never a full-donut child rect */
+        --orbit-active-fill:radial-gradient(circle at 50% 50%,
+          rgb(18,14,28) 0%,
+          rgb(28,20,48) 28%,
+          rgb(55,36,95) 44%,
+          rgb(105,72,158) 54%,
+          rgb(145,108,190) 60%,
+          rgb(190,168,220) 66%,
+          rgb(235,230,245) 72%,
+          rgb(255,255,255) 78%);
+        filter:none;
+        transition:background .35s var(--ease-out),
+          backdrop-filter .35s var(--ease-out), -webkit-backdrop-filter .35s var(--ease-out);}
+      .orbit-petal:hover,.orbit-petal.is-featured{
+        background:var(--orbit-active-fill);
+        -webkit-backdrop-filter:none;
+        backdrop-filter:none;
+        box-shadow:none;}
+      /* glow on the rim SVG only — filter on the petal uncips and flashes a rectangle */
+      .orbit-seg-lines{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:visible;
+        fill:none;}
+      .orbit-seg-rim{fill:none;stroke:rgba(220,224,234,0.5);stroke-width:1;
+        stroke-linecap:round;stroke-linejoin:round;
+        transition:stroke .35s var(--ease-out), filter .35s var(--ease-out);}
+      .orbit-seg-rim.is-lit{stroke:rgba(235,220,255,0.9);stroke-width:1.15;
+        filter:drop-shadow(0 0 6px rgba(150,110,230,0.85)) drop-shadow(0 0 14px rgba(110,70,200,0.55));}
+      .orbit-petal__content{position:absolute;transform:translate(-50%,-50%);
+        display:flex;flex-direction:column;align-items:center;gap:12px;
+        pointer-events:none;text-align:center;will-change:transform;z-index:3;}
+      .orbit-petal__icon{width:28px;height:28px;display:block;
+        color:rgba(245,245,248,0.95);transition:transform .4s var(--ease-out);}
+      .orbit-petal__icon svg{width:100%;height:100%;display:block;}
+      .orbit-petal:hover .orbit-petal__icon,.orbit-petal.is-featured .orbit-petal__icon{transform:scale(1.1);color:#fff;}
+      .orbit-petal__label{font-family:'Montserrat',var(--pf-display),system-ui,sans-serif;font-weight:400;
+        font-size:clamp(0.72rem,1.05vw,0.95rem);letter-spacing:-0.04em;line-height:1.2;
+        color:rgba(250,250,252,0.96);max-width:10ch;
+        text-shadow:0 1px 10px rgba(0,0,0,0.75);transition:color .3s;}
+      .orbit-petal:hover .orbit-petal__label,.orbit-petal.is-featured .orbit-petal__label{color:#fff;}
+      @media (max-width:1024px){
+        .orbit-heading{
+          left:50%;transform:translateX(-50%);
+          max-width:min(22rem,86vw);top:8vh;
+          align-items:center;text-align:center;
+        }
+        .orbit-heading__title,.orbit-heading__body{text-align:center;}
+        .orbit-heading__body{max-width:32ch;}
+        .orbit-petal__icon{width:22px;height:22px;}
+        .orbit-petal__label{
+          font-size:clamp(0.52rem,1.35vw,0.62rem);
+          line-height:1.15;max-width:9ch;letter-spacing:-0.03em;
+        }
+        .orbit-petal__content{gap:8px;}
+      }
+      @media (max-width:640px){
+        .orbit-heading{
+          left:50%;transform:translateX(-50%);
+          gap:0.7rem;max-width:min(20rem,88vw);
+          align-items:center;text-align:center;
+        }
+        .orbit-heading__title,.orbit-heading__body{text-align:center;}
+        .orbit-heading__body{max-width:28ch;font-size:0.88rem;}
+        .orbit-petal__label{font-size:0.5rem;max-width:8ch;}
+      }`
     document.head.appendChild(st)
     injectedStyle = st
+
+    layoutDonut()
+    on(window, 'resize', layoutDonut, { passive: true })
   }
 
-  function showArm(arm) {
-    armKicker.textContent = 'Persist'
-    armTitle.textContent = arm.title
-    armBody.textContent = arm.body
-    armDetail.classList.add('show')
+  /* ---- ARM detail card: hover-only (bottom-right) ----
+     Details appear only while a segment is hovered/focused. Scroll no longer
+     auto-cycles the panel. */
+  let featuredIndex = -1
+  let hoverActive = false
+  let lastProg = 0
+  let lastOp = 0
+  let swapTO = 0
+  const armContent = document.getElementById('armContent')
+
+  function setCardText(arm, iconSvg) {
+    if (armTitle) armTitle.textContent = arm.title
+    if (armBody) armBody.textContent = arm.body || ''
+    if (armKicker) armKicker.textContent = 'Persist'
+    if (armIcon) {
+      armIcon.innerHTML = iconSvg
+        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${iconSvg}</svg>`
+        : ''
+    }
+    if (armList) {
+      const pts = arm.points || []
+      armList.innerHTML = pts.map((t) => `<li>${t}</li>`).join('')
+      armList.hidden = pts.length === 0
+    }
+  }
+  function setRimLit(nodeEl) {
+    if (!orbitSegLines) return
+    const rims = orbitSegLines.querySelectorAll('.orbit-seg-rim')
+    armNodes.forEach((x, i) => {
+      const rim = rims[i]
+      if (rim) rim.classList.toggle('is-lit', x.el === nodeEl)
+    })
+  }
+  function setNodeFeatured(nodeEl) {
+    armNodes.forEach((x) => x.el.classList.toggle('is-featured', x.el === nodeEl))
+    setRimLit(nodeEl)
+  }
+  function clearCard() {
+    clearTimeout(swapTO)
+    if (!armDetail) return
+    armDetail.classList.remove('show', 'is-swapping')
+    if (armContent) armContent.classList.remove('is-fading')
+    featuredIndex = -1
+    armNodes.forEach((x) => x.el.classList.remove('is-featured'))
+    setRimLit(null)
+  }
+
+  function featureArm(arm, nodeEl, iconSvg, crossfade) {
+    if (!armDetail) return
+    armDetail.style.left = armDetail.style.top = armDetail.style.right =
+      armDetail.style.bottom = armDetail.style.transform = ''
+    armDetail.classList.add('portfolio-detail--anchored')
+    setNodeFeatured(nodeEl)
+    clearTimeout(swapTO)
+
+    const apply = () => {
+      setCardText(arm, iconSvg)
+      armDetail.classList.add('show')
+      armDetail.classList.remove('is-swapping')
+      if (armContent) armContent.classList.remove('is-fading')
+    }
+
+    if (crossfade && armDetail.classList.contains('show')) {
+      if (armContent) armContent.classList.add('is-fading')
+      swapTO = setTimeout(apply, 220)
+    } else {
+      apply()
+    }
+  }
+
+  function showArm(arm, nodeEl) {
+    hoverActive = true
+    const hit = armNodes.find((x) => x.arm === arm) || {}
+    const el = nodeEl || hit.el
+    const idx = armNodes.findIndex((x) => x.arm === arm)
+    featuredIndex = idx
+    featureArm(arm, el, hit.iconSvg || '', false)
   }
   function hideArm() {
-    armDetail.classList.remove('show')
+    hoverActive = false
+    clearCard()
+  }
+
+  // Scroll no longer drives the detail panel — hover/focus only.
+  function updateFeatured(p, op) {
+    lastProg = p
+    lastOp = op
+    if (!hoverActive && (featuredIndex !== -1 || armDetail?.classList.contains('show'))) {
+      clearCard()
+    }
   }
 
   function layoutOrbit(expand, spin, opacity) {
-    const R = Math.min(window.innerWidth, window.innerHeight) * (window.innerWidth < 768 ? 0.34 : 0.26)
-    const n = armNodes.length
+    if (!orbitDonut) return
     const op = (opacity == null) ? (expand < 0.05 ? 0 : Math.min(1, expand * 1.4)) : opacity
-    armNodes.forEach((node, i) => {
-      const ang = (-Math.PI / 2) + (i / n) * Math.PI * 2 + spin
-      const r = R * expand
-      const x = Math.cos(ang) * r
-      const y = Math.sin(ang) * r
-      const s = 0.2 + 0.8 * expand
-      const vis = Math.max(0, op) * orbitFade
-      node.el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${s})`
-      node.el.style.opacity = String(vis)
-      // faded-out nodes must not stay hoverable — their inline
-      // pointer-events:auto otherwise catches hovers over the sections
-      // beneath and pops the detail card from nowhere
-      node.el.style.pointerEvents = vis > 0.35 ? 'auto' : 'none'
+    const vis = Math.max(0, op) * orbitFade
+    // core star + ring scale up together as the zoom settles into the wheel
+    const scale = 0.55 + 0.45 * expand
+    const deg = (spin * 180 / Math.PI)
+    orbitDonut.style.transform = `translate(-50%, -50%) scale(${scale.toFixed(4)})`
+    orbitDonut.style.opacity = String(vis)
+    // spin the petal ring + glass moon together; counter-rotate labels so
+    // they stay upright while the wheel turns
+    if (orbitRing) orbitRing.style.transform = `rotate(${deg.toFixed(3)}deg)`
+    if (orbitMoon) orbitMoon.style.transform = `rotate(${deg.toFixed(3)}deg)`
+    armNodes.forEach(({ el }) => {
+      const content = el.querySelector('.orbit-petal__content')
+      if (content) content.style.transform = `translate(-50%, -50%) rotate(${(-deg).toFixed(3)}deg)`
     })
+    // one pointer-events toggle on the container: petals stay hoverable while
+    // the ring is visible, but a faded ring must not catch hovers over the
+    // sections beneath (which would pop the detail card from nowhere)
+    orbitDonut.style.pointerEvents = vis > 0.35 ? 'auto' : 'none'
+    if (orbitRing) orbitRing.style.pointerEvents = vis > 0.35 ? 'auto' : 'none'
   }
 
   /* ---- LOGO drop + nav glide ---- */
@@ -528,7 +949,12 @@ export default function initFoundry({ base = '/foundry' } = {}) {
   }
   function setLogo(drop, glide) {
     if (!persistLogo) return
-    const baseScale = 0.6 + 0.4 * drop
+    // while centered over the glass orb the mark must read much smaller
+    // than its CSS box — size it from the core diameter (set in layoutDonut)
+    const cssW = persistLogo.offsetWidth || 220
+    const orbitPx = Number(persistLogo.dataset.orbitMarkPx) || Math.round(cssW * 0.42)
+    const orbitScale = orbitPx / cssW
+    const baseScale = orbitScale * (0.82 + 0.18 * drop)
     const scale = baseScale * (1 - glide) + navScale * glide
     const x = navTarget.x * glide
     const y = navTarget.y * glide
@@ -578,14 +1004,19 @@ export default function initFoundry({ base = '/foundry' } = {}) {
     on(window, 'resize', computeNavTarget, { passive: true })
 
     let spin = 0
+    let spinDrift = 0
     let orbitProgress = 0
 
     function ringExpand(p) { return Math.min(1, Math.max(0, p) / 0.30) }
     function ringOpacity(p) {
-      if (p <= 0.14 || p >= 0.92) return 0
+      if (p <= 0.14 || p >= 0.94) return 0
       if (p < 0.30) return (p - 0.14) / 0.16
-      if (p <= 0.66) return 1
-      return 1 - (p - 0.66) / 0.26
+      if (p <= 0.74) return 1
+      return 1 - (p - 0.74) / 0.20
+    }
+    // scroll turns the wheel; a slow drift keeps the moon/segments alive between scrolls
+    function currentSpin() {
+      return orbitProgress * Math.PI * 1.35 + spinDrift
     }
 
     mkTrigger({
@@ -593,8 +1024,16 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       start: 'top 75%',
       end: 'bottom bottom',
       scrub: 0.5,
+      onLeaveBack: () => {
+        // scrolled back up out of the section — fully hide the wheel
+        if (orbitLayer) orbitLayer.style.opacity = '0'
+        clearCard()
+        starZoom = Math.min(starZoom, 0.3)
+      },
       onUpdate: (self) => {
         orbitProgress = self.progress
+        window.PF._orbitProgress = orbitProgress
+        spin = currentSpin()
         const drop = Math.min(1, orbitProgress / 0.26)
         window.PF._logoDrop = drop
         const ex = ringExpand(orbitProgress)
@@ -605,19 +1044,38 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         canvas.style.filter = `brightness(${(1 - drop * 0.55).toFixed(3)})`
         if (window.PF._gliding !== true) setLogo(drop, 0)
         orbitFade = 1
-        if (orbitLayer) orbitLayer.style.opacity = '1'
+        if (orbitLayer) {
+          orbitLayer.style.opacity = op > 0.01 || orbitProgress > 0.02 ? '1' : '0'
+          const bd = orbitLayer.querySelector('.orbit-backdrop')
+          const diag = orbitLayer.querySelector('.orbit-diagram')
+          // grid + diagram ease in as the star zoom settles
+          const uiReveal = Math.min(1, Math.max(0, (orbitProgress - 0.08) / 0.28))
+          if (bd) bd.style.opacity = String(uiReveal * 0.94)
+          // keep blueprint soft / recessed like the Hover_State mock
+          if (diag) diag.style.opacity = String(uiReveal * 0.28)
+        }
         layoutOrbit(ex, spin, op)
-        if (orbitHeading) orbitHeading.style.opacity = String(op)
-        threeCanvas.style.opacity = '1'; startThree()
-        if (starSprite) starSprite.material.opacity = Math.max(0, 0.8 - drop * 0.8)
+        if (orbitHeading) orbitHeading.style.opacity = String(Math.min(1, Math.max(0, (orbitProgress - 0.12) / 0.22)))
+
+        // starfield: zoom out hard as the section opens, keep a soft field behind the grid
+        const zoomT = Math.min(1, orbitProgress / 0.42)
+        // easeOutCubic so the rush happens early then settles
+        starZoom = 1 - Math.pow(1 - zoomT, 3)
+        const holdStars = 0.22 + (1 - Math.min(1, op)) * 0.55
+        starFieldOpacity = Math.max(0.12, holdStars * (0.35 + (1 - zoomT) * 0.65))
+        if (orbitProgress > 0.02) startThree()
+        updateFeatured(orbitProgress, op)
         updateDockNavLock()
       },
     })
 
     if (!reduceMotion) {
       tickerFn = () => {
-        if (running && armNodes.length) {
-          spin += 0.0012
+        // keep the ring + moon turning while the section is in view,
+        // independent of the Three.js starfield render loop
+        if (armNodes.length && orbitProgress > 0.08 && orbitProgress < 0.96) {
+          spinDrift += 0.0012
+          spin = currentSpin()
           const ex = ringExpand(orbitProgress)
           const op = ringOpacity(orbitProgress)
           if (ex > 0.02) layoutOrbit(ex, spin, op)
@@ -641,10 +1099,14 @@ export default function initFoundry({ base = '/foundry' } = {}) {
         // the portfolio renders transparent over the stage now — keep the
         // live starfield at full strength so it runs unbroken from the
         // backstory beat down through the notes section
+        starFieldOpacity = 1
         threeCanvas.style.opacity = '1'
+        if (!running) startThree()
         window.PF._gliding = gRaw > 0.001
         window.PF._glideG = g
         window.PF._glideRaw = gRaw
+        // leaving the orbit for the dock — drop any anchored arm card
+        if (gRaw > 0.02 && !hoverActive && armDetail.classList.contains('show')) clearCard()
         // re-measure the slot mid-glide: its position can shift after load
         // (scrollbar, font swap, nav scrolled-state), and a stale target
         // lands the mark off-center next to the wordmark
@@ -655,27 +1117,26 @@ export default function initFoundry({ base = '/foundry' } = {}) {
       },
     })
 
-    // "What you get" (#offer), the manifesto, and the filter render
-    // transparent over the fixed stage, so keep the live starfield at
-    // full strength across all three
+    // Value props → filter → final CTA stay over the live starfield.
+    // Hold stars at full strength through #apply; ease out only at the
+    // very end of the CTA so the footer can take over.
     mkTrigger({
-      trigger: '#offer',
-      endTrigger: '#filter',
+      trigger: '#valueProps',
+      endTrigger: '#apply',
       start: 'top 70%',
-      end: 'bottom 30%',
+      end: 'bottom 20%',
       scrub: 0.5,
       onUpdate: (self) => {
         const p = self.progress
-        // no fade-in at the top edge — the stars are already at full
-        // strength coming out of the portfolio, so a ramp would dip them
-        // at the seam; only fade out at the bottom into the final CTA
-        const fall = p > 0.94 ? (1 - p) / 0.06 : 1
-        threeCanvas.style.opacity = Math.max(0.05, fall).toFixed(3)
-        // the baked footage (its final frames ARE a starfield) stays dimmed
-        // to 0.45 for the orbit's logo legibility — ease it back up here so
-        // the galaxy actually reads behind these transparent sections
+        // no fade-in at the top edge — stars are already at full strength
+        // coming out of the portfolio; only fade out late into the footer
+        const fall = p > 0.92 ? (1 - p) / 0.08 : 1
+        starFieldOpacity = Math.max(0.08, fall)
+        threeCanvas.style.opacity = starFieldOpacity.toFixed(3)
+        // baked footage stays dimmed for orbit legibility — ease it back up
+        // so the galaxy reads behind these transparent sections
         const rise = Math.min(1, p / 0.15)
-        canvas.style.filter = `brightness(${(0.45 + Math.min(rise, fall) * 0.3).toFixed(3)})`
+        canvas.style.filter = `brightness(${(0.45 + Math.min(rise, fall) * 0.35).toFixed(3)})`
         if (fall > 0.02) startThree()
       },
     })

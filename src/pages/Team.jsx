@@ -2,9 +2,9 @@ import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
 /* ── data (order + copy from persist.org/our-team) ─────────
-   Images left null — upload into /public/assets/ and set `img`.
-   Social slugs preserved where we already had them; others null
-   until LinkedIn/X URLs are confirmed (source page blocks scrapers).
+   Photos live in /public/assets/team/ (B&W filter applied in CSS).
+   LinkedIn slugs synced from persist.org/our-team (members without
+   a LinkedIn link on that page stay null).
    ────────────────────────────────────────────────────────── */
 const TEAM = [
   {
@@ -16,28 +16,20 @@ const TEAM = [
     img: '/assets/jackjay.jpg',
   },
   {
-    name: 'Brock Pierce',
-    role: 'Advisor',
-    bio: 'Brock Pierce, advising at Persist Foundry, blends his cryptocurrency expertise with a futurist and philanthropic vision to drive innovation and impact.',
-    x: 'brockpierce',
-    li: 'brockpierce',
-    img: null,
-  },
-  {
     name: 'Jeremy Gardner',
     role: 'Portfolio Founder',
     bio: 'Adviser at Persist Foundry, enriches our strategies with his pioneering cryptocurrency insights, from founding Augur to early Bitcoin investments, guiding us toward innovative growth.',
     x: 'disruptepreneur',
-    li: 'jeremygardner',
-    img: null,
+    li: 'jg1578',
+    img: '/assets/team/jeremy-gardner.png',
   },
   {
     name: 'Christine Peterson',
     role: 'Advisor',
     bio: 'Chief Strategy Officer at Persist Foundry, former co-founder of the Foresight Institute and originator of "open source," steering us toward innovative futures.',
     x: 'christineapet',
-    li: 'christine-peterson',
-    img: null,
+    li: 'christine-peterson-3b81',
+    img: '/assets/team/christine-peterson.png',
   },
   {
     name: 'Chris Migliano',
@@ -45,23 +37,23 @@ const TEAM = [
     bio: 'Advisor at Persist Ventures, Chris leverages over 20 years in digital advertising, having launched and sold two companies to NASDAQ-listed firms, enriching our strategies with his deep understanding of technology and brands.',
     x: null,
     li: null,
-    img: null,
+    img: '/assets/team/chris-migliano.png',
   },
   {
     name: 'Sydney Thackray',
     role: 'Advisor',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'sydney-thackray-777291282',
+    img: '/assets/team/sydney-thackray.png',
   },
   {
     name: 'Michael Beer',
     role: 'Advisor',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'michaelwbeer',
+    img: '/assets/team/michael-beer.png',
   },
   {
     name: 'Mari Ross',
@@ -69,255 +61,247 @@ const TEAM = [
     bio: null,
     x: null,
     li: null,
-    img: null,
+    img: '/assets/team/mari-ross.png',
   },
   {
     name: 'Court Coursey',
     role: 'Advisor',
     bio: 'Managing Partner at TomorrowVentures, LLC, focusing on strategic investments and innovation in emerging industries.',
     x: null,
-    li: null,
-    img: null,
+    li: 'courtcoursey',
+    img: '/assets/team/court-coursey.png',
   },
   {
     name: 'Bryan Pope',
     role: 'Advisor',
     bio: 'Partner at Edge Healthcare Partners, specializing in healthcare investment banking and strategic advisory services.',
     x: null,
-    li: null,
-    img: null,
+    li: 'bryan-pope-1b08466',
+    img: '/assets/team/bryan-pope.png',
   },
   {
     name: 'Craig Sellars',
     role: 'Investor',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'craigcsellars',
+    img: '/assets/team/craig-sellars.png',
   },
   {
     name: 'Thomas Hessler',
     role: 'Investor',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'thomashessler',
+    img: '/assets/team/thomas-hessler.png',
   },
   {
     name: 'Claire Jing Sui',
     role: 'Investor',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'claire-jing-1a3162248',
+    img: '/assets/team/claire-jing.png',
   },
   {
     name: 'Bhavya Bansal',
     role: 'Chief Technology Officer',
     bio: 'Bhavya, our CTO, seamlessly blends technical expertise with strategic vision, leading our tech-forward approach through innovative thinking.',
     x: null,
-    li: 'bhavya-bansal',
-    img: null,
+    li: 'bhavya-bansal98',
+    img: '/assets/team/bhavya-bansal.png',
   },
   {
     name: 'Muskan Pandey',
     role: 'Head of Operations',
     bio: 'As Head of Operations, Muskan combines sharp operational skills with fresh, innovative thinking reflecting our dedication to new perspectives and the growth of young talent.',
     x: null,
-    li: null,
-    img: null,
+    li: 'muskan-pandey-51a176245',
+    img: '/assets/team/muskan-pandey.png',
   },
   {
     name: 'Yogita Gehani',
     role: 'Operations Manager',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'yogita-gehani',
+    img: '/assets/team/yogita-gehani.png',
   },
   {
     name: 'Pratham Mangla',
     role: 'Head of Project Management',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'pratham-mangla-ba6110237',
+    img: '/assets/team/pratham-mangla.png',
   },
   {
     name: 'Akash Mishra',
     role: 'Chief Design Officer',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'akash-mishra-xd',
+    img: '/assets/team/akash-mishra.png',
   },
   {
     name: 'Michael Dadzie',
     role: 'Head of Mobile Engineering',
     bio: 'Michael, leading mobile engineering at Persist Foundry for three years, blends technical expertise with innovation, driving our mobile solutions to new heights.',
     x: null,
-    li: null,
-    img: null,
+    li: 'michaeldadzie',
+    img: '/assets/team/michael-dadzie.png',
   },
   {
     name: 'Shagun Yadav',
     role: 'Assistant Project Manager',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'shagun-yadav-00b584256',
+    img: '/assets/team/shagun-yadav.png',
   },
   {
     name: 'Mohit Kumar',
     role: 'Creative Solution Manager',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'mohitkhere',
+    img: '/assets/team/mohit-kumar.png',
   },
   {
     name: 'Nayan Patil',
     role: 'CEO, Startupathon',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'nayan-patil-496b28201',
+    img: '/assets/team/nayan-patil.png',
   },
   {
     name: 'Jorge Martín Poza',
     role: 'Co-founder, Palantir For Creators',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'jorgepoza',
+    img: '/assets/team/jorge-martin-poza.png',
   },
   {
     name: 'Onirudda Islam',
     role: 'Co-founder, Meme Mates',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'onirudda-islam',
+    img: '/assets/team/onirudda-islam.png',
   },
   {
     name: 'Felicien Bamporineza',
     role: 'Co-founder, WestX',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'felicien-bamporineza-cfa-54b437186',
+    img: '/assets/team/felicien-bamporineza.png',
   },
   {
     name: 'Kejun (Albert) Ying',
     role: 'Co-founder, Real Estate AI',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'kejun-albert-ying',
+    img: '/assets/team/kejun-ying.png',
   },
   {
     name: 'Ravikiran G',
     role: 'Senior Video Editor',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'ravikiranrk',
+    img: '/assets/team/ravikiran.png',
   },
   {
     name: 'Mohd Adil Sameer',
     role: 'CTO of Facesearch AI',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'adilsameer',
+    img: '/assets/team/adil-sameer.png',
   },
   {
     name: 'Naman Jain',
     role: 'Senior Backend & Web3 Engineer',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'naman-jain-444a3b266',
+    img: '/assets/team/naman-jain.png',
   },
   {
     name: 'Shahdab Malik',
     role: 'Full Stack Developer',
     bio: 'Shahdab, a standout Lead Full Stack Developer, merges technical expertise with forward-looking strategies, showcasing our commitment to innovation and nurturing emerging talent.',
     x: null,
-    li: null,
-    img: null,
+    li: 'shahdab-malik',
+    img: '/assets/team/shahdab-malik.png',
   },
   {
     name: 'Harjobandeep Singh',
     role: 'Co-founder, GIF Studios',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'harjobandeep-singh',
+    img: '/assets/team/harjobandeep-singh.png',
   },
   {
     name: 'Akash Laha',
     role: 'Co-Founder, FaceSearch AI',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'akash-laha-dev',
+    img: '/assets/team/akash-laha.png',
   },
   {
     name: 'Haseeb Zaki',
     role: 'Co-founder, Shorts-lol',
     bio: null,
     x: null,
-    li: null,
-    img: null,
-  },
-  {
-    name: 'JeetKumar Tirpude',
-    role: 'Co-founder, Soulmegle',
-    bio: null,
-    x: null,
-    li: null,
-    img: null,
+    li: 'haseebzaki',
+    img: '/assets/team/haseeb-zaki.png',
   },
   {
     name: 'Vishesh Gupta',
     role: 'Co-founder, Game of Creators',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'vishesh-gupta-a34111209',
+    img: '/assets/team/vishesh-gupta.png',
   },
   {
     name: 'Jatin Sharma',
     role: 'Co-founder, Career Accelerator',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'jatinn-sharmaa',
+    img: '/assets/team/jatin-sharma.png',
   },
   {
     name: 'Ankit Sahal',
     role: 'Co-founder, Career Accelerator',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'ankit-sahal',
+    img: '/assets/team/ankit-sahal.png',
   },
   {
     name: 'Raghavendra Reddy N',
     role: 'Co-Founder, Meme Mates',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'raghavendra-reddy-n-319690221',
+    img: '/assets/team/raghavendra-reddy.png',
   },
   {
     name: 'Nilesh Kumar',
     role: 'Co-founder, Deepvid ai',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'aiwithnilesh',
+    img: '/assets/team/nilesh-kumar.png',
   },
   {
     name: 'Shubham Pawar',
@@ -325,39 +309,39 @@ const TEAM = [
     bio: null,
     x: null,
     li: null,
-    img: null,
+    img: '/assets/team/shubham-pawar.png',
   },
   {
     name: 'Isha Janorkar',
     role: 'Web Developer',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'isha-janorkar-b72500231',
+    img: '/assets/team/isha-janorkar.png',
   },
   {
     name: 'Mian Bilal',
     role: 'Web Developer',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'main-bilal',
+    img: '/assets/team/mian-bilal.png',
   },
   {
     name: 'Mary Rose Fabillar',
     role: 'Webflow Developer',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'mary-rose-fabillar',
+    img: '/assets/team/mary-rose-fabillar.png',
   },
   {
     name: 'Lalit Choudhary',
     role: 'Web Developer',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'lalit-choudhary-7b6653205',
+    img: '/assets/team/lalit-choudhary.png',
   },
   {
     name: 'Mahesh Jadhav',
@@ -365,26 +349,25 @@ const TEAM = [
     bio: null,
     x: null,
     li: null,
-    img: null,
+    img: '/assets/team/mahesh-jadhav.png',
   },
   {
     name: 'Prashasti Randive',
     role: 'Full-stack Developer',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'prashasti-randive-43b269207',
+    img: '/assets/team/prashasti-randive.png',
   },
   {
     name: 'Naval Thanik',
     role: 'Graphic Designer',
     bio: null,
     x: null,
-    li: null,
-    img: null,
+    li: 'navalthanik',
+    img: '/assets/team/naval-thanik.png',
   },
 ]
-
 /* ── icons ───────────────────────────────────────────────── */
 const LiIcon = () => (
   <svg className="tm-ico" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
@@ -413,6 +396,8 @@ function TeamCard({ person, revealDelay }) {
             src={person.img}
             alt={person.name}
             className="tm-portrait-img"
+            loading="lazy"
+            decoding="async"
           />
         )}
         <div className="tm-ph-name">{person.name.split(' ')[0]}</div>
@@ -492,6 +477,7 @@ export default function Team() {
     })
 
     /* scroll reveal */
+    /* scroll-reveal — observe + immediately reveal anything already on-screen */
     const revealEls = document.querySelectorAll('.tm-reveal-el')
     const revealObs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -500,8 +486,17 @@ export default function Team() {
         setTimeout(() => entry.target.classList.add('is-visible'), delay)
         revealObs.unobserve(entry.target)
       })
-    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' })
-    revealEls.forEach(el => revealObs.observe(el))
+    }, { threshold: 0.05, rootMargin: '0px 0px 10% 0px' })
+    revealEls.forEach(el => {
+      const rect = el.getBoundingClientRect()
+      const inView = rect.top < window.innerHeight * 0.95 && rect.bottom > 0
+      if (inView) {
+        const delay = parseInt(el.dataset.delay || '0')
+        setTimeout(() => el.classList.add('is-visible'), delay)
+      } else {
+        revealObs.observe(el)
+      }
+    })
 
     /* progress bar */
     const progressBar = document.getElementById('progress')
