@@ -799,7 +799,8 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         '<path d="M12 3.2 3 8l9 4.8L21 8 12 3.2Z"/><path d="M3 12l9 4.8L21 12"/><path d="M3 15.9l9 4.8 9-4.8"/>',
       // upward rocket — Accelerator
       accelerator:
-        '<path d="M12 2.8c2.4 3.4 3.6 6.8 3.6 9.6 0 2.6-1.1 4.5-3.6 6-2.5-1.5-3.6-3.4-3.6-6 0-2.8 1.2-6.2 3.6-9.6Z"/><path d="M9.1 14.2 6.2 19.4M14.9 14.2l2.9 5.2"/><path d="M10.4 11h3.2"/><circle cx="12" cy="9.2" r="1.1"/>',
+        '<path d="M7 11.2947C12.284 1.44656 18.8635 1.333 21.4928 2.50724C22.667 5.1365 22.5534 11.716 12.7053 17C12.6031 16.4129 12.0352 14.8749 10.5801 13.4199C9.12512 11.9648 7.58712 11.3969 7 11.2947Z" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 16.8C16.0428 17.7334 16.2609 19.4069 16.5439 21C16.5439 21 20.8223 18.0481 18.0856 14" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.19998 10C6.26664 7.95722 4.59305 7.73912 3 7.45614C3 7.45614 5.95194 3.17766 10 5.91444" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.20864 14C5.57675 14.6319 4.50253 16.4644 5.2608 18.7392C7.53562 19.4975 9.36811 18.4233 9.99998 17.7914" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.0953 7.75298C18.0953 6.73278 17.2683 5.90576 16.2481 5.90576C15.2279 5.90576 14.4009 6.73278 14.4009 7.75298C14.4009 8.77317 15.2279 9.6002 16.2481 9.6002C17.2683 9.6002 18.0953 8.77317 18.0953 7.75298Z" stroke="white" stroke-width="1.3"/>',
+
       // suspension bridge — Co-Founder Bridge
       cofounder:
         '<path d="M3 19h18"/><path d="M5 19V8M19 19V8"/><path d="M5 8c4 4.4 10 4.4 14 0"/><path d="M9 19v-4.6M12 19v-6M15 19v-4.6"/>',
