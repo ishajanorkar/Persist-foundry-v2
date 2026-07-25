@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import SixThingsSection from '../components/SixThingsSection'
 
 export default function Home() {
@@ -589,10 +590,10 @@ export default function Home() {
               <span className="word" style={{'--i': 2}}><span><em>yourself.</em></span></span>
             </h1>
             <div className="panel-1-actions">
-              <button className="btn-primary" data-magnetic onClick={() => scrollTo('apply')}>
+              <Link className="btn-primary" data-magnetic to="/fellowship-program-application">
                 Apply for fellowship
                 <svg className="btn-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
+              </Link>
             </div>
             <div className="panel-1-status">
               <span className="strong">Persist</span><br />
@@ -639,10 +640,10 @@ export default function Home() {
               <span className="word" style={{'--i': 10}}><span><em>it.</em></span></span>
             </h2>
             <div className="panel-3-actions">
-              <button className="btn-primary" data-magnetic onClick={() => scrollTo('apply')}>
+              <Link className="btn-primary" data-magnetic to="/fellowship-program-application">
                 Apply for fellowship
                 <svg className="btn-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
+              </Link>
               <button className="btn-ghost" onClick={() => scrollTo('filter')}>
                 See if you fit
                 <svg className="btn-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3l5 5-5 5M3 8h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -1120,14 +1121,18 @@ export default function Home() {
           <p className="final-cta-eyebrow">You've made this bet a thousand times in your head.</p>
 
           {/* apply button */}
-          <button className="final-cta-apply-btn" data-magnetic onClick={() => window.open('mailto:apply@persist.foundry?subject=Foundry%20Cohort%202026', '_blank')}>
+          <Link
+            className="final-cta-apply-btn"
+            data-magnetic
+            to="/fellowship-program-application"
+          >
             Apply
             <span className="final-cta-apply-arr" aria-hidden="true">
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M2 6h8M6 2l4 4-4 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </span>
-          </button>
+          </Link>
 
           <a href="#" className="final-cta-partner">Or talk to a partner first</a>
 

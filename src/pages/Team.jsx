@@ -567,7 +567,7 @@ export default function Team() {
             to build something worth building.
           </p>
           <Link
-            to="/#apply"
+            to="/fellowship-program-application"
             className="tm-join-btn tm-reveal-el"
             data-delay="300"
             data-magnetic

@@ -654,7 +654,7 @@ export default function About() {
           </p>
           <Link
             className="ab-cta__link ab-reveal"
-            to="/#apply"
+            to="/fellowship-program-application"
             data-magnetic
             data-delay="260"
           >

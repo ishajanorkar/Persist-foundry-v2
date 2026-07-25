@@ -41,6 +41,10 @@ function Layout() {
           path="/investor-application"
           element={<ApplicationForm formKey="investor" />}
         />
+        <Route
+          path="/fellowship-program-application"
+          element={<ApplicationForm formKey="fellowship" />}
+        />
       </Routes>
       {!foundryHome && <Footer />}
     </>

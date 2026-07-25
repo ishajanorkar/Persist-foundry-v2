@@ -202,7 +202,12 @@ export default function Navbar() {
 
         {/* RIGHT SIDE */}
         <div className="nav-right">
-          <button className="nav-cta" data-magnetic onClick={() => go("apply")}>
+          <Link
+            className="nav-cta"
+            data-magnetic
+            to="/fellowship-program-application"
+            onClick={closeMobile}
+          >
             Apply For Fellowship
             <svg
               className="nav-cta-arrow"
@@ -218,7 +223,7 @@ export default function Navbar() {
                 strokeLinejoin="round"
               />
             </svg>
-          </button>
+          </Link>
 
           <button
             className={`nav-hamburger${mobileOpen ? " is-open" : ""}`}
@@ -352,10 +357,11 @@ export default function Navbar() {
           })}
         </nav>
 
-        <button
+        <Link
           className={`nav-mobile-cta${mobileOpen ? " is-visible" : ""}`}
           style={{ transitionDelay: mobileOpen ? "360ms" : "0ms" }}
-          onClick={() => go("apply")}
+          to="/fellowship-program-application"
+          onClick={closeMobile}
         >
           Apply For Fellowship
           <svg
@@ -373,7 +379,7 @@ export default function Navbar() {
               strokeLinejoin="round"
             />
           </svg>
-        </button>
+        </Link>
       </div>
 
       {mobileOpen && <div className="nav-backdrop" onClick={closeMobile} />}
