@@ -1,12 +1,12 @@
-import { useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
-import '../foundry/foundry.css'
-import initFoundry from '../foundry/engine'
-import FilterSection from '../components/FilterSection'
-import FinalCtaSection from '../components/FinalCtaSection'
-import Footer from '../components/Footer'
-import ScrollFloat from '../components/ScrollFloat'
-import UnfairStartSection from '../components/UnfairStartSection'
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import "../foundry/foundry.css";
+import initFoundry from "../foundry/engine";
+import FilterSection from "../components/FilterSection";
+import FinalCtaSection from "../components/FinalCtaSection";
+import Footer from "../components/Footer";
+import ScrollFloat from "../components/ScrollFloat";
+import UnfairStartSection from "../components/UnfairStartSection";
 
 /* ============================================================
    PERSIST FOUNDRY — alternative cinematic landing.
@@ -17,73 +17,82 @@ import UnfairStartSection from '../components/UnfairStartSection'
    scroll-track so it paints above the fixed cinematic stage.
    ============================================================ */
 export default function Foundry() {
-  const rootRef = useRef(null)
-  const ctaRevealRef = useRef(null)
-  const asideRevealRef = useRef(null)
+  const rootRef = useRef(null);
+  const ctaRevealRef = useRef(null);
+  const asideRevealRef = useRef(null);
 
   useEffect(() => {
     // useEffect already runs after the DOM is committed/laid out, so the
     // engine can measure the canvas immediately — no rAF defer (a deferred
     // init can get canceled by StrictMode/Fast-Refresh churn before it fires).
-    document.body.classList.add('pf-landing')
-    const cleanup = initFoundry({ base: '/foundry' })
+    document.body.classList.add("pf-landing");
+    const cleanup = initFoundry({ base: "/foundry" });
 
     // Full-viewport sticky cards: pure CSS stack (increasing z-index).
     // No transform recess — next card rises from below and covers the prior one.
-    const stackCards = Array.from(document.querySelectorAll('#pfolioStack .pfolio-card'))
+    const stackCards = Array.from(
+      document.querySelectorAll("#pfolioStack .pfolio-card"),
+    );
     stackCards.forEach((card) => {
-      card.style.transform = ''
-      card.style.filter = ''
-    })
+      card.style.transform = "";
+      card.style.filter = "";
+    });
 
     return () => {
-      cleanup()
-      document.body.classList.remove('pf-landing')
-    }
-  }, [])
+      cleanup();
+      document.body.classList.remove("pf-landing");
+    };
+  }, []);
 
   // Soft line-rise for hero CTA + aside — plays once after loader, after headline starts
   useEffect(() => {
-    const ctaInner = ctaRevealRef.current
-    const asideInner = asideRevealRef.current
-    if (!ctaInner || !asideInner) return
+    const ctaInner = ctaRevealRef.current;
+    const asideInner = asideRevealRef.current;
+    if (!ctaInner || !asideInner) return;
 
-    gsap.set([ctaInner, asideInner], { yPercent: 115, opacity: 0 })
+    gsap.set([ctaInner, asideInner], { yPercent: 115, opacity: 0 });
 
-    let tl = null
-    let played = false
+    let tl = null;
+    let played = false;
     const play = () => {
-      if (played) return
-      played = true
-      tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
-      tl.to(ctaInner, { yPercent: 0, opacity: 1, duration: 0.85 }, 0.5)
-        .to(asideInner, { yPercent: 0, opacity: 1, duration: 0.95 }, 0.72)
-    }
+      if (played) return;
+      played = true;
+      tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl.to(ctaInner, { yPercent: 0, opacity: 1, duration: 0.85 }, 0.5).to(
+        asideInner,
+        { yPercent: 0, opacity: 1, duration: 0.95 },
+        0.72,
+      );
+    };
 
-    const loaderDone = document.querySelector('.pf-loader.done')
-    let fallback = 0
+    const loaderDone = document.querySelector(".pf-loader.done");
+    let fallback = 0;
     if (loaderDone) {
-      play()
+      play();
     } else {
-      document.addEventListener('pf:ready', play, { once: true })
-      fallback = window.setTimeout(play, 2800)
+      document.addEventListener("pf:ready", play, { once: true });
+      fallback = window.setTimeout(play, 2800);
     }
 
     return () => {
-      document.removeEventListener('pf:ready', play)
-      if (fallback) window.clearTimeout(fallback)
-      if (tl) tl.kill()
-      else gsap.killTweensOf([ctaInner, asideInner])
-    }
-  }, [])
+      document.removeEventListener("pf:ready", play);
+      if (fallback) window.clearTimeout(fallback);
+      if (tl) tl.kill();
+      else gsap.killTweensOf([ctaInner, asideInner]);
+    };
+  }, []);
 
   return (
     <div className="pf" ref={rootRef}>
       {/* ===================== LOADER ===================== */}
       <div className="pf-loader" id="loader">
         <div className="loader__mark">Persist</div>
-        <div className="loader__bar"><i id="loaderBar" /></div>
-        <div className="loader__pct" id="loaderPct">000</div>
+        <div className="loader__bar">
+          <i id="loaderBar" />
+        </div>
+        <div className="loader__pct" id="loaderPct">
+          000
+        </div>
       </div>
 
       {/* ===================== FIXED STAGE ===================== */}
@@ -92,7 +101,11 @@ export default function Foundry() {
         <canvas id="three-canvas" />
         <div className="stage-fade" id="stageFade" />
         {/* Covers the baked center flare on Backstory; lifts when Five Ways enters */}
-        <div className="stage-flare-mask" id="stageFlareMask" aria-hidden="true" />
+        <div
+          className="stage-flare-mask"
+          id="stageFlareMask"
+          aria-hidden="true"
+        />
       </div>
 
       {/* persistent Persist mark: center anchor -> glides to nav */}
@@ -102,7 +115,6 @@ export default function Foundry() {
 
       {/* ===================== SCROLL TRACK / BEATS ===================== */}
       <main className="scroll-track" id="scrollTrack">
-
         {/* BEAT 1 — HERO */}
         <section className="beat beat--hero" data-beat="0" id="hero">
           <div className="beat__scrim" />
@@ -128,15 +140,28 @@ export default function Foundry() {
                   data-magnetic
                 >
                   Apply For Fellowship
-                  <svg viewBox="0 0 16 16" fill="none" width="15" height="15" aria-hidden="true">
-                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    width="15"
+                    height="15"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3 8h10M9 4l4 4-4 4"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </a>
               </div>
             </div>
             <p className="hero-aside" data-copy="hero-lead">
               <span ref={asideRevealRef} className="hero-aside-reveal__inner">
-                The rest will follow. Persist forges founders into the companies they were meant to build.
+                The rest will follow. Persist forges founders into the companies
+                they were meant to build.
               </span>
             </p>
           </div>
@@ -149,7 +174,9 @@ export default function Foundry() {
             <div className="lockup">
               <div className="lockup__top">
                 <h2 className="lockup__heading">
-                  Funded by the<br />founders of
+                  Funded by the
+                  <br />
+                  founders of
                 </h2>
                 <div className="lockup__primary">
                   <a
@@ -159,7 +186,12 @@ export default function Foundry() {
                     rel="noopener noreferrer"
                     aria-label="Tether"
                   >
-                    <img className="logo-swap" src="/foundry/logo/tether.png" alt="Tether" data-fallback="tether" />
+                    <img
+                      className="logo-swap"
+                      src="/foundry/logo/tether.png"
+                      alt="Tether"
+                      data-fallback="tether"
+                    />
                   </a>
                 </div>
               </div>
@@ -171,7 +203,12 @@ export default function Foundry() {
                   rel="noopener noreferrer"
                   aria-label="DNA Fund"
                 >
-                  <img className="logo-swap" src="/foundry/logo/dna.png" alt="DNA Fund" data-fallback="DNA" />
+                  <img
+                    className="logo-swap"
+                    src="/foundry/logo/dna.png"
+                    alt="DNA Fund"
+                    data-fallback="DNA"
+                  />
                 </a>
                 <a
                   className="lockup__link"
@@ -180,7 +217,12 @@ export default function Foundry() {
                   rel="noopener noreferrer"
                   aria-label="Blockchain Founders Fund"
                 >
-                  <img className="logo-swap" src="/foundry/logo/bff.png" alt="Blockchain Founders Fund" data-fallback="Blockchain Founders Fund" />
+                  <img
+                    className="logo-swap"
+                    src="/foundry/logo/bff.png"
+                    alt="Blockchain Founders Fund"
+                    data-fallback="Blockchain Founders Fund"
+                  />
                 </a>
                 <a
                   className="lockup__link"
@@ -189,7 +231,12 @@ export default function Foundry() {
                   rel="noopener noreferrer"
                   aria-label="Percival"
                 >
-                  <img className="logo-swap" src="/foundry/logo/percival.png" alt="Percival" data-fallback="PERCIVAL" />
+                  <img
+                    className="logo-swap"
+                    src="/foundry/logo/percival.png"
+                    alt="Percival"
+                    data-fallback="PERCIVAL"
+                  />
                 </a>
                 <a
                   className="lockup__link"
@@ -198,7 +245,12 @@ export default function Foundry() {
                   rel="noopener noreferrer"
                   aria-label="Welara"
                 >
-                  <img className="logo-swap" src="/foundry/logo/welara.png" alt="Welara" data-fallback="Welara" />
+                  <img
+                    className="logo-swap"
+                    src="/foundry/logo/welara.png"
+                    alt="Welara"
+                    data-fallback="Welara"
+                  />
                 </a>
               </div>
             </div>
@@ -208,74 +260,236 @@ export default function Foundry() {
         {/* BEAT 3 — THRESHOLD / BACKSTORY */}
         <section className="beat beat--center" data-beat="2" id="threshold">
           <div className="beat__scrim" />
+          {/* Right-half glass / blur veil behind the stat cards */}
+          <div className="threshold-glass" aria-hidden="true" />
           <div className="beat__inner beat__inner--threshold">
             <div className="threshold-copy">
               <p className="threshold-eyebrow">Backstory</p>
               <h2 className="display display--backstory">
-                Building alongside<br />founders
+                Building alongside
+                <br />
+                founders
               </h2>
               <p className="threshold-body" data-copy="threshold-lead">
-                Started in 2016 to rethink founder support, Persist was inspired by Thiel but open to everyone. It began as a PayPal-to-Ethereum exchange that proved the model. Nine years later, Persist remains founder-first and actively involved, having built thirty companies alongside founders. The right support creates exceptional companies.
+                Started in 2016 to rethink founder support, Persist was inspired
+                by Thiel but open to everyone. It began as a PayPal-to-Ethereum
+                exchange that proved the model. Nine years later, Persist
+                remains founder-first and actively involved, having built thirty
+                companies alongside founders. The right support creates
+                exceptional companies.
               </p>
             </div>
 
-            <div className="threshold-stats" aria-label="Persist by the numbers">
+            <div
+              className="threshold-stats"
+              aria-label="Persist by the numbers"
+            >
               <article className="bcard">
-                <img className="bcard__cross bcard__cross--tl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                <img className="bcard__cross bcard__cross--tr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                <img className="bcard__cross bcard__cross--bl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                <img className="bcard__cross bcard__cross--br" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img
+                  className="bcard__cross bcard__cross--tl"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="bcard__cross bcard__cross--tr"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="bcard__cross bcard__cross--bl"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="bcard__cross bcard__cross--br"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
                 <div className="bcard__label">
-                  <img className="bcard__cross bcard__cross--ml" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                  <img className="bcard__cross bcard__cross--mr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                  Companies<br />launched
+                  <img
+                    className="bcard__cross bcard__cross--ml"
+                    src="/assets/plus-icon.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                  <img
+                    className="bcard__cross bcard__cross--mr"
+                    src="/assets/plus-icon.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                  Companies
+                  <br />
+                  launched
                 </div>
-                <div className="bcard__value"><span className="stat__num">30+</span></div>
+                <div className="bcard__value">
+                  <span className="stat__num">30+</span>
+                </div>
               </article>
               <article className="bcard">
-                <img className="bcard__cross bcard__cross--tl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                <img className="bcard__cross bcard__cross--tr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                <img className="bcard__cross bcard__cross--bl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                <img className="bcard__cross bcard__cross--br" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img
+                  className="bcard__cross bcard__cross--tl"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="bcard__cross bcard__cross--tr"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="bcard__cross bcard__cross--bl"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="bcard__cross bcard__cross--br"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
                 <div className="bcard__label">
-                  <img className="bcard__cross bcard__cross--ml" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                  <img className="bcard__cross bcard__cross--mr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                  Net Asset<br />Value
+                  <img
+                    className="bcard__cross bcard__cross--ml"
+                    src="/assets/plus-icon.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                  <img
+                    className="bcard__cross bcard__cross--mr"
+                    src="/assets/plus-icon.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                  Net Asset
+                  <br />
+                  Value
                 </div>
-                <div className="bcard__value"><span className="stat__num">$117M</span></div>
+                <div className="bcard__value">
+                  <span className="stat__num">$117M</span>
+                </div>
               </article>
               <article className="bcard">
-                <img className="bcard__cross bcard__cross--tl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                <img className="bcard__cross bcard__cross--tr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                <img className="bcard__cross bcard__cross--bl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                <img className="bcard__cross bcard__cross--br" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img
+                  className="bcard__cross bcard__cross--tl"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="bcard__cross bcard__cross--tr"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="bcard__cross bcard__cross--bl"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="bcard__cross bcard__cross--br"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
                 <div className="bcard__label">
-                  <img className="bcard__cross bcard__cross--ml" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                  <img className="bcard__cross bcard__cross--mr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                  Advisor<br />network
+                  <img
+                    className="bcard__cross bcard__cross--ml"
+                    src="/assets/plus-icon.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                  <img
+                    className="bcard__cross bcard__cross--mr"
+                    src="/assets/plus-icon.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                  Advisor
+                  <br />
+                  network
                 </div>
-                <div className="bcard__value"><span className="stat__num">400+</span></div>
+                <div className="bcard__value">
+                  <span className="stat__num">400+</span>
+                </div>
               </article>
               <article className="bcard">
-                <img className="bcard__cross bcard__cross--tl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                <img className="bcard__cross bcard__cross--tr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                <img className="bcard__cross bcard__cross--bl" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                <img className="bcard__cross bcard__cross--br" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
+                <img
+                  className="bcard__cross bcard__cross--tl"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="bcard__cross bcard__cross--tr"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="bcard__cross bcard__cross--bl"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="bcard__cross bcard__cross--br"
+                  src="/assets/plus-icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
                 <div className="bcard__label">
-                  <img className="bcard__cross bcard__cross--ml" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                  <img className="bcard__cross bcard__cross--mr" src="/assets/plus-icon.svg" alt="" aria-hidden="true" />
-                  Portfolio<br />impressions
+                  <img
+                    className="bcard__cross bcard__cross--ml"
+                    src="/assets/plus-icon.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                  <img
+                    className="bcard__cross bcard__cross--mr"
+                    src="/assets/plus-icon.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                  Portfolio
+                  <br />
+                  impressions
                 </div>
-                <div className="bcard__value"><span className="stat__num">67B</span></div>
+                <div className="bcard__value">
+                  <span className="stat__num">67B</span>
+                </div>
               </article>
             </div>
           </div>
         </section>
 
         {/* FINALE SPACER — orbit lives here; extra height so the P-dock can breathe */}
-        <section className="beat beat--center" data-beat="4" id="orbit" style={{ minHeight: '320vh' }}>
-          <div className="beat__inner" style={{ opacity: 1, transform: 'none' }}>
-            <p className="eyebrow" id="orbitEyebrow" style={{ marginTop: '8vh' }}>Five ways we forge</p>
+        <section
+          className="beat beat--center"
+          data-beat="4"
+          id="orbit"
+          style={{ minHeight: "320vh" }}
+        >
+          <div
+            className="beat__inner"
+            style={{ opacity: 1, transform: "none" }}
+          >
+            <p
+              className="eyebrow"
+              id="orbitEyebrow"
+              style={{ marginTop: "8vh" }}
+            >
+              Five ways we forge
+            </p>
           </div>
         </section>
 
@@ -290,7 +504,10 @@ export default function Foundry() {
                 <div className="pfolio__aside-inner">
                   <h2 className="pfolio__title">Turning Ideas Into Impact.</h2>
                   <p className="pfolio__sub">
-                    Discover our diverse range of impactful projects, where collaboration drives success and transforms ideas into results.
+                    Discover our diverse range of impactful projects, featuring
+                    30 successful projects and many more coming soon, where
+                    collaboration drives success and transforms ideas into
+                    results.
                   </p>
                   <a className="pfolio__cta" href="/portfolio">
                     View Portfolio <span aria-hidden="true">↗</span>
@@ -318,7 +535,8 @@ export default function Foundry() {
                     <h3 className="pfolio-card__name">Open Droids</h3>
                     <div className="pfolio-card__meta">
                       <p className="pfolio-card__desc">
-                        Home robots that earn their keep. Built by someone who got tired of waiting for the future to arrive.
+                        Home robots that earn their keep. Built by someone who
+                        got tired of waiting for the future to arrive.
                       </p>
                       <a
                         className="pfolio-card__explore"
@@ -351,7 +569,9 @@ export default function Foundry() {
                     <h3 className="pfolio-card__name">Face Search</h3>
                     <div className="pfolio-card__meta">
                       <p className="pfolio-card__desc">
-                        Find every place your face lives online. Built by someone who couldn&apos;t sleep until the problem was solved.
+                        Find every place your face lives online. Built by
+                        someone who couldn&apos;t sleep until the problem was
+                        solved.
                       </p>
                       <a
                         className="pfolio-card__explore"
@@ -384,7 +604,9 @@ export default function Foundry() {
                     <h3 className="pfolio-card__name">Swissmote</h3>
                     <div className="pfolio-card__meta">
                       <p className="pfolio-card__desc">
-                        Hiring the world&apos;s most overlooked builders. Built by someone who heard &quot;no&quot; so many times he rewrote the rules.
+                        Hiring the world&apos;s most overlooked builders. Built
+                        by someone who heard &quot;no&quot; so many times he
+                        rewrote the rules.
                       </p>
                       <a
                         className="pfolio-card__explore"
@@ -412,13 +634,19 @@ export default function Foundry() {
         <div className="portfolio-detail" id="armDetail">
           <div className="portfolio-detail__content" id="armContent">
             <div className="portfolio-detail__head" id="armHead">
-              <span className="portfolio-detail__icon" id="armIcon" aria-hidden="true" />
+              <span
+                className="portfolio-detail__icon"
+                id="armIcon"
+                aria-hidden="true"
+              />
               <h4 id="armTitle">Accelerator</h4>
             </div>
             <ul className="portfolio-detail__list" id="armList" />
           </div>
           <p id="armBody" hidden />
-          <span className="kicker" id="armKicker" hidden>Persist</span>
+          <span className="kicker" id="armKicker" hidden>
+            Persist
+          </span>
         </div>
 
         {/* FINAL CTA — "Once on paper changes everything." (ported from legacy landing) */}
@@ -429,11 +657,14 @@ export default function Foundry() {
       </main>
 
       {/* scroll cue */}
-      <div className="scroll-cue" id="scrollCue"><span>Scroll</span><span className="scroll-cue__line" /></div>
+      <div className="scroll-cue" id="scrollCue">
+        <span>Scroll</span>
+        <span className="scroll-cue__line" />
+      </div>
 
       {/* custom cursor */}
       <div className="cursor-ring" id="cursorRing" />
       <div className="cursor-dot" id="cursorDot" />
     </div>
-  )
+  );
 }
