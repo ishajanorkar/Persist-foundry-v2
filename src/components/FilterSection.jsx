@@ -1,100 +1,111 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 /* ─────────────────────────────────────────────────────────────
    FILTER — "If You're Still Deciding, This Isn't for You."
    Blueprint twin-column apply / don't-apply panel with deco
-   structures + mouse parallax (same feel as the starfield).
+   structures that drift upward on scroll (vertical parallax),
+   each at a different speed — matching UnfairStartSection.
 ───────────────────────────────────────────────────────────── */
 
 const YES = [
   "You're thinking about it the second you stop talking.",
   "You'll outwork the version of yourself that plays it safe.",
-  'Comfort makes you restless, not reassured.',
+  "Comfort makes you restless, not reassured.",
   'You stopped saying "someday" just about a while ago.',
-]
+];
 
 const NO = [
   "You're here for the cheque, not the work.",
   "You haven't decided what to care about.",
-  'Honest feedback derails your week.',
-  'The title matters more to you than the job does.',
-]
+  "Honest feedback derails your week.",
+  "The title matters more to you than the job does.",
+];
+
+// Total upward drift (px) each deco shape travels as the section
+// passes through the viewport. Different values = different speeds.
+const SCROLL_RANGE_TR = 360;
+const SCROLL_RANGE_BL = 190;
 
 export default function FilterSection() {
-  const sectionRef = useRef(null)
-  const decoTrRef = useRef(null)
-  const decoBlRef = useRef(null)
+  const sectionRef = useRef(null);
+  const decoTrRef = useRef(null);
+  const decoBlRef = useRef(null);
 
   useEffect(() => {
-    const section = sectionRef.current
-    if (!section) return
+    const section = sectionRef.current;
+    if (!section) return;
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     // Section in-view → stagger-reveal points (and head / panel)
-    const sectionObs = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          section.classList.add('is-in-view')
-          sectionObs.disconnect()
-        }
-      })
-    }, { threshold: 0.18 })
-    sectionObs.observe(section)
+    const sectionObs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            section.classList.add("is-in-view");
+            sectionObs.disconnect();
+          }
+        });
+      },
+      { threshold: 0.18 },
+    );
+    sectionObs.observe(section);
 
-    // Mouse parallax on the two background structures
-    let raf = 0
-    let alive = true
-    let active = false
-    let targetX = 0
-    let targetY = 0
-    let curX = 0
-    let curY = 0
-
-    const nearObs = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { active = e.isIntersecting })
-    }, { rootMargin: '20% 0px', threshold: 0 })
-    nearObs.observe(section)
-
-    function onMouse(e) {
-      if (reduceMotion || !active) return
-      targetX = (e.clientX / window.innerWidth - 0.5)
-      targetY = (e.clientY / window.innerHeight - 0.5)
+    if (reduceMotion) {
+      return () => sectionObs.disconnect();
     }
 
-    function tick() {
-      if (!alive) return
-      curX += (targetX - curX) * 0.055
-      curY += (targetY - curY) * 0.055
+    // ---- Scroll parallax: each shape drifts upward at its own speed ----
+    const tweens = [];
 
-      const tr = decoTrRef.current
-      const bl = decoBlRef.current
-      if (tr) {
-        // top-right drifts with the pointer (same bias as star camera)
-        tr.style.transform =
-          `translate3d(${(curX * 28).toFixed(2)}px, ${(curY * 20).toFixed(2)}px, 0)`
-      }
-      if (bl) {
-        // bottom-left counter-moves for depth
-        bl.style.transform =
-          `translate3d(${(curX * -22).toFixed(2)}px, ${(curY * -16).toFixed(2)}px, 0)`
-      }
-      raf = requestAnimationFrame(tick)
+    if (decoTrRef.current) {
+      tweens.push(
+        gsap.to(decoTrRef.current, {
+          y: -SCROLL_RANGE_TR,
+          ease: "none",
+          force3D: true,
+          scrollTrigger: {
+            trigger: section,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1.5,
+            invalidateOnRefresh: true,
+          },
+        }),
+      );
     }
 
-    if (!reduceMotion) {
-      window.addEventListener('mousemove', onMouse, { passive: true })
-      raf = requestAnimationFrame(tick)
+    if (decoBlRef.current) {
+      tweens.push(
+        gsap.to(decoBlRef.current, {
+          y: -SCROLL_RANGE_BL,
+          ease: "none",
+          force3D: true,
+          scrollTrigger: {
+            trigger: section,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        }),
+      );
     }
 
     return () => {
-      alive = false
-      sectionObs.disconnect()
-      nearObs.disconnect()
-      window.removeEventListener('mousemove', onMouse)
-      if (raf) cancelAnimationFrame(raf)
-    }
-  }, [])
+      sectionObs.disconnect();
+      tweens.forEach((tw) => {
+        tw.scrollTrigger?.kill();
+        tw.kill();
+      });
+    };
+  }, []);
 
   return (
     <section className="filter-section" id="filter" ref={sectionRef}>
@@ -123,8 +134,8 @@ export default function FilterSection() {
             This Isn&apos;t for You.
           </h2>
           <p className="filter-headline-sub">
-            This isn&apos;t the place to figure out whether you want to build something.
-            It&apos;s for the people who decided a long time ago.
+            This isn&apos;t the place to figure out whether you want to build
+            something. It&apos;s for the people who decided a long time ago.
           </p>
         </header>
 
@@ -139,16 +150,14 @@ export default function FilterSection() {
           <div className="filter-panel__grid">
             <div className="filter-col filter-col--yes">
               <div className="filter-col-label">
-                <span className="filter-col-icon" aria-hidden="true">✓</span>
+                <span className="filter-col-icon" aria-hidden="true">
+                  ✓
+                </span>
                 Apply if
               </div>
               <ul className="filter-list">
                 {YES.map((text, i) => (
-                  <li
-                    key={text}
-                    className="filter-row"
-                    style={{ '--i': i }}
-                  >
+                  <li key={text} className="filter-row" style={{ "--i": i }}>
                     {text}
                   </li>
                 ))}
@@ -157,16 +166,14 @@ export default function FilterSection() {
 
             <div className="filter-col filter-col--no">
               <div className="filter-col-label">
-                <span className="filter-col-icon" aria-hidden="true">✕</span>
+                <span className="filter-col-icon" aria-hidden="true">
+                  ✕
+                </span>
                 Don&apos;t apply if
               </div>
               <ul className="filter-list">
                 {NO.map((text, i) => (
-                  <li
-                    key={text}
-                    className="filter-row"
-                    style={{ '--i': i }}
-                  >
+                  <li key={text} className="filter-row" style={{ "--i": i }}>
                     {text}
                   </li>
                 ))}
@@ -176,5 +183,5 @@ export default function FilterSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
