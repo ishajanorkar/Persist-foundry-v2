@@ -144,8 +144,8 @@ export default function Footer() {
               aria-label="LinkedIn"
             >
               <svg
-                width="15"
-                height="15"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="currentColor"
               >
@@ -160,8 +160,8 @@ export default function Footer() {
               aria-label="Instagram"
             >
               <svg
-                width="15"
-                height="15"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="currentColor"
               >
@@ -176,8 +176,8 @@ export default function Footer() {
               aria-label="YouTube"
             >
               <svg
-                width="15"
-                height="15"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="currentColor"
               >
