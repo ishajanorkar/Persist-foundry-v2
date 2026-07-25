@@ -44,8 +44,9 @@
 .ap-inner {
   position: relative;
   z-index: 1;
-  max-width: 720px;
+  max-width: 860px;
   margin: 0 auto;
+  margin-top: 90px;
   padding: 0 clamp(1.25rem, 4vw, 2.5rem);
 }
 
@@ -82,13 +83,12 @@
   font-size: clamp(1.75rem, 3.2vw, 2.75rem);
   font-weight: 600;
   line-height: 1.12;
-  letter-spacing: -0.03em;
   color: #fffaf1;
 }
 
 .ap-subtitle {
   margin: 0;
-  max-width: 42ch;
+  max-width: 60ch;
   font-family: "Montserrat", var(--montserrat), sans-serif;
   font-weight: 300;
   font-size: clamp(0.95rem, 1.18vw, 1.1rem);
@@ -106,8 +106,8 @@
 }
 
 .ap-form {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1.35rem;
 }
 
@@ -115,6 +115,19 @@
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
+  grid-column: 1 / -1;
+}
+
+.ap-field--half {
+  grid-column: span 1;
+}
+
+.ap-error {
+  grid-column: 1 / -1;
+}
+
+.ap-submit {
+  grid-column: 1 / -1;
 }
 
 .ap-label {
@@ -285,6 +298,12 @@
   }
   .ap-panel {
     padding: 1.5rem 1.15rem;
+  }
+  .ap-form {
+    grid-template-columns: 1fr;
+  }
+  .ap-field--half {
+    grid-column: 1 / -1;
   }
   .ap-submit {
     font-size: 1rem;

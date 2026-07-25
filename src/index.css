@@ -345,6 +345,7 @@ body::before {
 .nav-dropdown-link {
   display: block;
   padding: 10px 14px;
+  margin: 2px auto;
   border-radius: 10px;
   font-size: 12.5px;
   font-family: var(--sans);
@@ -443,6 +444,7 @@ body::before {
   letter-spacing: 0.01em;
   cursor: none;
   white-space: nowrap;
+  text-decoration: none;
   position: relative;
   overflow: hidden;
   isolation: isolate;
