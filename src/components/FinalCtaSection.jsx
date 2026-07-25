@@ -2,116 +2,60 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 /* ─────────────────────────────────────────────────────────────
-   FINAL CTA — "Once on paper changes everything."
-   Team photo + apply CTA over the live Foundry starfield.
+   FINAL CTA — glass panel: "Once on paper everything changes."
+   Drop final aurora art at /assets/final-cta-bg.png
 ───────────────────────────────────────────────────────────── */
 
 export default function FinalCtaSection() {
   useEffect(() => {
     const finalCta = document.getElementById("apply");
-    const finalHeadline = document.getElementById("finalHeadline");
     if (!finalCta) return;
 
-    let alive = true;
-    const cleanups = [];
-
-    // mouse parallax on the headline
-    if (finalHeadline) {
-      let fX = 0,
-        fY = 0,
-        tX = 0,
-        tY = 0;
-      const onMove = (e) => {
-        const r = finalCta.getBoundingClientRect();
-        tX = (e.clientX - r.left - r.width / 2) / r.width;
-        tY = (e.clientY - r.top - r.height / 2) / r.height;
-      };
-      const onLeave = () => {
-        tX = 0;
-        tY = 0;
-      };
-      finalCta.addEventListener("mousemove", onMove);
-      finalCta.addEventListener("mouseleave", onLeave);
-      cleanups.push(() => {
-        finalCta.removeEventListener("mousemove", onMove);
-        finalCta.removeEventListener("mouseleave", onLeave);
-      });
-      let raf = 0;
-      function animateFinal() {
-        if (!alive) return;
-        fX += (tX - fX) * 0.08;
-        fY += (tY - fY) * 0.08;
-        finalHeadline.style.transform = `translate(${fX * 18}px, ${fY * 10}px)`;
-        raf = requestAnimationFrame(animateFinal);
-      }
-      raf = requestAnimationFrame(animateFinal);
-      cleanups.push(() => cancelAnimationFrame(raf));
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduceMotion) {
+      finalCta.classList.add("is-in-view");
+      return;
     }
 
-    // section reveal
-    const finalCtaObs = new IntersectionObserver(
+    const obs = new IntersectionObserver(
       (entries) => {
-        entries.forEach((e) =>
-          e.target.classList.toggle("is-in-view", e.isIntersecting),
-        );
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          e.target.classList.add("is-in-view");
+          obs.unobserve(e.target);
+        });
       },
-      { threshold: 0.1 },
+      { threshold: 0.18 },
     );
-    finalCtaObs.observe(finalCta);
-    cleanups.push(() => finalCtaObs.disconnect());
-
-    return () => {
-      alive = false;
-      cleanups.forEach((fn) => fn());
-    };
+    obs.observe(finalCta);
+    return () => obs.disconnect();
   }, []);
 
   return (
     <section className="final-cta" id="apply">
-      <div className="final-cta-content">
-        <h2 className="final-cta-hero" id="finalHeadline">
-          <span className="final-cta-hero-line1">Once on paper</span>
-          <span className="final-cta-hero-line2">changes everything.</span>
-        </h2>
-
-        <figure className="final-cta-team">
-          <div className="final-cta-team-frame">
-            <img
-              src="/assets/team-cohort.jpg"
-              alt="The Persist Foundry team"
-              loading="lazy"
-            />
-            <div className="final-cta-team-shade" aria-hidden="true" />
-          </div>
-        </figure>
-
-        <p className="final-cta-eyebrow">
-          You&apos;ve made this bet a thousand times in your head.
-        </p>
-
-        {/* apply button */}
-        <Link
-          className="final-cta-apply-btn"
-          data-magnetic
-          to="/fellowship-program-application"
-        >
-          Apply
-          <span className="final-cta-apply-arr" aria-hidden="true">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path
-                d="M2 6h8M6 2l4 4-4 4"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-        </Link>
-
-        <a href="#" className="final-cta-partner">
-          Or talk to a partner first
-        </a>
+      <div className="final-cta-bg" aria-hidden="true" />
+      <div className="final-cta-panel">
+        <div className="final-cta-panel__bg" aria-hidden="true" />
+        <div className="final-cta-panel__glow" aria-hidden="true" />
+        <div className="final-cta-content">
+          <p className="final-cta-kicker">Now you know us</p>
+          <h2 className="final-cta-hero" id="finalHeadline">
+            <span className="final-cta-hero-line1">Once on paper</span>
+            <span className="final-cta-hero-line2">everything changes.</span>
+          </h2>
+          <p className="final-cta-sub">
+            You&apos;ve made this bet a thousand times in your head.
+          </p>
+          <Link
+            className="final-cta-link"
+            data-magnetic
+            to="/fellowship-program-application"
+          >
+            Become A Founder <span aria-hidden="true">↗</span>
+          </Link>
+        </div>
       </div>
     </section>
   );
