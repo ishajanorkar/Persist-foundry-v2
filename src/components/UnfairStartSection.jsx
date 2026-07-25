@@ -1,93 +1,109 @@
-import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import CornerTicks from "../about/CornerTicks";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
 /* ─────────────────────────────────────────────────────────────
-   UNFAIR START — desktop: one continuous horizontal strip of
-   staggered cards (sticky + 1:1 scrub). Tablet/phone: 2×3 grid.
+   UNFAIR START — vertical parallax columns.
+   Desktop (≥1025px): 3 columns, each scrubbed to a different
+   translateY distance as the section passes through the
+   viewport, so columns visibly drift at different speeds.
+   Tablet/phone: static 2×3 grid (unchanged).
 ───────────────────────────────────────────────────────────── */
 
 const HEADER = {
-  titleLead: 'We Hand Founders',
-  titleTrail: 'An',
-  titleSub: 'Unfair Start.',
-}
+  titleLead: "We Hand Founders",
+  titleTrail: "An",
+  titleSub: "Unfair Start.",
+};
 
-const CARDS = [
-  {
-    title: 'Financial Freedom',
+const CARDS = {
+  financial: {
+    title: "Financial Freedom",
     body: [
-      'Funding and a monthly salary so you can',
-      'build full time from the very first day.',
+      "Funding and a monthly salary so you can",
+      "build full time from the very first day.",
     ],
-    icon: '/foundry/value-props/icon-financial.png',
-    alt: 'Metallic coin with dollar mark',
-    shift: 'up',
+    icon: "/foundry/value-props/icon-financial.png",
+    alt: "Metallic coin with dollar mark",
   },
-  {
-    title: 'Founder Network',
+  network: {
+    title: "Founder Network",
     body: [
-      'A close-knit group of ambitious founders',
-      'building alongside you through every stage.',
+      "A close-knit group of ambitious founders",
+      "building alongside you through every stage.",
     ],
-    icon: '/foundry/value-props/icon-network.png',
-    alt: 'Network pedestal diagram',
-    shift: 'down',
+    icon: "/foundry/value-props/icon-network.png",
+    alt: "Network pedestal diagram",
   },
-  {
-    title: 'Embedded Expertise',
+  expertise: {
+    title: "Embedded Expertise",
     body: [
-      'Builders, designers, and recruiters embedded',
-      'in your venture until it stands on its own.',
+      "Builders, designers, and recruiters embedded",
+      "in your venture until it stands on its own.",
     ],
-    icon: '/foundry/value-props/icon-expertise.png',
-    alt: 'Glowing expertise cube',
-    shift: 'up',
+    icon: "/foundry/value-props/icon-expertise.png",
+    alt: "Glowing expertise cube",
   },
-  {
-    title: 'Proven Mentorship',
+  mentorship: {
+    title: "Proven Mentorship",
     body: [
-      'Experienced founders and operators in your corner',
-      'whenever you need guidance.',
+      "Experienced founders and operators in your corner",
+      "whenever you need guidance.",
     ],
-    icon: '/foundry/value-props/icon-mentorship.png',
-    alt: 'Glass pyramid icon',
-    shift: 'down',
+    icon: "/foundry/value-props/icon-mentorship.png",
+    alt: "Glass pyramid icon",
   },
-  {
-    title: 'Meaningful Connections',
+  connections: {
+    title: "Meaningful Connections",
     body: [
-      'Warm introductions to customers, top talent,',
-      'and investors who boost growth.',
+      "Warm introductions to customers, top talent,",
+      "and investors who boost growth.",
     ],
-    icon: '/foundry/value-props/icon-connections.png',
-    alt: 'Interlocking chain links icon',
-    shift: 'up',
+    icon: "/foundry/value-props/icon-connections.png",
+    alt: "Interlocking chain links icon",
   },
-  {
-    title: 'Long-Term Partnership',
+  partnership: {
+    title: "Long-Term Partnership",
     body: [
-      'Support that continues beyond the first check',
-      'through every raise, pivot, and milestone.',
+      "Support that continues beyond the first check",
+      "through every raise, pivot, and milestone.",
     ],
-    icon: '/foundry/value-props/icon-partnership.png',
-    alt: 'Glass staircase icon',
-    shift: 'down',
+    icon: "/foundry/value-props/icon-partnership.png",
+    alt: "Glass staircase icon",
   },
-]
+};
+
+// Flat order — used for the tablet/phone static grid, left-to-right/top-to-bottom
+const FLAT_ORDER = [
+  "financial",
+  "network",
+  "expertise",
+  "mentorship",
+  "connections",
+  "partnership",
+];
+
+// Column grouping + per-column scroll speed (px of extra translateY across
+// the section's full pass through the viewport). Opposite signs = columns
+// visibly cross each other while scrolling, matching a classic parallax feel.
+const COLUMN_LAYOUT = [
+  { speed: -700, keys: ["financial", "mentorship"] },
+  { speed: -260, keys: ["expertise", "connections"] },
+  { speed: -370, keys: ["network", "partnership"] },
+];
 
 function PropCard({ card }) {
   return (
-    <article className={`vprop-card vprop-card--${card.shift}`}>
+    <article className="vprop-card">
+      <CornerTicks />
       <h3 className="vprop-card__title">{card.title}</h3>
       <div className="vprop-card__icon">
         <img src={card.icon} alt={card.alt} loading="lazy" draggable="false" />
       </div>
       <div className="vprop-card__foot">
-        <span className="vprop-card__cross vprop-card__cross--ml" aria-hidden="true" />
-        <span className="vprop-card__cross vprop-card__cross--mr" aria-hidden="true" />
         <p>
           {card.body.map((line, i) => (
             <span key={i}>
@@ -97,115 +113,102 @@ function PropCard({ card }) {
           ))}
         </p>
       </div>
-      <span className="vprop-card__cross vprop-card__cross--tl" aria-hidden="true" />
-      <span className="vprop-card__cross vprop-card__cross--tr" aria-hidden="true" />
-      <span className="vprop-card__cross vprop-card__cross--bl" aria-hidden="true" />
-      <span className="vprop-card__cross vprop-card__cross--br" aria-hidden="true" />
     </article>
-  )
+  );
 }
 
 export default function UnfairStartSection() {
-  const rootRef = useRef(null)
-  const pinRef = useRef(null)
-  const viewRef = useRef(null)
-  const trackRef = useRef(null)
+  const rootRef = useRef(null);
+  const colRefs = useRef([]);
 
   useEffect(() => {
-    const root = rootRef.current
-    const pin = pinRef.current
-    const view = viewRef.current
-    const track = trackRef.current
-    if (!root || !pin || !view || !track) return
+    const root = rootRef.current;
+    const cols = colRefs.current.filter(Boolean);
+    if (!root || !cols.length) return;
 
-    const mm = gsap.matchMedia()
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const mm = gsap.matchMedia();
 
-    mm.add('(min-width: 1025px)', () => {
-      const getShift = () => Math.max(0, track.scrollWidth - view.clientWidth)
+    if (!prefersReduced) {
+      mm.add("(min-width: 1025px)", () => {
+        const tweens = cols.map((col) => {
+          const speed = parseFloat(col.dataset.speed) || 0;
+          return gsap.to(col, {
+            y: speed,
+            ease: "none",
+            force3D: true,
+            scrollTrigger: {
+              trigger: root,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1.2,
+              invalidateOnRefresh: true,
+            },
+          });
+        });
 
-      const syncRunway = () => {
-        // Extra runway so the horizontal scrub feels smoother / less abrupt
-        root.style.setProperty('--vprop-run', `${Math.round(getShift() * 1.35)}px`)
-      }
+        const onResize = () => ScrollTrigger.refresh();
+        window.addEventListener("resize", onResize);
 
-      syncRunway()
+        return () => {
+          window.removeEventListener("resize", onResize);
+          tweens.forEach((tw) => {
+            tw.scrollTrigger?.kill();
+            tw.kill();
+          });
+          gsap.set(cols, { clearProps: "transform" });
+        };
+      });
+    }
 
-      const tween = gsap.to(track, {
-        x: () => -getShift(),
-        ease: 'none',
-        force3D: true,
-        scrollTrigger: {
-          trigger: root,
-          start: 'top top',
-          end: 'bottom bottom',
-          // Laggy scrub = smoother horizontal follow
-          scrub: 1.35,
-          invalidateOnRefresh: true,
-          onRefresh: syncRunway,
-        },
-      })
-
-      const onResize = () => {
-        syncRunway()
-        ScrollTrigger.refresh()
-      }
-      window.addEventListener('resize', onResize)
-
-      requestAnimationFrame(() => {
-        syncRunway()
-        ScrollTrigger.refresh()
-      })
-
-      return () => {
-        window.removeEventListener('resize', onResize)
-        tween.scrollTrigger?.kill()
-        tween.kill()
-        gsap.set(track, { clearProps: 'transform' })
-        root.style.removeProperty('--vprop-run')
-      }
-    })
-
-    const onRefresh = () => ScrollTrigger.refresh()
-    window.addEventListener('load', onRefresh)
-    if (document.fonts?.ready) document.fonts.ready.then(onRefresh)
+    const onLoad = () => ScrollTrigger.refresh();
+    window.addEventListener("load", onLoad);
+    if (document.fonts?.ready) document.fonts.ready.then(onLoad);
 
     return () => {
-      mm.revert()
-      window.removeEventListener('load', onRefresh)
-    }
-  }, [])
+      mm.revert();
+      window.removeEventListener("load", onLoad);
+    };
+  }, []);
 
   return (
     <section className="vprop" id="valueProps" ref={rootRef}>
-      <div className="vprop__pin" ref={pinRef}>
-        <header className="vprop__head">
-          <h2 className="vprop__title">
-            <span className="vprop__line">
-              <span className="vprop__lead">{HEADER.titleLead}</span>{' '}
-              <span className="vprop__trail">{HEADER.titleTrail}</span>
-            </span>
-            <span className="vprop__sub">{HEADER.titleSub}</span>
-          </h2>
-        </header>
+      <header className="vprop__head">
+        <h2 className="vprop__title">
+          <span className="vprop__line">
+            <span className="vprop__lead">{HEADER.titleLead}</span>{" "}
+            <span className="vprop__trail">{HEADER.titleTrail}</span>
+          </span>
+          <span className="vprop__sub">{HEADER.titleSub}</span>
+        </h2>
+      </header>
 
-        {/* Desktop — continuous staggered strip */}
-        <div className="vprop__viewport" ref={viewRef}>
-          <div className="vprop__track" ref={trackRef}>
-            {CARDS.map((card) => (
-              <PropCard key={card.title} card={card} />
+      {/* Desktop — 3-column vertical parallax */}
+      <div className="vprop__parallax">
+        {COLUMN_LAYOUT.map((col, i) => (
+          <div
+            key={i}
+            className={`vprop__col vprop__col--${i + 1}`}
+            data-speed={col.speed}
+            ref={(el) => (colRefs.current[i] = el)}
+          >
+            {col.keys.map((key) => (
+              <PropCard key={key} card={CARDS[key]} />
             ))}
           </div>
-        </div>
+        ))}
+      </div>
 
-        {/* Tablet / phone — static 2×3 grid */}
-        <div className="vprop__compact">
-          <div className="vprop-grid--flat">
-            {CARDS.map((card) => (
-              <PropCard key={card.title} card={card} />
-            ))}
-          </div>
+      {/* Tablet / phone — static 2×3 grid */}
+      <div className="vprop__compact">
+        <div className="vprop-grid--flat">
+          {FLAT_ORDER.map((key) => (
+            <PropCard key={key} card={CARDS[key]} />
+          ))}
         </div>
       </div>
     </section>
-  )
+  );
 }
