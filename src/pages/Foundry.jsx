@@ -650,10 +650,7 @@ export default function Foundry() {
         </div>
 
         {/* FINAL CTA — "Once on paper changes everything." (ported from legacy landing) */}
-        <FinalCtaSection />
-
-        {/* FOOTER — inside scroll-track so it clears the fixed stage */}
-        <Footer />
+        <FinalCtaSection footer={true} />
       </main>
 
       {/* scroll cue */}
