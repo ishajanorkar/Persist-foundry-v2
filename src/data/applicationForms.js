@@ -162,6 +162,95 @@ export const APPLICATION_FORMS = {
       },
     ],
   },
+
+  fellowship: {
+    formType: 'Fellowship',
+    path: '/fellowship-program-application',
+    title: 'Are you ready to transform your vision into reality?',
+    subtitle:
+      "Persist's fellowship is where we help dreamers dream, by giving them a salary and tons of support to follow their highest goals and mission. Share your vision for the world with us!",
+    sheetTab: 'Fellowship',
+    fields: [
+      {
+        name: 'fullName',
+        label: 'Your full name.',
+        type: 'text',
+        placeholder: 'Full Name',
+        required: true,
+      },
+      {
+        name: 'email',
+        label: 'Email',
+        type: 'email',
+        placeholder: 'xyz@gmail.com',
+        required: true,
+        half: true,
+      },
+      {
+        name: 'portfolio',
+        label: 'Portfolio or online profiles link(if any)',
+        type: 'url',
+        placeholder: 'https://www.linkedin.com/in/',
+        required: false,
+        half: true,
+      },
+      {
+        name: 'idea',
+        label: 'Please provide a concise description of your idea.',
+        type: 'text',
+        placeholder: '',
+        required: true,
+      },
+      {
+        name: 'prototype',
+        label: 'Deployed Link to Your Prototype (if any)',
+        type: 'url',
+        placeholder: 'https://myprototype.com',
+        required: false,
+        half: true,
+      },
+      {
+        name: 'additionalFiles',
+        label: 'Link to Additional Files (if any):',
+        type: 'url',
+        placeholder: 'https://drive.google.com/file/',
+        required: false,
+        half: true,
+      },
+      {
+        name: 'team',
+        label:
+          "Are you working independently or as part of a team? If you're part of a team, how many members are there?",
+        type: 'text',
+        placeholder: '',
+        required: true,
+      },
+      {
+        name: 'cityChallenge',
+        label:
+          'You get dropped in a new city with a laptop, no contacts, and 3 days to make $1,000. What do you do?',
+        type: 'text',
+        placeholder: '',
+        required: true,
+      },
+      {
+        name: 'howFoundUs',
+        label: 'How did you hear about us?',
+        type: 'text',
+        placeholder: '',
+        required: true,
+      },
+      {
+        name: 'loomVideo',
+        label:
+          'Kindly share a Loom video link introducing yourself and your idea.',
+        type: 'url',
+        placeholder: 'https://www.loom.com/',
+        required: true,
+        help: '(Please include your introduction, explain your interest in this fellowship, why you are the ideal candidate, and how your project will create an impact.)',
+      },
+    ],
+  },
 }
 
 export const WORK_WITH_US_LINKS = [

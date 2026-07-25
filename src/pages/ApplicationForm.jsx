@@ -7,6 +7,7 @@ const EYEBROW_BY_KEY = {
   fullTime: "Job Application",
   cofoundathon: "Co-Foundathon",
   investor: "Investor Application",
+  fellowship: "Persist Foundry",
 };
 
 function CornerTicks({ size = 22 }) {
@@ -51,7 +52,7 @@ function CornerTicks({ size = 22 }) {
 
 /**
  * Shared application form page driven by formKey config.
- * Routes: fullTime | cofoundathon | investor
+ * Routes: fullTime | cofoundathon | investor | fellowship
  * Visual language matches About (.ab-*).
  */
 export default function ApplicationForm({ formKey }) {
@@ -167,7 +168,10 @@ export default function ApplicationForm({ formKey }) {
           ) : (
             <form className="ap-form" onSubmit={onSubmit} noValidate>
               {def.fields.map((field) => (
-                <label className="ap-field" key={field.name}>
+                <label
+                  className={`ap-field${field.half ? " ap-field--half" : ""}`}
+                  key={field.name}
+                >
                   <span className="ap-label">{field.label}</span>
                   <input
                     className="ap-input"
