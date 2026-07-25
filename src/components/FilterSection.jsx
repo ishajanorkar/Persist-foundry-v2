@@ -27,8 +27,8 @@ const NO = [
 
 // Total upward drift (px) each deco shape travels as the section
 // passes through the viewport. Different values = different speeds.
-const SCROLL_RANGE_TR = 360;
-const SCROLL_RANGE_BL = 190;
+const SCROLL_RANGE_TR = 560;
+const SCROLL_RANGE_BL = 290;
 
 export default function FilterSection() {
   const sectionRef = useRef(null);
