@@ -6,11 +6,16 @@ import CornerTicks from "../about/CornerTicks";
 gsap.registerPlugin(ScrollTrigger);
 
 /* ─────────────────────────────────────────────────────────────
-   UNFAIR START — vertical parallax columns.
-   Desktop (≥1025px): 3 columns, each scrubbed to a different
-   translateY distance as the section passes through the
-   viewport, so columns visibly drift at different speeds.
-   Tablet/phone: static 2×3 grid (unchanged).
+   UNFAIR START — vertical parallax, all breakpoints.
+   Every card is animated individually (not grouped by column),
+   so the effect still reads as "different speeds" even when the
+   grid collapses to a single column on phones. A small idle CSS
+   bob is layered on top of the scroll-tween for a floating feel.
+
+   Grid reflow (CSS only):
+     Desktop  ≥1025px → 3 columns, middle-column cards offset down
+     Tablet   641–1024px → 2 columns
+     Mobile   ≤640px → 1 column
 ───────────────────────────────────────────────────────────── */
 
 const HEADER = {
@@ -76,24 +81,29 @@ const CARDS = {
   },
 };
 
-// Flat order — used for the tablet/phone static grid, left-to-right/top-to-bottom
-const FLAT_ORDER = [
+// Row-major order — this is also the order CSS Grid lays cards out in,
+// desktop (3-col): row1 financial/expertise/network, row2 mentorship/connections/partnership.
+// Index i below lines up 1:1 with this array for the speed tables.
+const CARD_ORDER = [
   "financial",
-  "network",
   "expertise",
+  "network",
   "mentorship",
   "connections",
   "partnership",
 ];
 
-// Column grouping + per-column scroll speed (px of extra translateY across
-// the section's full pass through the viewport). Opposite signs = columns
-// visibly cross each other while scrolling, matching a classic parallax feel.
-const COLUMN_LAYOUT = [
-  { speed: -700, keys: ["financial", "mentorship"] },
-  { speed: -260, keys: ["expertise", "connections"] },
-  { speed: -370, keys: ["network", "partnership"] },
-];
+// Per-card scroll-parallax distance (px of translateY across the section's
+// full pass through the viewport), indexed to CARD_ORDER, one set per
+// breakpoint. Desktop pairs (0&3, 1&4, 2&5) share a speed so same-column
+// cards still drift together; tablet/mobile vary per-card since columns
+// collapse — that variance is what keeps the "different speed" feel alive
+// even in a single mobile column.
+const SPEEDS = {
+  desktop: [-700, -260, -370, -700, -260, -370],
+  tablet: [-190, -130, -190, -130, -190, -130],
+  mobile: [-70, -95, -60, -100, -75, -90],
+};
 
 function PropCard({ card }) {
   return (
@@ -119,12 +129,12 @@ function PropCard({ card }) {
 
 export default function UnfairStartSection() {
   const rootRef = useRef(null);
-  const colRefs = useRef([]);
+  const cellRefs = useRef([]);
 
   useEffect(() => {
     const root = rootRef.current;
-    const cols = colRefs.current.filter(Boolean);
-    if (!root || !cols.length) return;
+    const cells = cellRefs.current.filter(Boolean);
+    if (!root || !cells.length) return;
 
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -132,35 +142,48 @@ export default function UnfairStartSection() {
     const mm = gsap.matchMedia();
 
     if (!prefersReduced) {
-      mm.add("(min-width: 1025px)", () => {
-        const tweens = cols.map((col) => {
-          const speed = parseFloat(col.dataset.speed) || 0;
-          return gsap.to(col, {
-            y: speed,
-            ease: "none",
-            force3D: true,
-            scrollTrigger: {
-              trigger: root,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 1.2,
-              invalidateOnRefresh: true,
-            },
-          });
-        });
+      mm.add(
+        {
+          isDesktop: "(min-width: 1025px)",
+          isTablet: "(min-width: 641px) and (max-width: 1024px)",
+          isMobile: "(max-width: 640px)",
+        },
+        (context) => {
+          const { isDesktop, isTablet } = context.conditions;
+          const speeds = isDesktop
+            ? SPEEDS.desktop
+            : isTablet
+              ? SPEEDS.tablet
+              : SPEEDS.mobile;
 
-        const onResize = () => ScrollTrigger.refresh();
-        window.addEventListener("resize", onResize);
+          const tweens = cells.map((cell, i) =>
+            gsap.to(cell, {
+              y: speeds[i % speeds.length],
+              ease: "none",
+              force3D: true,
+              scrollTrigger: {
+                trigger: root,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1.2,
+                invalidateOnRefresh: true,
+              },
+            }),
+          );
 
-        return () => {
-          window.removeEventListener("resize", onResize);
-          tweens.forEach((tw) => {
-            tw.scrollTrigger?.kill();
-            tw.kill();
-          });
-          gsap.set(cols, { clearProps: "transform" });
-        };
-      });
+          const onResize = () => ScrollTrigger.refresh();
+          window.addEventListener("resize", onResize);
+
+          return () => {
+            window.removeEventListener("resize", onResize);
+            tweens.forEach((tw) => {
+              tw.scrollTrigger?.kill();
+              tw.kill();
+            });
+            gsap.set(cells, { clearProps: "transform" });
+          };
+        },
+      );
     }
 
     const onLoad = () => ScrollTrigger.refresh();
@@ -185,29 +208,16 @@ export default function UnfairStartSection() {
         </h2>
       </header>
 
-      {/* Desktop — 3-column vertical parallax */}
       <div className="vprop__parallax">
-        {COLUMN_LAYOUT.map((col, i) => (
+        {CARD_ORDER.map((key, i) => (
           <div
-            key={i}
-            className={`vprop__col vprop__col--${i + 1}`}
-            data-speed={col.speed}
-            ref={(el) => (colRefs.current[i] = el)}
+            key={key}
+            className="vprop__cell"
+            ref={(el) => (cellRefs.current[i] = el)}
           >
-            {col.keys.map((key) => (
-              <PropCard key={key} card={CARDS[key]} />
-            ))}
+            <PropCard card={CARDS[key]} />
           </div>
         ))}
-      </div>
-
-      {/* Tablet / phone — static 2×3 grid */}
-      <div className="vprop__compact">
-        <div className="vprop-grid--flat">
-          {FLAT_ORDER.map((key) => (
-            <PropCard key={key} card={CARDS[key]} />
-          ))}
-        </div>
       </div>
     </section>
   );
