@@ -4113,6 +4113,21 @@ body::before {
   backdrop-filter: blur(3px) saturate(60%);
   -webkit-backdrop-filter: blur(3px) saturate(60%);
 }
+@media (max-width: 640px) {
+  .pf-final-cta-container .footer {
+    border-top: none;
+    background: #fff;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(5, 6, 9, 1) 30%,
+      rgba(5, 6, 9, 1) 100%
+    );
+    /* border-top: 1px solid var(--hairline); */
+    backdrop-filter: blur(3px) saturate(60%);
+    -webkit-backdrop-filter: blur(3px) saturate(60%);
+  }
+}
 
 /* top 4-col grid */
 .footer-top {

@@ -2931,7 +2931,7 @@ body.pf-landing .pf ~ .footer {
   pointer-events: none;
 }
 
-/* ---------- Value Props — vertical parallax columns ---------- */
+/* ---------- Value Props — vertical parallax (all breakpoints) ---------- */
 .vprop {
   position: relative;
   z-index: var(--z-overlay);
@@ -2955,7 +2955,7 @@ body.pf-landing .pf ~ .footer {
   font-family: "Montserrat", var(--pf-display), system-ui, sans-serif;
   font-weight: 600;
   font-style: normal;
-  font-size: clamp(2.85rem, 3.5vw, 2.75rem);
+  font-size: clamp(1.85rem, 3.4vw, 2.75rem);
   line-height: 1.22;
   text-align: center;
   text-transform: capitalize;
@@ -2976,35 +2976,51 @@ body.pf-landing .pf ~ .footer {
   color: rgba(210, 214, 224, 0.78);
 }
 
-/* Desktop — 3-column parallax grid */
+/* ---- Grid: mobile-first, 1 column, reflows up at each breakpoint ---- */
 .vprop__parallax {
-  display: none;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2.75rem, 11vw, 3.75rem);
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  align-items: start;
+  box-sizing: border-box;
 }
-@media (min-width: 1025px) {
-  .vprop__parallax {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(2rem, 4vw, 3.75rem);
-    max-width: 1320px;
-    margin: 280px auto 60px auto;
-    padding: 0 var(--gutter);
-    align-items: start;
-    box-sizing: border-box;
-  }
-}
-.vprop__col {
-  /* ~one card tall — leaves a pocket for the neighboring column’s card */
-  --vprop-slot: clamp(40rem, 50vh, 52rem);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(28rem, 34vh, 45rem);
+
+.vprop__cell {
   will-change: transform;
 }
-/* Middle column offset by one slot so cards nest in the outer-column gaps */
-.vprop__col--2 {
-  margin-top: clamp(24rem, 34vh, 42rem);
+
+/* Tablet — 2 columns */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .vprop__parallax {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 46rem;
+    gap: clamp(2rem, 4vw, 3rem);
+    margin-top: clamp(2.5rem, 6vh, 4rem);
+  }
+  /* light stagger so it doesn't read as a flat 2-col grid at rest */
+  .vprop__cell:nth-child(even) {
+    margin-top: clamp(1.75rem, 4vh, 2.75rem);
+  }
+}
+
+/* Desktop — 3 columns, diamond stagger on the middle column */
+@media (min-width: 1025px) {
+  .vprop__parallax {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 1320px;
+    gap: clamp(2rem, 4vw, 3.75rem);
+    margin: 280px auto 60px auto;
+  }
+  /* middle column (2nd & 5th cell, i.e. expertise + connections) sits lower */
+  .vprop__cell:nth-child(2),
+  .vprop__cell:nth-child(5) {
+    margin-top: clamp(3.5rem, 8vh, 6rem);
+  }
 }
 
 @media (max-width: 1280px) and (min-width: 1025px),
@@ -3018,12 +3034,13 @@ body.pf-landing .pf ~ .footer {
   .vprop__parallax {
     gap: clamp(1.5rem, 3vw, 2.5rem);
   }
-  .vprop__col {
-    --vprop-slot: clamp(11rem, 22vh, 15rem);
+  .vprop__cell:nth-child(2),
+  .vprop__cell:nth-child(5) {
+    margin-top: clamp(2rem, 5vh, 3.5rem);
   }
 }
 
-/* ---------- Card (shared between desktop parallax + compact grid) ---------- */
+/* ---------- Card ---------- */
 .vprop-card {
   --vprop-line: rgba(200, 205, 220, 0.55);
   --vprop-cross: 14px;
@@ -3035,13 +3052,37 @@ body.pf-landing .pf ~ .footer {
   gap: 0.8rem;
   margin: 0;
   padding: 1.4rem 0 0;
-  /* box-sizing: border-box; */
   background: rgba(255, 255, 255, 0.07);
   border-width: 1.5px;
   border-style: solid;
   border-color: #fffbf11f;
   overflow: visible;
   backdrop-filter: blur(3px);
+
+  /* idle float — layered on top of the scroll-tween on .vprop__cell */
+  animation: vprop-float 6.5s ease-in-out infinite;
+}
+/* desync the bob per card so it doesn't look like one synced pulse */
+.vprop__cell:nth-child(2n) .vprop-card {
+  animation-duration: 7.4s;
+  animation-delay: -1.6s;
+}
+.vprop__cell:nth-child(3n) .vprop-card {
+  animation-duration: 5.9s;
+  animation-delay: -3.1s;
+}
+.vprop__cell:nth-child(5n) .vprop-card {
+  animation-duration: 8.1s;
+  animation-delay: -2.2s;
+}
+@keyframes vprop-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
 .vprop-card__title {
@@ -3061,12 +3102,12 @@ body.pf-landing .pf ~ .footer {
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: clamp(16rem, 32vh, 22rem);
+  min-height: clamp(9rem, 24vh, 22rem);
   padding: 0.5rem 1.25rem 1rem;
   box-sizing: border-box;
 }
 .vprop-card__icon img {
-  width: clamp(12rem, 20vh, 22rem);
+  width: clamp(6.5rem, 15vh, 22rem);
   height: auto;
   object-fit: contain;
   filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.55));
@@ -3087,116 +3128,43 @@ body.pf-landing .pf ~ .footer {
   margin: 0;
   font-family: "Montserrat", var(--pf-body), system-ui, sans-serif;
   font-weight: 400;
-  font-size: clamp(0.68rem, 0.85vw, 0.78rem);
+  font-size: clamp(0.7rem, 0.85vw, 0.78rem);
   line-height: 1.45;
   color: rgba(220, 224, 235, 0.78);
   text-align: center;
 }
-.vprop-card__cross {
-  position: absolute;
-  width: var(--vprop-cross);
-  height: var(--vprop-cross);
-  pointer-events: none;
-  background:
-    linear-gradient(var(--vprop-line), var(--vprop-line)) center / 100% 1px
-      no-repeat,
-    linear-gradient(var(--vprop-line), var(--vprop-line)) center / 1px 100%
-      no-repeat;
-}
-.vprop-card__cross--tl {
-  top: 0;
-  left: 0;
-  transform: translate(-50%, -50%);
-}
-.vprop-card__cross--tr {
-  top: 0;
-  right: 0;
-  transform: translate(50%, -50%);
-}
-.vprop-card__cross--bl {
-  bottom: 0;
-  left: 0;
-  transform: translate(-50%, 50%);
-}
-.vprop-card__cross--br {
-  bottom: 0;
-  right: 0;
-  transform: translate(50%, 50%);
-}
-.vprop-card__cross--ml {
-  top: 0;
-  left: 0;
-  transform: translate(-50%, -50%);
-}
-.vprop-card__cross--mr {
-  top: 0;
-  left: 100%;
-  transform: translate(-50%, -50%);
+
+@media (min-width: 1025px) {
+  .vprop-card__icon {
+    min-height: clamp(16rem, 32vh, 22rem);
+  }
+  .vprop-card__icon img {
+    width: clamp(12rem, 20vh, 22rem);
+  }
 }
 
-/* Tablet / phone — static 2×3 grid (unchanged behaviour) */
-.vprop__compact {
-  display: none;
-}
-
-@media (max-width: 1024px) {
+@media (max-width: 640px) {
   .vprop__head {
-    padding: clamp(1rem, 3vh, 1.5rem) var(--gutter) 0;
+    padding: clamp(1rem, 4vh, 1.75rem) var(--gutter) clamp(2rem, 6vh, 2.75rem);
   }
-  .vprop__compact {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: clamp(1.5rem, 4vh, 2.25rem);
-    width: 100%;
-    padding: clamp(1.5rem, 4vh, 2.25rem) var(--gutter)
-      clamp(2.5rem, 6vh, 3.5rem);
-    box-sizing: border-box;
+  .vprop-card__title {
+    font-size: clamp(0.78rem, 4vw, 0.95rem);
   }
-  .vprop-grid--flat {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(3, auto);
-    column-gap: clamp(0.85rem, 2.5vw, 1.25rem);
-    row-gap: clamp(0.85rem, 2.5vw, 1.25rem);
-    width: 100%;
-    max-width: 42rem;
-    margin: 0 auto;
+  .vprop-card__icon {
+    min-height: clamp(6.5rem, 22vh, 9rem);
+    padding: 0.35rem 1rem 0.7rem;
   }
-  .vprop-grid--flat > .vprop-card {
-    --vprop-cross: 10px;
-    width: 100%;
-    max-width: none;
-    gap: 0.45rem;
-    padding: 0.85rem 0 0;
+  .vprop-card__icon img {
+    width: clamp(5rem, 17vh, 7rem);
   }
-  .vprop-grid--flat .vprop-card__title {
-    padding: 0 0.7rem;
-    font-size: clamp(0.62rem, 1.5vw, 0.72rem);
-    letter-spacing: 0.08em;
-  }
-  .vprop-grid--flat .vprop-card__icon {
-    min-height: clamp(4.5rem, 12vh, 6rem);
-    padding: 0.2rem 0.7rem 0.45rem;
-  }
-  .vprop-grid--flat .vprop-card__icon img {
-    width: clamp(3.75rem, 9vh, 5rem);
-  }
-  .vprop-grid--flat .vprop-card__foot {
-    padding: 0.5rem 0.65rem 0.6rem;
-  }
-  .vprop-grid--flat .vprop-card__foot p {
-    font-size: clamp(0.58rem, 1.4vw, 0.68rem);
-    line-height: 1.35;
+  .vprop-card__foot p {
+    font-size: clamp(0.66rem, 3vw, 0.74rem);
   }
 }
 
-@media (max-width: 560px) {
-  .vprop-grid--flat {
-    grid-template-columns: 1fr;
-    grid-template-rows: none;
-    max-width: 19rem;
-    row-gap: 1rem;
+@media (prefers-reduced-motion: reduce) {
+  .vprop-card {
+    animation: none;
   }
 }
 
@@ -3724,4 +3692,10 @@ body.pf-landing .pf ~ .footer {
   object-fit: cover;
   object-position: bottom;
   z-index: 5;
+}
+
+@media (max-width: 640px) {
+  .pf-final-cta-background {
+    bottom: 40%;
+  }
 }
