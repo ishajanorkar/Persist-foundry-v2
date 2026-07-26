@@ -127,7 +127,7 @@ export default function Foundry() {
                 animationDuration={1}
                 ease="back.inOut(2)"
                 scrollStart="top bottom"
-                stagger={0.03}
+                stagger={0.02}
                 playOnce
               >
                 Back yourself to win big.
