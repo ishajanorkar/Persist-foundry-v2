@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Footer from "./Footer";
+import "../foundry/foundry.css";
 /* ─────────────────────────────────────────────────────────────
    FINAL CTA — glass panel: "Once on paper everything changes."
-   Drop final aurora art at /assets/final-cta-bg.png
+   Global sitewide CTA (also used on Foundry home with footer).
 ───────────────────────────────────────────────────────────── */
 
-export default function FinalCtaSection({ footer = true }) {
+export default function FinalCtaSection({ footer = false }) {
   useEffect(() => {
     const finalCta = document.getElementById("apply");
     if (!finalCta) return;

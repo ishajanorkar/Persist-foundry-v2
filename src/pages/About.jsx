@@ -103,7 +103,6 @@ const clamp01 = (v) => Math.max(0, Math.min(1, v));
 const smoothstep = (t) => t * t * (3 - 2 * t);
 
 export default function About() {
-  const cursorRafRef = useRef(null);
   const heroRafRef = useRef(null);
   const ctaRafRef = useRef(null);
 
@@ -115,44 +114,6 @@ export default function About() {
     const isMobile = () => window.innerWidth <= 968;
     const cleanups = [];
     const timers = [];
-
-    /* ── CUSTOM CURSOR ─────────────────────────────── */
-    const cursor = document.getElementById("cursor");
-    let cursorX = 0;
-    let cursorY = 0;
-    let targetX = 0;
-    let targetY = 0;
-
-    const trackMouse = (e) => {
-      targetX = e.clientX;
-      targetY = e.clientY;
-    };
-    document.addEventListener("mousemove", trackMouse);
-    cleanups.push(() => document.removeEventListener("mousemove", trackMouse));
-
-    const tickCursor = () => {
-      cursorX += (targetX - cursorX) * 0.18;
-      cursorY += (targetY - cursorY) * 0.18;
-      if (cursor) {
-        cursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`;
-      }
-      cursorRafRef.current = requestAnimationFrame(tickCursor);
-    };
-    cursorRafRef.current = requestAnimationFrame(tickCursor);
-    cleanups.push(() => {
-      if (cursorRafRef.current) cancelAnimationFrame(cursorRafRef.current);
-    });
-
-    document.querySelectorAll("a, button").forEach((el) => {
-      const enter = () => cursor?.classList.add("is-hover");
-      const leave = () => cursor?.classList.remove("is-hover");
-      el.addEventListener("mouseenter", enter);
-      el.addEventListener("mouseleave", leave);
-      cleanups.push(() => {
-        el.removeEventListener("mouseenter", enter);
-        el.removeEventListener("mouseleave", leave);
-      });
-    });
 
     /* ── MAGNETIC BUTTONS ──────────────────────────── */
     document.querySelectorAll("[data-magnetic]").forEach((btn) => {
@@ -413,7 +374,6 @@ export default function About() {
 
   return (
     <>
-      <div className="cursor" id="cursor" />
       <div className="progress" id="progress" />
 
       {/* ═══════════════ HERO ═══════════════
@@ -637,29 +597,6 @@ export default function About() {
             the world was about to miss, one bet at a time, for as long as it
             takes.
           </p>
-        </div>
-      </section>
-
-      {/* ═══════════════ FINAL CTA ═══════════════ */}
-      <section className="ab-cta" id="cta">
-        <div className="ab-cta__inner">
-          <p className="ab-eyebrow ab-reveal" data-delay="0">
-            NOW YOU KNOW US
-          </p>
-          <h2 className="ab-cta__headline ab-reveal" data-delay="100">
-            So, are you one of us?
-          </h2>
-          <p className="ab-cta__body ab-reveal" data-delay="180">
-            If any of this sounded like you, you already have your answer.
-          </p>
-          <Link
-            className="ab-cta__link ab-reveal"
-            to="/fellowship-program-application"
-            data-magnetic
-            data-delay="260"
-          >
-            Become A Founder <span aria-hidden="true">↗</span>
-          </Link>
         </div>
       </section>
     </>

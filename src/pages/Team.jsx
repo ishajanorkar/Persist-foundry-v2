@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 /* ── data (order + copy from persist.org/our-team) ─────────
@@ -443,29 +443,8 @@ function TeamCard({ person, revealDelay }) {
 
 /* ── page ────────────────────────────────────────────────── */
 export default function Team() {
-  const cursorRafRef = useRef(null)
-
   useEffect(() => {
     document.body.classList.add('is-loaded')
-
-    /* custom cursor */
-    const cursor = document.getElementById('cursor')
-    let cursorX = 0, cursorY = 0, targetX = 0, targetY = 0
-    const trackMouse = (e) => { targetX = e.clientX; targetY = e.clientY }
-    document.addEventListener('mousemove', trackMouse)
-    const tickCursor = () => {
-      cursorX += (targetX - cursorX) * 0.18
-      cursorY += (targetY - cursorY) * 0.18
-      if (cursor) cursor.style.transform = `translate(${cursorX}px,${cursorY}px) translate(-50%,-50%)`
-      cursorRafRef.current = requestAnimationFrame(tickCursor)
-    }
-    cursorRafRef.current = requestAnimationFrame(tickCursor)
-
-    /* cursor hover swell */
-    document.querySelectorAll('a, button, .tm-card').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor?.classList.add('is-hover'))
-      el.addEventListener('mouseleave', () => cursor?.classList.remove('is-hover'))
-    })
 
     /* magnetic buttons */
     document.querySelectorAll('[data-magnetic]').forEach(btn => {
@@ -508,16 +487,13 @@ export default function Team() {
     updateProgress()
 
     return () => {
-      document.removeEventListener('mousemove', trackMouse)
       window.removeEventListener('scroll', updateProgress)
-      if (cursorRafRef.current) cancelAnimationFrame(cursorRafRef.current)
       revealObs.disconnect()
     }
   }, [])
 
   return (
     <>
-      <div className="cursor" id="cursor"></div>
       <div className="progress" id="progress"></div>
 
       {/* ════════════════════════════════════════════

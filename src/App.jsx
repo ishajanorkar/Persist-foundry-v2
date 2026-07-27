@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
+import CustomCursor from './components/CustomCursor'
+import FinalCtaSection from './components/FinalCtaSection'
 import Home from './pages/Home'
 import Foundry from './pages/Foundry'
 import About from './pages/About'
@@ -14,11 +16,12 @@ import ApplicationForm from './pages/ApplicationForm'
 
 function Layout() {
   const { pathname } = useLocation()
-  // Foundry home embeds the footer inside its scroll-track so it sits
-  // above the fixed cinematic stage. Other routes use the shared one.
+  // Foundry embeds CTA+footer in its scroll track; legacy home has its own CTA.
   const foundryHome = pathname === '/'
+  const showGlobalCta = pathname !== '/' && pathname !== '/legacy'
   return (
     <>
+      <CustomCursor />
       <Navbar />
       <Routes>
         <Route path="/" element={<Foundry />} />
@@ -46,6 +49,7 @@ function Layout() {
           element={<ApplicationForm formKey="fellowship" />}
         />
       </Routes>
+      {showGlobalCta && <FinalCtaSection footer={false} />}
       {!foundryHome && <Footer />}
     </>
   )

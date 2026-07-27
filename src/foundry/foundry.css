@@ -2114,35 +2114,15 @@ body.pf-landing ::selection {
   }
 }
 
-/* ---------- Custom cursor (desktop, subtle) ---------- */
-.cursor-dot {
+/* ---------- FollowCursor — soft lagging brand dot ---------- */
+.cursor-canvas {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: var(--z-cursor);
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--pf-violet-white);
   pointer-events: none;
-  transform: translate(-50%, -50%);
-  mix-blend-mode: screen;
-  transition:
-    width 0.25s var(--ease-out),
-    height 0.25s var(--ease-out),
-    background 0.25s;
-}
-.cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: var(--z-cursor);
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid rgba(184, 160, 255, 0.4);
-  pointer-events: none;
-  transform: translate(-50%, -50%);
+  display: block;
 }
 
 /* ---------- Loader ---------- */
@@ -2661,12 +2641,12 @@ body.pf-landing ::selection {
 .pf .st-ghost {
   font-weight: 300;
 }
-.pf .final-cta-hero {
+.pf-final-cta-container .final-cta-hero {
   font-size: clamp(2rem, 4.5vw, 3.5rem);
 }
 
 /* Final CTA — glass card panel over the Foundry stage */
-.pf .final-cta {
+.pf-final-cta-container .final-cta {
   position: relative;
   z-index: var(--z-overlay);
   /* background: url("/assets/cta.png"); */
@@ -2680,10 +2660,10 @@ body.pf-landing ::selection {
   justify-content: center;
   align-items: center;
   text-align: center;
-  cursor: auto;
+  cursor: none;
   overflow: visible;
 }
-.pf .final-cta-bg {
+.pf-final-cta-container .final-cta-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -2692,21 +2672,21 @@ body.pf-landing ::selection {
   backdrop-filter: blur(3px) saturate(60%);
   -webkit-backdrop-filter: blur(3px) saturate(60%);
 }
-.pf .final-cta-grid-bg,
-.pf .final-cta-watermark,
-.pf .final-cta-noise,
-.pf .final-cta-vignette,
-.pf .final-cta-cohort,
-.pf .final-cta-team,
-.pf .final-cta-team-cap,
-.pf .final-cta-stats,
-.pf .final-cta-eyebrow,
-.pf .final-cta-apply-btn,
-.pf .final-cta-partner {
+.pf-final-cta-container .final-cta-grid-bg,
+.pf-final-cta-container .final-cta-watermark,
+.pf-final-cta-container .final-cta-noise,
+.pf-final-cta-container .final-cta-vignette,
+.pf-final-cta-container .final-cta-cohort,
+.pf-final-cta-container .final-cta-team,
+.pf-final-cta-container .final-cta-team-cap,
+.pf-final-cta-container .final-cta-stats,
+.pf-final-cta-container .final-cta-eyebrow,
+.pf-final-cta-container .final-cta-apply-btn,
+.pf-final-cta-container .final-cta-partner {
   display: none !important;
 }
 
-.pf .final-cta-panel {
+.pf-final-cta-container .final-cta-panel {
   position: relative;
   width: 100%;
   max-width: min(1320px, 100%);
@@ -2721,14 +2701,14 @@ body.pf-landing ::selection {
 }
 
 /* Placeholder aurora — swap file at /public/assets/final-cta-bg.png */
-.pf .final-cta-panel__bg {
+.pf-final-cta-container .final-cta-panel__bg {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
 }
 
-.pf .final-cta-panel__glow {
+.pf-final-cta-container .final-cta-panel__glow {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -2747,7 +2727,7 @@ body.pf-landing ::selection {
     );
 }
 
-.pf .final-cta-content {
+.pf-final-cta-container .final-cta-content {
   position: relative;
   z-index: 2;
   display: flex;
@@ -2762,7 +2742,7 @@ body.pf-landing ::selection {
   text-align: center;
 }
 
-.pf .final-cta-kicker {
+.pf-final-cta-container .final-cta-kicker {
   margin: 0 0 clamp(1.1rem, 2.2vh, 1.5rem);
   font-family: "Montserrat", var(--pf-display), system-ui, sans-serif;
   font-weight: 500;
@@ -2772,7 +2752,7 @@ body.pf-landing ::selection {
   color: rgba(210, 200, 235, 0.72);
 }
 
-.pf .final-cta-hero {
+.pf-final-cta-container .final-cta-hero {
   margin: 0;
   font-family: "Montserrat", var(--pf-display), system-ui, sans-serif;
   font-weight: 600;
@@ -2784,17 +2764,17 @@ body.pf-landing ::selection {
   max-width: 16ch;
   text-shadow: 0 0 48px rgba(4, 3, 10, 0.55);
 }
-.pf .final-cta-hero-line1,
-.pf .final-cta-hero-line2 {
+.pf-final-cta-container .final-cta-hero-line1,
+.pf-final-cta-container .final-cta-hero-line2 {
   display: block;
   color: #ffffff;
   font-style: normal;
 }
-.pf .final-cta-hero-line2 {
+.pf-final-cta-container .final-cta-hero-line2 {
   margin-top: 0.02em;
 }
 
-.pf .final-cta-sub {
+.pf-final-cta-container .final-cta-sub {
   margin: clamp(1.15rem, 2.4vh, 1.65rem) 0 0;
   max-width: 36ch;
   font-family: "Montserrat", var(--pf-body), system-ui, sans-serif;
@@ -2804,7 +2784,7 @@ body.pf-landing ::selection {
   color: rgba(210, 200, 230, 0.72);
 }
 
-.pf .final-cta-link {
+.pf-final-cta-container .final-cta-link {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -2821,51 +2801,51 @@ body.pf-landing ::selection {
     color 0.3s ease,
     border-color 0.3s ease;
 }
-.pf .final-cta-link:hover {
+.pf-final-cta-container .final-cta-link:hover {
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.9);
 }
-.pf .final-cta-link span {
+.pf-final-cta-container .final-cta-link span {
   font-size: 0.95em;
   line-height: 1;
 }
 
 /* Soft staggered reveal */
-.pf .final-cta-kicker,
-.pf .final-cta-hero,
-.pf .final-cta-sub,
-.pf .final-cta-link {
+.pf-final-cta-container .final-cta-kicker,
+.pf-final-cta-container .final-cta-hero,
+.pf-final-cta-container .final-cta-sub,
+.pf-final-cta-container .final-cta-link {
   opacity: 0;
   transform: translateY(18px);
   transition:
     opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.pf .final-cta.is-in-view .final-cta-kicker {
+.pf-final-cta-container .final-cta.is-in-view .final-cta-kicker {
   opacity: 1;
   transform: none;
   transition-delay: 0.05s;
 }
-.pf .final-cta.is-in-view .final-cta-hero {
+.pf-final-cta-container .final-cta.is-in-view .final-cta-hero {
   opacity: 1;
   transform: none;
   transition-delay: 0.16s;
 }
-.pf .final-cta.is-in-view .final-cta-sub {
+.pf-final-cta-container .final-cta.is-in-view .final-cta-sub {
   opacity: 1;
   transform: none;
   transition-delay: 0.28s;
 }
-.pf .final-cta.is-in-view .final-cta-link {
+.pf-final-cta-container .final-cta.is-in-view .final-cta-link {
   opacity: 1;
   transform: none;
   transition-delay: 0.4s;
 }
 @media (prefers-reduced-motion: reduce) {
-  .pf .final-cta-kicker,
-  .pf .final-cta-hero,
-  .pf .final-cta-sub,
-  .pf .final-cta-link {
+  .pf-final-cta-container .final-cta-kicker,
+  .pf-final-cta-container .final-cta-hero,
+  .pf-final-cta-container .final-cta-sub,
+  .pf-final-cta-container .final-cta-link {
     opacity: 1;
     transform: none;
     transition: none;
@@ -2873,17 +2853,17 @@ body.pf-landing ::selection {
 }
 
 @media (max-width: 720px) {
-  .pf .final-cta {
+  .pf-final-cta-container .final-cta {
     padding: clamp(3rem, 6vh, 4rem) clamp(1rem, 4vw, 1.25rem)
       clamp(3.5rem, 8vh, 5rem);
   }
-  .pf .final-cta-panel {
+  .pf-final-cta-container .final-cta-panel {
     border-radius: 20px;
   }
-  .pf .final-cta-content {
+  .pf-final-cta-container .final-cta-content {
     padding: clamp(3rem, 8vh, 4.5rem) clamp(1.15rem, 4vw, 1.75rem);
   }
-  .pf .final-cta-hero {
+  .pf-final-cta-container .final-cta-hero {
     max-width: 12ch;
   }
 }
@@ -3504,8 +3484,7 @@ body.pf-landing .pf ~ .footer {
 /* ---------- Reduced motion + mobile ---------- */
 @media (prefers-reduced-motion: reduce) {
   .pf .scroll-cue,
-  .pf .cursor-dot,
-  .pf .cursor-ring {
+  .pf .cursor-canvas {
     display: none;
   }
   .pf * {
@@ -3534,8 +3513,7 @@ body.pf-landing .pf ~ .footer {
   .lead {
     font-size: 1.02rem;
   }
-  .cursor-dot,
-  .cursor-ring {
+  .cursor-canvas {
     display: none;
   }
   .beat {
@@ -3681,6 +3659,7 @@ body.pf-landing .pf ~ .footer {
 .pf-final-cta-container {
   position: relative;
   z-index: 1;
+  background: #050609;
 }
 
 .pf-final-cta-background {

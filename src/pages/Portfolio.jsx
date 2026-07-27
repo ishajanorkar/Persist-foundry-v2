@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   PORTFOLIO,
@@ -68,7 +68,6 @@ function PortfolioCell({ company, index, revealOrder }) {
 export default function Portfolio() {
   const [category, setCategory] = useState('all')
   const [pageReady, setPageReady] = useState(false)
-  const cursorRafRef = useRef(null)
 
   const filtered = useMemo(() => (
     PORTFOLIO.filter((item) => category === 'all' || item.tags.includes(category))
@@ -88,52 +87,6 @@ export default function Portfolio() {
   useEffect(() => {
     document.body.classList.add('is-loaded', 'pf-page')
 
-    const cursor = document.getElementById('cursor')
-    let cursorX = 0
-    let cursorY = 0
-    let targetX = 0
-    let targetY = 0
-    let cursorActive = true
-    const interactiveSel = 'a, button, .pf-cell, .pf-filter-btn'
-
-    const trackMouse = (e) => {
-      targetX = e.clientX
-      targetY = e.clientY
-    }
-    document.addEventListener('mousemove', trackMouse, { passive: true })
-
-    const tickCursor = () => {
-      if (!cursorActive) return
-      const dx = targetX - cursorX
-      const dy = targetY - cursorY
-      if (Math.abs(dx) > 0.4 || Math.abs(dy) > 0.4) {
-        cursorX += dx * 0.2
-        cursorY += dy * 0.2
-        if (cursor) cursor.style.transform = `translate3d(${cursorX}px,${cursorY}px,0) translate(-50%,-50%)`
-      }
-      cursorRafRef.current = requestAnimationFrame(tickCursor)
-    }
-    cursorRafRef.current = requestAnimationFrame(tickCursor)
-
-    const onVis = () => {
-      cursorActive = !document.hidden
-      if (cursorActive && !cursorRafRef.current) {
-        cursorRafRef.current = requestAnimationFrame(tickCursor)
-      }
-    }
-    document.addEventListener('visibilitychange', onVis)
-
-    const onOver = (e) => {
-      if (e.target.closest(interactiveSel)) cursor?.classList.add('is-hover')
-    }
-    const onOut = (e) => {
-      const from = e.target.closest(interactiveSel)
-      const to = e.relatedTarget instanceof Element ? e.relatedTarget.closest(interactiveSel) : null
-      if (from && !to) cursor?.classList.remove('is-hover')
-    }
-    document.addEventListener('mouseover', onOver)
-    document.addEventListener('mouseout', onOut)
-
     const progressBar = document.getElementById('progress')
     const updateProgress = () => {
       const total = document.documentElement.scrollHeight - window.innerHeight
@@ -144,19 +97,12 @@ export default function Portfolio() {
 
     return () => {
       document.body.classList.remove('pf-page')
-      document.removeEventListener('mousemove', trackMouse)
-      document.removeEventListener('visibilitychange', onVis)
-      document.removeEventListener('mouseover', onOver)
-      document.removeEventListener('mouseout', onOut)
       window.removeEventListener('scroll', updateProgress)
-      if (cursorRafRef.current) cancelAnimationFrame(cursorRafRef.current)
-      cursorRafRef.current = null
     }
   }, [])
 
   return (
     <>
-      <div className="cursor" id="cursor" />
       <div className="progress" id="progress" />
 
       <div className={`pf-page-wrap${pageReady ? ' pf-page-wrap--ready' : ''}`}>

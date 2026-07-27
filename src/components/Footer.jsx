@@ -9,27 +9,58 @@ export default function Footer() {
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
-    if (!email.trim() || !email.includes("@")) return;
+    const value = email.trim().toLowerCase();
+    if (!value || !value.includes("@") || !value.includes(".")) return;
+
     if (!SCRIPT_URL) {
-      console.warn("VITE_GOOGLE_SCRIPT_URL not set");
+      console.warn(
+        "VITE_GOOGLE_SCRIPT_URL is not set. Deploy google-apps-script/newsletter.gs and add the Web App URL to .env",
+      );
       setStatus("error");
       return;
     }
 
     setStatus("loading");
     try {
-      const res = await fetch(
-        `${SCRIPT_URL}?email=${encodeURIComponent(email.trim())}`,
-      );
-      const json = await res.json();
-      if (json.success) {
+      // Apps Script web apps accept GET ?email= (see newsletter.gs doGet)
+      const endpoint = `${SCRIPT_URL}${SCRIPT_URL.includes("?") ? "&" : "?"}email=${encodeURIComponent(value)}`;
+      const res = await fetch(endpoint, {
+        method: "GET",
+        redirect: "follow",
+      });
+
+      // Some deployments return opaque/redirected bodies; treat OK HTTP as success
+      // when JSON cannot be parsed, as long as the request completed.
+      let ok = res.ok;
+      try {
+        const json = await res.json();
+        ok = Boolean(json && json.success);
+      } catch {
+        ok = res.ok || res.type === "opaque";
+      }
+
+      if (ok) {
         setStatus("success");
         setEmail("");
       } else {
         setStatus("error");
       }
-    } catch {
-      setStatus("error");
+    } catch (err) {
+      // CORS edge-case: retry as no-cors POST (cannot read body → optimistic success)
+      try {
+        const body = new FormData();
+        body.append("email", value);
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          body,
+        });
+        setStatus("success");
+        setEmail("");
+      } catch {
+        console.error("Newsletter subscribe failed", err);
+        setStatus("error");
+      }
     }
   };
 

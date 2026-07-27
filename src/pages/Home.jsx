@@ -11,24 +11,7 @@ export default function Home() {
     if (initialized.current) return
     initialized.current = true
 
-    /* ── CUSTOM CURSOR ───────────────────────────────────────── */
-    const cursor = document.getElementById('cursor')
-    let cursorX = 0, cursorY = 0, targetX = 0, targetY = 0
-    document.addEventListener('mousemove', (e) => {
-      targetX = e.clientX
-      targetY = e.clientY
-    })
-    function animateCursor() {
-      cursorX += (targetX - cursorX) * 0.18
-      cursorY += (targetY - cursorY) * 0.18
-      if (cursor) cursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`
-      requestAnimationFrame(animateCursor)
-    }
-    animateCursor()
-    document.querySelectorAll('a, button, .pf-card, .filter-col, .backed-logo, .offer-card').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor && cursor.classList.add('is-hover'))
-      el.addEventListener('mouseleave', () => cursor && cursor.classList.remove('is-hover'))
-    })
+    /* ── CUSTOM CURSOR (global CustomCursor component) ─────── */
 
     /* ── MAGNETIC BUTTONS ────────────────────────────────────── */
     document.querySelectorAll('[data-magnetic]').forEach(btn => {
@@ -549,9 +532,6 @@ export default function Home() {
 
   return (
     <>
-      {/* CUSTOM CURSOR */}
-      <div className="cursor" id="cursor"></div>
-
       {/* LOADER */}
       <div className="loader" id="loader">
         <div className="loader-inner">

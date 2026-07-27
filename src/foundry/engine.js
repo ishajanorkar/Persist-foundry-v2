@@ -136,6 +136,26 @@ export default function initFoundry({ base = "/foundry" } = {}) {
 
   let cw = 0,
     ch = 0;
+
+  /* ── Hero mouse parallax (Vital Ventures–style) ───────────────
+     pointer → NDC (−1…1), lerp 0.05, UV warp:
+       warpedUv = centered * (1.0 - r * 0.15) - uMouse * 0.03 + 0.5
+     Canvas approximates that as overscan scale + opposite offset. */
+  const MOUSE_LERP = 0.05;
+  const MOUSE_UV_SHIFT = 0.03;
+  const RADIAL_ZOOM = 0.15; // matches shader (1.0 - r * 0.15) overscan
+  const mouseTarget = { x: 0, y: 0 };
+  const mouseSmooth = { x: 0, y: 0 };
+  let parallaxRaf = 0;
+
+  function heroParallaxAmount() {
+    // Full effect through hero; ease out before Funded-by / tether
+    const p = window.PF.heroProgress || 0;
+    if (p <= 0.18) return 1;
+    if (p >= 0.36) return 0;
+    return 1 - (p - 0.18) / 0.18;
+  }
+
   function resizeCanvas() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     cw = window.innerWidth;
@@ -152,11 +172,22 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       ih = img.naturalHeight;
     const cWpx = canvas.width,
       cHpx = canvas.height;
-    const scale = Math.max(cWpx / iw, cHpx / ih);
+    const cover = Math.max(cWpx / iw, cHpx / ih);
+    // Overscan so radial zoom + mouse shift never flash edges
+    const overscan = 1 / (1 - RADIAL_ZOOM * 0.707);
+    const scale = cover * overscan;
     const w = iw * scale,
       h = ih * scale;
-    const x = (cWpx - w) / 2,
-      y = (cHpx - h) / 2;
+
+    const amt = reduceMotion ? 0 : heroParallaxAmount();
+    const mx = mouseSmooth.x * amt;
+    const my = mouseSmooth.y * amt;
+    // Same as shader: warpedUv -= uMouse * 0.03  (screen UV → canvas px)
+    const ox = -mx * MOUSE_UV_SHIFT * cWpx;
+    const oy = -my * MOUSE_UV_SHIFT * cHpx;
+
+    const x = (cWpx - w) / 2 + ox,
+      y = (cHpx - h) / 2 + oy;
     ctx.fillStyle = "#050409";
     ctx.fillRect(0, 0, cWpx, cHpx);
     ctx.drawImage(img, x, y, w, h);
@@ -186,6 +217,37 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       drawCover(frames[j]);
       currentFrame = i;
     }
+  }
+
+  function onHeroPointerMove(e) {
+    // VitalV: x = clientX/w*2-1, y = -(clientY/h*2)+1
+    mouseTarget.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouseTarget.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  }
+
+  function tickHeroParallax() {
+    parallaxRaf = requestAnimationFrame(tickHeroParallax);
+    if (killed || reduceMotion) return;
+
+    mouseSmooth.x += (mouseTarget.x - mouseSmooth.x) * MOUSE_LERP;
+    mouseSmooth.y += (mouseTarget.y - mouseSmooth.y) * MOUSE_LERP;
+
+    const settling =
+      Math.abs(mouseTarget.x - mouseSmooth.x) > 0.0004 ||
+      Math.abs(mouseTarget.y - mouseSmooth.y) > 0.0004;
+    if (!settling || currentFrame < 0) return;
+    if (heroParallaxAmount() <= 0) return;
+    drawFrame(currentFrame, true);
+  }
+
+  function initHeroParallax() {
+    if (reduceMotion || !canvas) return;
+    on(window, "pointermove", onHeroPointerMove, { passive: true });
+    parallaxRaf = requestAnimationFrame(tickHeroParallax);
+    cleanups.push(() => {
+      if (parallaxRaf) cancelAnimationFrame(parallaxRaf);
+      parallaxRaf = 0;
+    });
   }
 
   const A = CFG.anchors;
@@ -408,6 +470,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   function initScrubber() {
     resizeCanvas();
     on(window, "resize", resizeCanvas, { passive: true });
+    initHeroParallax();
 
     if (reduceMotion) {
       drawFrame(A.hero, true);
@@ -1478,53 +1541,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     };
     on(window, "scroll", onWinScroll, { passive: true });
 
-    // custom cursor (desktop only)
-    const dot = document.getElementById("cursorDot");
-    const ring = document.getElementById("cursorRing");
-    const fine = window.matchMedia("(pointer:fine)").matches;
-    if (fine && dot && ring && !reduceMotion) {
-      let mx = innerWidth / 2,
-        my = innerHeight / 2,
-        rx = mx,
-        ry = my;
-      let cursorRaf = null;
-      on(
-        window,
-        "mousemove",
-        (e) => {
-          mx = e.clientX;
-          my = e.clientY;
-          dot.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
-        },
-        { passive: true },
-      );
-      (function ringLoop() {
-        if (killed) return;
-        rx += (mx - rx) * 0.18;
-        ry += (my - ry) * 0.18;
-        ring.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
-        cursorRaf = requestAnimationFrame(ringLoop);
-      })();
-      cleanups.push(() => {
-        if (cursorRaf) cancelAnimationFrame(cursorRaf);
-      });
-      const hov = "a,button,.orbit-node,.btn,.sound-toggle";
-      on(document, "mouseover", (e) => {
-        if (e.target.closest(hov)) {
-          ring.style.width = "52px";
-          ring.style.height = "52px";
-        }
-      });
-      on(document, "mouseout", (e) => {
-        if (e.target.closest(hov)) {
-          ring.style.width = "34px";
-          ring.style.height = "34px";
-        }
-      });
-    } else {
-      if (dot) dot.style.display = "none";
-      if (ring) ring.style.display = "none";
-    }
+    // Cursor: sitewide CustomCursor in App layout (brand #6145a9)
 
     // SOUND: ambient pad + UI ticks (toggle UI removed — muted by default)
     const toggle = document.getElementById("soundToggle");

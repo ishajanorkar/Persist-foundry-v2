@@ -50,41 +50,7 @@
   font-weight: 400;
 }
 
-/* Custom cursor used by both portfolio pages */
-.cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 10px;
-  height: 10px;
-  background: var(--brand);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: normal;
-  transition:
-    transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
-    width 0.3s,
-    height 0.3s,
-    background 0.3s,
-    opacity 0.3s;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 16px var(--brand-glow);
-}
-
-.cursor.is-hover {
-  width: 48px;
-  height: 48px;
-  background: transparent;
-  border: 1.5px solid var(--brand);
-  box-shadow: 0 0 20px var(--brand-glow);
-}
-
-@media (max-width: 968px) {
-  .cursor {
-    display: none;
-  }
-}
+/* Custom cursor styles live in index.css (.cursor) — kept in sync via App */
 
 /* Scroll progress bar on portfolio index */
 .progress {

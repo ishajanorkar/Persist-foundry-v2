@@ -658,10 +658,6 @@ export default function Foundry() {
         <span>Scroll</span>
         <span className="scroll-cue__line" />
       </div>
-
-      {/* custom cursor */}
-      <div className="cursor-ring" id="cursorRing" />
-      <div className="cursor-dot" id="cursorDot" />
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { LIVE_PORTFOLIO_LINKS } from './portfolioLiveLinks'
+
 const founder = (name, links = {}) => ({ name, ...links })
 
 export const CATEGORY_CODES = {
@@ -25,7 +27,7 @@ export function getPrimaryCode(tags) {
   return CATEGORY_CODES[tags?.[0]] || 'PF'
 }
 
-export const PORTFOLIO = [
+const PORTFOLIO_RAW = [
   {
     id: 'open-droids',
     name: 'Open Droids',
@@ -791,6 +793,26 @@ export const PORTFOLIO = [
   },
 ]
 
+/** Sync website / pitch deck / logo / description from persist.org/persist-portfolio */
+export const PORTFOLIO = PORTFOLIO_RAW.map((company) => {
+  const live = LIVE_PORTFOLIO_LINKS[company.id]
+  if (!live) {
+    return {
+      ...company,
+      url: company.url || null,
+      pitchDeck: company.pitchDeck || null,
+      logoLive: null,
+    }
+  }
+  return {
+    ...company,
+    url: live.url || null,
+    pitchDeck: live.pitchDeck || null,
+    logoLive: live.logo || null,
+    description: live.description || company.description,
+  }
+})
+
 export const PORTFOLIO_THUMBNAILS = {
   'open-droids': '/assets/open-droids.webp',
   bump: '/assets/bump.fm.webp',
@@ -836,6 +858,18 @@ export const PORTFOLIO_THUMBNAILS = {
 
 export function getPortfolioThumbnail(companyId) {
   return PORTFOLIO_THUMBNAILS[companyId] || null
+}
+
+export function getPortfolioPitchDeck(companyId) {
+  const company = PORTFOLIO.find((c) => c.id === companyId)
+  if (company?.pitchDeck) return company.pitchDeck
+  return LIVE_PORTFOLIO_LINKS[companyId]?.pitchDeck || null
+}
+
+export function getCompanyWebsite(companyId) {
+  const company = PORTFOLIO.find((c) => c.id === companyId)
+  if (company?.url) return company.url
+  return LIVE_PORTFOLIO_LINKS[companyId]?.url || null
 }
 
 export function getPortfolioImage(company) {
