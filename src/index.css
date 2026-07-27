@@ -7712,16 +7712,29 @@ body::before {
   align-items: center;
   justify-content: center;
   padding: 20px 16px;
-  background: rgba(5, 6, 9, 0.78);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  /* solid scrim so page content never bleeds through (blur is additive) */
+  background: rgba(5, 6, 9, 0.82);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  backdrop-filter: blur(14px) saturate(120%);
   animation: cr-modal-fade 0.22s ease;
+}
+.cr-modal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: rgba(5, 6, 9, 0.55);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
 }
 @keyframes cr-modal-fade {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 .cr-modal-panel {
+  position: relative;
+  z-index: 1;
   width: min(560px, 100%);
   max-height: min(88vh, 720px);
   overflow-x: hidden;
@@ -7729,6 +7742,12 @@ body::before {
   margin: 0;
   outline: none;
   padding: 1.35rem 1.4rem 1.45rem;
+  /* override translucent .ap-panel glass — keep form readable over page */
+  background: rgba(14, 15, 20, 0.97);
+  border: 1px solid rgba(255, 251, 241, 0.14);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
   animation: cr-form-in 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
   scrollbar-width: none;
   -ms-overflow-style: none;
