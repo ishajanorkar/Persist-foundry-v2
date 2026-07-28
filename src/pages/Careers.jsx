@@ -1,20 +1,26 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import CornerTicks from '../about/CornerTicks'
+import {
+  hasCareerSheet,
+  submitCareerApplication,
+} from '../lib/submitCareerApplication'
 
 /* ─────────────────────────────────────────────────────────────
    CAREERS — replica of persist.org/careers:
    seven opportunity categories, each role with its own custom
-   application form (same fields + Make.com webhooks as live site).
+   application form. Roles with a Google Sheet Apps Script URL
+   (see submitCareerApplication.js) post there; others still use
+   Make.com webhooks until wired one-by-one.
    Apply Now opens a popup modal. Styles: index.css (.cr-*)
 ───────────────────────────────────────────────────────────── */
 
 const MAKE_BASE = 'https://hook.eu2.make.com'
 
 /**
- * Each role mirrors persist.org/careers: unique Make webhook +
- * video field name (CFO uses applicant-loom-link; others use
- * applicant-portfolio-link).
+ * Each role: Make webhook (legacy) + video field name
+ * (CFO uses applicant-loom-link; others use applicant-portfolio-link).
+ * CFO → Google Sheet via VITE_CAREERS_CFO_SCRIPT_URL.
  */
 const CATEGORIES = [
   {
@@ -212,10 +218,11 @@ function CareerRoleForm({ role }) {
   const iframeName = `careers-submit-${role.id}-${reactId.replace(/:/g, '')}`
   const [form, setForm] = useState(EMPTY)
   const [status, setStatus] = useState('idle') // idle | submitting | success | error
+  const [errorMsg, setErrorMsg] = useState('')
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }))
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
     if (status === 'submitting') return
 
@@ -224,14 +231,48 @@ function CareerRoleForm({ role }) {
     const location = form.location.trim()
     const salary = form['salary-range'].trim()
     if (!name || !email || !location || !salary) {
+      setErrorMsg('Please fill in name, email, location, and salary range.')
       setStatus('error')
       return
     }
 
     setStatus('submitting')
+    setErrorMsg('')
 
-    // Mirror Webflow → Make: POST as form-urlencoded into a hidden iframe
-    // so we avoid CORS while keeping the user on this page.
+    // Prefer Google Sheet when this role has an Apps Script URL configured
+    if (hasCareerSheet(role.id)) {
+      try {
+        await submitCareerApplication({
+          roleId: role.id,
+          roleTitle: role.title,
+          fields: {
+            fullName: name,
+            email,
+            linkedin: form.linkedin.trim(),
+            location,
+            salaryRange: salary,
+            video: form.video.trim(),
+            loomVideo: form.video.trim(),
+            portfolioVideo: form.video.trim(),
+            'applicant-loom-link': form.video.trim(),
+            'applicant-portfolio-link': form.video.trim(),
+            [role.videoField]: form.video.trim(),
+          },
+        })
+        setStatus('success')
+        setForm(EMPTY)
+      } catch (err) {
+        const msg =
+          err instanceof Error && err.message
+            ? err.message
+            : 'Something went wrong submitting. Please try again.'
+        setErrorMsg(msg)
+        setStatus('error')
+      }
+      return
+    }
+
+    // Legacy: Webflow → Make via hidden iframe (avoids CORS)
     const body = new URLSearchParams()
     body.set('applicant-name', name)
     body.set('investors-email-2', email)
@@ -259,7 +300,6 @@ function CareerRoleForm({ role }) {
     ghost.submit()
     ghost.remove()
 
-    // Make hooks return quickly; treat post as success after a short beat
     window.setTimeout(() => {
       setStatus('success')
       setForm(EMPTY)
@@ -391,7 +431,7 @@ function CareerRoleForm({ role }) {
 
         {status === 'error' && (
           <div className="ap-error" role="alert">
-            Please fill in name, email, location, and salary range.
+            {errorMsg || 'Please fill in name, email, location, and salary range.'}
           </div>
         )}
 

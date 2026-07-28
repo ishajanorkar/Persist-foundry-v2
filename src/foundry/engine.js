@@ -289,7 +289,6 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     }));
   const stageFade = document.getElementById("stageFade");
   const stageFlareMask = document.getElementById("stageFlareMask");
-  const thresholdGlass = document.querySelector("#threshold .threshold-glass");
 
   function bandOpacity(p, b) {
     const [a, c, d, e] = b;
@@ -317,10 +316,6 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       if (i === 1) stageO = Math.max(stageO, o * 0.92);
       // i === 2 (threshold/backstory): intentionally no stage fade
       if (i === 2) thresholdO = o;
-    }
-    // Glass veil fades with Backstory beat content (same band opacity)
-    if (thresholdGlass) {
-      thresholdGlass.style.opacity = thresholdO.toFixed(3);
     }
     if (stageFade) stageFade.style.opacity = stageO.toFixed(3);
     // Soft Backstory veil — track the beat like Tether's stageFade (no hard snap to black)
@@ -684,17 +679,28 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   // corners, place its icon+label at the segment's mid-radius, size the core.
   function layoutDonut() {
     if (!orbitDonut) return;
-    const vmin = Math.min(window.innerWidth, window.innerHeight);
-    const w = window.innerWidth;
-    // Scale the wheel down so it doesn't dominate the viewport
-    let scale = 0.66;
-    // Phones only use the larger mobile wheel; small laptops stay compact
-    // so the bottom-right detail panel clears the ring
-    if (w <= 640) scale = 0.62;
-    else if (w <= 900) scale = 0.78;
-    else if (w < 1100) scale = 0.48;
-    else if (w < 1280) scale = 0.56;
-    const D = Math.round(vmin * scale);
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const vmin = Math.min(vw, vh);
+    // Desktop: scale from vmin. Tablet/phone: also respect height budget so
+    // the ring clears the centered heading above + detail panel below.
+    let D;
+    if (vw <= 900) {
+      // Phones: larger ring + type; tablets: still height-aware so heading/detail clear.
+      const headingBudget = vw <= 640 ? 118 : 112;
+      const detailBudget = vw <= 640 ? 128 : 124;
+      const availH = Math.max(180, vh - headingBudget - detailBudget - 24);
+      const availW = vw * (vw <= 640 ? 0.86 : 0.62);
+      const scale = vw <= 640 ? 0.56 : 0.42;
+      D = Math.round(Math.min(vmin * scale, availH, availW));
+      D = Math.max(vw <= 640 ? 200 : 180, Math.min(D, vw <= 640 ? 300 : 290));
+    } else if (vw < 1100) {
+      D = Math.round(vmin * 0.48);
+    } else if (vw < 1280) {
+      D = Math.round(vmin * 0.56);
+    } else {
+      D = Math.round(vmin * 0.66);
+    }
     const Ro = D / 2;
     const Ri = Ro * 0.52;
     const cx = Ro,
@@ -775,8 +781,12 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     // SVG art only fills ~42% of the 2000² box — target visual P ≈ 22% of core
     if (persistLogo && core) {
       const corePx = parseFloat(core.style.width) || Ri * 2 * 0.78;
-      const markPx = Math.max(56, Math.round(corePx * 0.52));
+      const markPx = Math.max(40, Math.round(corePx * 0.52));
       persistLogo.dataset.orbitMarkPx = String(markPx);
+      // Re-anchor the mark to the (possibly reflowed) orb center
+      const drop = window.PF?._logoDrop ?? 0;
+      const glide = window.PF?._glideG ?? 0;
+      if (drop > 0.01) setLogo(drop, glide);
     }
   }
 
@@ -928,6 +938,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       .orbit-core{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
         border-radius:50%;pointer-events:none;z-index:3;overflow:visible;
         background:#c3c3c3;
+        transition:opacity 0.35s ease, visibility 0.35s ease;
         box-shadow:
           0 0 0 1px rgba(255,255,255,0.12),
           0 0 28px 10px rgba(255,255,255,0.14),
@@ -961,38 +972,38 @@ export default function initFoundry({ base = "/foundry" } = {}) {
           inset 1px 0.5px 0 rgba(255,255,255,0.12),
           inset 0 -1px 0 rgba(0,0,0,0.4),
           inset -1px 0 0 rgba(0,0,0,0.18);
-        /* active purple lives on ::before — opacity fade stays inside clip-path */
+        /* active purple — muted lilac rim, no pure-white hotspot (OLED-safe) */
         --orbit-active-fill:radial-gradient(circle at 50% 50%,
-          rgb(18,14,28) 0%,
-          rgb(28,20,48) 28%,
-          rgb(55,36,95) 44%,
-          rgb(105,72,158) 54%,
-          rgb(145,108,190) 60%,
-          rgb(190,168,220) 66%,
-          rgb(235,230,245) 72%,
-          rgb(255,255,255) 78%);}
+          rgb(20,16,34) 0%,
+          rgb(32,24,52) 28%,
+          rgb(58,42,98) 46%,
+          rgb(88,66,138) 56%,
+          rgb(112,90,158) 64%,
+          rgb(138,118,178) 72%,
+          rgba(168,150,198,0.88) 82%,
+          rgba(190,176,210,0.55) 92%);}
       .orbit-petal::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
         background:var(--orbit-active-fill);opacity:0;
         transition:opacity .35s var(--ease-out);}
-      .orbit-petal:hover::before,.orbit-petal.is-featured::before{opacity:1;}
+      .orbit-petal:hover::before,.orbit-petal.is-featured::before{opacity:0.92;}
       /* soft static glass edge wash clipped with the petal */
       .orbit-petal::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
         background:linear-gradient(145deg,
-          rgba(255,255,255,0.16) 0%,
-          rgba(255,255,255,0.04) 35%,
+          rgba(255,255,255,0.12) 0%,
+          rgba(255,255,255,0.03) 35%,
           rgba(255,255,255,0) 60%,
-          rgba(255,255,255,0.06) 100%);
-        opacity:0.85;mix-blend-mode:soft-light;}
+          rgba(255,255,255,0.04) 100%);
+        opacity:0.7;mix-blend-mode:soft-light;}
       /* glow on the rim SVG only — never filter the petal (unclips a rectangle) */
       .orbit-seg-lines{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:visible;
         fill:none;}
       .orbit-seg-rim{fill:none;
-        stroke:rgba(255,255,255,0.32);
+        stroke:rgba(255,255,255,0.28);
         stroke-width:1.2;
         stroke-linecap:round;stroke-linejoin:round;
         transition:stroke .35s var(--ease-out),filter .35s var(--ease-out),stroke-width .35s var(--ease-out);}
-      .orbit-seg-rim.is-lit{stroke:rgba(255,255,255,0.92);stroke-width:1.35;
-        filter:drop-shadow(0 0 5px rgba(255,255,255,0.45)) drop-shadow(0 0 12px rgba(150,110,230,0.55));}
+      .orbit-seg-rim.is-lit{stroke:rgba(220,210,240,0.75);stroke-width:1.3;
+        filter:drop-shadow(0 0 4px rgba(160,130,210,0.35)) drop-shadow(0 0 10px rgba(120,90,180,0.28));}
       .orbit-petal__content{position:absolute;transform:translate(-50%,-50%);
         display:flex;flex-direction:column;align-items:center;gap:12px;
         pointer-events:none;text-align:center;will-change:transform;z-index:3;}
@@ -1019,35 +1030,44 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       @media (max-width:900px){
         .orbit-heading{
           left:50%;transform:translateX(-50%);
-          max-width:min(20rem,84vw);top:clamp(5.5rem,12vh,7.5rem);
-          align-items:center;text-align:center;gap:0.55rem;
+          max-width:min(22rem,86vw);top:clamp(5rem,10vh,6.5rem);
+          align-items:center;text-align:center;gap:0.5rem;
         }
         .orbit-heading__title{
-          font-size:clamp(0.82rem,2.8vw,1rem);
+          font-size:clamp(0.95rem,2.6vw,1.1rem);
           text-align:center;
         }
         .orbit-heading__body{
-          max-width:30ch;font-size:clamp(0.66rem,2.2vw,0.76rem);
-          text-align:center;
+          max-width:32ch;font-size:clamp(0.72rem,1.9vw,0.82rem);
+          line-height:1.4;text-align:center;
         }
+        /* mid band — detail sits just under the ring */
+        .orbit-donut{top:52%;}
         .orbit-petal__icon{width:18px;height:18px;}
         .orbit-petal__label{
-          font-size:clamp(0.44rem,1.15vw,0.54rem);
-          line-height:1.12;max-width:8.5ch;letter-spacing:-0.03em;
+          font-size:clamp(0.48rem,1.3vw,0.58rem);
+          line-height:1.15;max-width:9ch;letter-spacing:-0.03em;
         }
         .orbit-petal__content{gap:6px;}
+      }
+      @media (max-width:900px) and (max-height:820px){
+        .orbit-heading{top:clamp(4.5rem,8.5vh,5.75rem);gap:0.35rem;}
+        .orbit-heading__body{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+        .orbit-donut{top:50%;}
       }
       @media (max-width:640px){
         .orbit-heading{
           left:50%;transform:translateX(-50%);
-          top:clamp(5.25rem,11.5vh,7rem);
-          gap:0.55rem;max-width:min(18rem,88vw);
+          top:clamp(5.25rem,10.5vh,6.75rem);
+          gap:0.45rem;max-width:min(20rem,90vw);
           align-items:center;text-align:center;
         }
         .orbit-heading__title,.orbit-heading__body{text-align:center;}
-        .orbit-heading__title{font-size:clamp(0.78rem,4.2vw,0.95rem);}
-        .orbit-heading__body{max-width:26ch;font-size:0.7rem;}
-        .orbit-petal__label{font-size:0.44rem;max-width:8ch;}
+        .orbit-heading__title{font-size:clamp(1.05rem,5.2vw,1.28rem);}
+        .orbit-heading__body{max-width:30ch;font-size:clamp(0.78rem,3.5vw,0.92rem);line-height:1.4;}
+        .orbit-donut{top:52%;}
+        .orbit-petal__icon{width:16px;height:16px;}
+        .orbit-petal__label{font-size:clamp(0.46rem,2.1vw,0.54rem);max-width:9ch;}
       }`;
     document.head.appendChild(st);
     injectedStyle = st;
@@ -1185,6 +1205,11 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     // they stay upright while the wheel turns
     if (orbitRing) orbitRing.style.transform = `rotate(${deg.toFixed(3)}deg)`;
     if (orbitMoon) orbitMoon.style.transform = `rotate(${deg.toFixed(3)}deg)`;
+
+    // Eclipse "globe" stays only while the wheel is on screen; hide as soon
+    // as the ring fades so the solo-P beat is just the mark + stars.
+    setOrbitGlobeVisible(vis > 0.12);
+
     armNodes.forEach(({ el }) => {
       const content = el.querySelector(".orbit-petal__content");
       if (content)
@@ -1197,6 +1222,17 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     if (orbitRing) orbitRing.style.pointerEvents = vis > 0.35 ? "auto" : "none";
     // Fixed body panel must not outlive the wheel (esp. after touch hover)
     if (vis <= 0.35 && armDetail?.classList.contains("show")) clearCard();
+  }
+
+  /** Show/hide the eclipse moon + Three.js center flare together. */
+  function setOrbitGlobeVisible(show) {
+    const core = orbitDonut && orbitDonut.querySelector(".orbit-core");
+    if (core) {
+      core.style.opacity = show ? "1" : "0";
+      core.style.visibility = show ? "visible" : "hidden";
+      core.style.pointerEvents = "none";
+    }
+    if (starSprite) starSprite.visible = !!show;
   }
 
   /* ---- LOGO drop + nav glide ---- */
@@ -1235,10 +1271,25 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     const orbitScale = orbitPx / cssW;
     const baseScale = orbitScale * (0.82 + 0.18 * drop);
     const scale = baseScale * (1 - glide) + navScale * glide;
-    const x = navTarget.x * glide;
-    const y = navTarget.y * glide;
+
+    // Keep the P locked to the glass orb center (donut may sit off 50%/50%
+    // on tablet), then blend toward the nav brand slot as glide progresses.
+    let orbitOffX = 0;
+    let orbitOffY = 0;
+    if (orbitDonut && glide < 1) {
+      const r = orbitDonut.getBoundingClientRect();
+      if (r.width > 1 && r.height > 1) {
+        const cx = document.documentElement.clientWidth / 2;
+        const cy = document.documentElement.clientHeight / 2;
+        orbitOffX = r.left + r.width / 2 - cx;
+        orbitOffY = r.top + r.height / 2 - cy;
+      }
+    }
+    const x = orbitOffX * (1 - glide) + navTarget.x * glide;
+    const y = orbitOffY * (1 - glide) + navTarget.y * glide;
+
     persistLogo.style.opacity = String(Math.min(1, drop));
-    persistLogo.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${scale})`;
+    persistLogo.style.transform = `translate(calc(-50% + ${x.toFixed(2)}px), calc(-50% + ${y.toFixed(2)}px)) scale(${scale})`;
   }
 
   /* Reveal the shared React navbar only once the P begins traveling
@@ -1320,6 +1371,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       onLeave: () => {
         // scrolled past Five Ways — drop the fixed detail so it can't overlay portfolio
         clearCard();
+        setOrbitGlobeVisible(false);
       },
       onUpdate: (self) => {
         orbitProgress = self.progress;
@@ -1403,26 +1455,38 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       start: "top 95%",
       end: "top -40%",
       scrub: 1.85,
+      onLeaveBack: () => {
+        // Back into Five Ways — footage + globe return with the wheel
+        if (canvas) {
+          canvas.style.opacity = "1";
+          canvas.style.filter = "";
+        }
+        // layoutOrbit will re-show the globe once the ring is visible again
+      },
       onUpdate: (self) => {
         const gRaw = self.progress;
         const g = mapGlideProgress(gRaw);
         if (orbitLayer)
           orbitLayer.style.opacity = String(Math.max(0, 1 - gRaw * 2.4));
         if (orbitHeading) orbitHeading.style.opacity = "0";
-        // the portfolio renders transparent over the stage now — keep the
-        // live starfield at full strength so it runs unbroken from the
-        // backstory beat down through the notes section
+        // Live starfield only — no eclipse globe, no baked footage flare
         starFieldOpacity = 1;
-        threeCanvas.style.opacity = "1";
+        if (threeCanvas) threeCanvas.style.opacity = "1";
         if (!running) startThree();
+
+        setOrbitGlobeVisible(false);
+        starZoom = 0;
+        // Kill the cinematic frame flare so a bright orb can't sit beside the P
+        if (canvas) {
+          canvas.style.opacity = "0";
+          canvas.style.filter = "none";
+        }
+        if (stageFlareMask) stageFlareMask.style.opacity = "0";
+
         window.PF._gliding = gRaw > 0.001;
         window.PF._glideG = g;
         window.PF._glideRaw = gRaw;
-        // leaving the orbit for the dock — always drop the fixed arm card
         if (gRaw > 0.02 && armDetail?.classList.contains("show")) clearCard();
-        // re-measure the slot mid-glide: its position can shift after load
-        // (scrollbar, font swap, nav scrolled-state), and a stale target
-        // lands the mark off-center next to the wordmark
         if (g > 0.001) computeNavTarget();
         setLogo(1, g);
         if (navSlot) navSlot.style.pointerEvents = g > 0.55 ? "auto" : "none";
@@ -1430,26 +1494,39 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       },
     });
 
-    // Value props → filter → final CTA stay over the live starfield.
-    // Hold stars at full strength through #apply; ease out only at the
-    // very end of the CTA so the footer can take over.
+    // Value props -> filter -> final CTA: stars only (no baked footage / video).
+    // Hide the frame-sequence canvas and center flare; keep mouse-parallax stars.
     mkTrigger({
       trigger: "#valueProps",
       endTrigger: "#apply",
       start: "top 70%",
       end: "bottom 20%",
       scrub: 0.5,
+      onLeaveBack: () => {
+        if (canvas) {
+          canvas.style.opacity = "1";
+          canvas.style.filter = "";
+        }
+        if (starSprite) starSprite.visible = true;
+      },
       onUpdate: (self) => {
         const p = self.progress;
-        // no fade-in at the top edge — stars are already at full strength
-        // coming out of the portfolio; only fade out late into the footer
+        // Stars already at full strength from portfolio; fade out late into footer
         const fall = p > 0.92 ? (1 - p) / 0.08 : 1;
         starFieldOpacity = Math.max(0.08, fall);
-        threeCanvas.style.opacity = starFieldOpacity.toFixed(3);
-        // baked footage stays dimmed for orbit legibility — ease it back up
-        // so the galaxy reads behind these transparent sections
-        const rise = Math.min(1, p / 0.15);
-        canvas.style.filter = `brightness(${(0.45 + Math.min(rise, fall) * 0.35).toFixed(3)})`;
+        if (threeCanvas) threeCanvas.style.opacity = starFieldOpacity.toFixed(3);
+
+        // Drop cinematic frame footage — only the live starfield remains
+        if (canvas) {
+          canvas.style.opacity = "0";
+          canvas.style.filter = "none";
+        }
+        // Hide bright center flare sprite (reads like a video glow)
+        if (starSprite) starSprite.visible = false;
+        // Settle zoom so stars drift with mouse, not a blown-out fly-through
+        starZoom = 0;
+        if (stageFlareMask) stageFlareMask.style.opacity = "0";
+
         if (fall > 0.02) startThree();
       },
     });

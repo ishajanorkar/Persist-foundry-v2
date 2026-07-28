@@ -1,26 +1,28 @@
 ï»¿:root {
+  color-scheme: dark;
   --void: #07050f;
   --night: #0f0a1f;
   --night-2: #18102e;
-  --violet: #7854d5;
-  --violet-soft: #9b7fe4;
-  --violet-deep: #4a2e9f;
-  --violet-glow: rgba(120, 84, 213, 0.4);
-  --brand: #6145a9;
-  --brand-glow: rgba(97, 69, 169, 0.45);
-  --lilac: #c7b8f5;
-  --paper: #f4f1fa;
-  --bone: #eae4f4;
+  /* Brand — softened for OLED / device dark mode (less neon burn) */
+  --violet: #6e4fc2;
+  --violet-soft: #8f78d4;
+  --violet-deep: #45308a;
+  --violet-glow: rgba(110, 79, 194, 0.28);
+  --brand: #5a419c;
+  --brand-glow: rgba(90, 65, 156, 0.32);
+  --lilac: #b8a8e6;
+  --paper: #f0ecf7;
+  --bone: #e4deed;
   --ink: #14101e;
   --ink-soft: #2e2840;
   --stone: #6b5f88;
-  --stone-soft: #a599c2;
-  --hairline: rgba(199, 184, 245, 0.12);
-  --hairline-strong: rgba(199, 184, 245, 0.25);
+  --stone-soft: #9a90b5;
+  --hairline: rgba(184, 168, 230, 0.12);
+  --hairline-strong: rgba(184, 168, 230, 0.22);
   --warm: #f3aa62;
   --warm-soft: #ffd49a;
   --warm-glow: rgba(243, 170, 98, 0.45);
-  /* Sitewide type ÎÃÃ¶ match Foundry home (Montserrat) */
+  /* Sitewide type — match Foundry home (Montserrat) */
   --display: "Montserrat", system-ui, -apple-system, sans-serif;
   --serif: "Montserrat", system-ui, -apple-system, sans-serif;
   --sans: "Montserrat", system-ui, -apple-system, sans-serif;
@@ -70,6 +72,8 @@
 }
 html {
   scroll-behavior: auto;
+  color-scheme: dark;
+  background: var(--night);
 }
 body {
   font-family: var(--sans);
@@ -77,6 +81,8 @@ body {
   background: var(--night);
   color: var(--paper);
   line-height: 1.5;
+  /* Prevent browser auto-darkening from over-boosting accents on OLED */
+  -webkit-tap-highlight-color: rgba(110, 79, 194, 0.18);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -8364,5 +8370,23 @@ body::before {
   }
   .ct-submit {
     width: 100%;
+  }
+}
+
+/* Device dark mode: site is already dark — dial accents down so OLED
+   doesn't push brand purple into neon / eye-strain territory. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --violet: #6850b5;
+    --violet-soft: #8670c8;
+    --violet-deep: #3f2d7c;
+    --violet-glow: rgba(104, 80, 181, 0.22);
+    --brand: #544092;
+    --brand-glow: rgba(84, 64, 146, 0.26);
+    --pf-violet: #6850b5;
+    --pf-violet-bright: #9a88d4;
+    --pf-violet-white: #d4ccec;
+    --pf-glow: 0 0 32px rgba(104, 80, 181, 0.2);
+    --pf-glow-soft: 0 0 64px rgba(104, 80, 181, 0.1);
   }
 }

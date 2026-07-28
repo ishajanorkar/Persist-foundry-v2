@@ -9,28 +9,29 @@
 
 /* ---- design tokens (kept on :root so body-level orbit nodes inherit) ---- */
 :root {
+  color-scheme: dark;
   /* ---- Color: grounds ---- */
   --pf-bg: #050409;
   --pf-bg-2: #0a0712;
   --pf-bg-3: #120c1f;
 
-  /* ---- Color: violet system (from the footage) ---- */
-  --pf-violet: #7854d5;
-  --pf-violet-deep: #4b338f;
-  --pf-violet-bright: #b9a0ff;
-  --pf-violet-white: #e9e2ff;
-  --pf-star: #f4f0ff;
+  /* ---- Color: violet system (softened for dark OLED comfort) ---- */
+  --pf-violet: #6e4fc2;
+  --pf-violet-deep: #45308a;
+  --pf-violet-bright: #a692e0;
+  --pf-violet-white: #dcd4f2;
+  --pf-star: #ebe6f8;
 
   /* ---- Color: ink ---- */
-  --pf-ink: #ece8f7;
-  --pf-ink-soft: #b6aecb;
-  --pf-mono-ink: #8f86a8;
-  --pf-line: rgba(184, 160, 255, 0.14);
-  --pf-line-soft: rgba(184, 160, 255, 0.07);
+  --pf-ink: #e6e2f2;
+  --pf-ink-soft: #a8a0c0;
+  --pf-mono-ink: #857c9e;
+  --pf-line: rgba(166, 146, 224, 0.14);
+  --pf-line-soft: rgba(166, 146, 224, 0.07);
 
   /* ---- Glow ---- */
-  --pf-glow: 0 0 40px rgba(120, 84, 213, 0.45);
-  --pf-glow-soft: 0 0 80px rgba(120, 84, 213, 0.25);
+  --pf-glow: 0 0 36px rgba(110, 79, 194, 0.28);
+  --pf-glow-soft: 0 0 72px rgba(110, 79, 194, 0.16);
 
   /* ---- Typography ---- */
   --pf-display: "Montserrat", system-ui, -apple-system, sans-serif;
@@ -424,13 +425,20 @@ body.pf-landing ::selection {
   opacity: 0;
   pointer-events: none;
   will-change: transform, opacity;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .persist-logo svg,
 .persist-logo img {
+  display: block;
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 0 10px rgba(180, 150, 255, 0.75))
-    drop-shadow(0 0 22px rgba(120, 84, 213, 0.55));
+  margin: 0;
+  /* optical center — P glyph mass sits slightly high-left in the artboard */
+  transform: translate(2%, -1%);
+  filter: drop-shadow(0 0 8px rgba(140, 120, 200, 0.45))
+    drop-shadow(0 0 18px rgba(100, 75, 170, 0.28));
 }
 
 /* ---------- Scroll track + beat overlays ---------- */
@@ -684,54 +692,6 @@ body.pf-landing ::selection {
 /* Backstory — no center veil; let the starfield read clean */
 #threshold .beat__scrim {
   display: none;
-}
-
-/* Right-half glass morphism — full height, soft blur behind stats */
-#threshold .threshold-glass {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 52%;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0;
-  will-change: opacity;
-  /* Soft frost over the footage/starfield on the stats side only */
-  background:
-    linear-gradient(
-      90deg,
-      rgba(12, 14, 28, 0.22) 0%,
-      rgba(18, 22, 42, 0.32) 45%,
-      rgba(14, 16, 32, 0.38) 100%
-    ),
-    radial-gradient(
-      ellipse 70% 55% at 55% 48%,
-      rgba(88, 110, 180, 0.22) 0%,
-      rgba(50, 60, 120, 0.1) 45%,
-      transparent 75%
-    );
-  backdrop-filter: blur(18px) saturate(90%);
-  -webkit-backdrop-filter: blur(18px) saturate(90%);
-  /* Fade top/bottom only so the glass soft-blends into the section */
-  -webkit-mask-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(0, 0, 0, 0.35) 10%,
-    #000 22%,
-    #000 78%,
-    rgba(0, 0, 0, 0.35) 90%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(0, 0, 0, 0.35) 10%,
-    #000 22%,
-    #000 78%,
-    rgba(0, 0, 0, 0.35) 90%,
-    transparent 100%
-  );
 }
 
 /* ---------- Typography blocks ---------- */
@@ -1037,43 +997,6 @@ body.pf-landing ::selection {
     text-align: center;
     padding: clamp(4.25rem, 9vh, 5.5rem) var(--gutter)
       clamp(0.85rem, 2.5vh, 1.5rem);
-  }
-  /* Stacked layout: glass covers lower half under the stats */
-  #threshold .threshold-glass {
-    width: 100%;
-    top: 40%;
-    -webkit-mask-image: linear-gradient(
-      180deg,
-      transparent 0%,
-      rgba(0, 0, 0, 0.4) 12%,
-      #000 28%,
-      #000 78%,
-      rgba(0, 0, 0, 0.4) 90%,
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      180deg,
-      transparent 0%,
-      rgba(0, 0, 0, 0.4) 12%,
-      #000 28%,
-      #000 78%,
-      rgba(0, 0, 0, 0.4) 90%,
-      transparent 100%
-    );
-    -webkit-mask-composite: unset;
-    mask-composite: unset;
-    background:
-      linear-gradient(
-        180deg,
-        transparent 0%,
-        rgba(12, 14, 28, 0.22) 20%,
-        rgba(18, 22, 42, 0.36) 100%
-      ),
-      radial-gradient(
-        ellipse 80% 50% at 50% 40%,
-        rgba(88, 110, 180, 0.2) 0%,
-        transparent 70%
-      );
   }
   #threshold .beat__inner--threshold {
     display: flex;
@@ -1763,14 +1686,17 @@ body.pf-landing ::selection {
   }
 }
 
-/* Phone / small tablet — centered under the wheel, smaller type */
+/* Phone / small tablet — centered under the wheel, compact type */
 @media (max-width: 900px) {
   .portfolio-detail--anchored {
     left: 50%;
     right: auto;
-    bottom: clamp(2.75rem, 6.5vh, 4rem);
-    width: min(260px, 84vw);
-    transform: translateX(-50%) translateY(14px);
+    /* Sit just under the ring — larger bottom pulls the panel up */
+    bottom: clamp(4.75rem, 9.5vh, 6.75rem);
+    width: min(260px, 86vw);
+    max-height: min(26vh, 155px);
+    overflow: hidden;
+    transform: translateX(-50%) translateY(10px);
     align-items: center;
     text-align: center;
   }
@@ -1780,9 +1706,10 @@ body.pf-landing ::selection {
   .portfolio-detail--anchored h4 {
     font-size: clamp(0.72rem, 1.9vw, 0.88rem);
     text-align: center;
+    line-height: 1.2;
   }
   .portfolio-detail--anchored .portfolio-detail__head {
-    margin-bottom: 0.55rem;
+    margin-bottom: 0.4rem;
     gap: 5px;
     justify-content: center;
     width: 100%;
@@ -1795,15 +1722,15 @@ body.pf-landing ::selection {
     align-items: center;
   }
   .portfolio-detail--anchored .portfolio-detail__list {
-    gap: 5px;
+    gap: 6px;
     align-items: center;
     text-align: center;
     width: 100%;
   }
   .portfolio-detail--anchored .portfolio-detail__list li {
-    font-size: clamp(0.55rem, 1.35vw, 0.64rem);
-    line-height: 1.28;
-    max-width: 24ch;
+    font-size: clamp(0.6rem, 1.5vw, 0.72rem);
+    line-height: 1.3;
+    max-width: 26ch;
     padding-left: 0;
     display: flex;
     align-items: flex-start;
@@ -2178,7 +2105,7 @@ body.pf-landing ::selection {
    finale. The engine raises the starfield canvas back to full opacity
    while this section is on screen. */
 .pf .st-wrap {
-  background: rgba(5, 4, 9, 0.6);
+  background: rgba(5, 4, 9, 0.28);
 }
 .pf .st-p-body {
   color: #efeaf8;
@@ -2202,7 +2129,7 @@ body.pf-landing ::selection {
 /* Manifesto on this page: same treatment — transparent over the live
    starfield with the same dark veil, and a calmer headline scale */
 .pf .manifesto-stage {
-  background: rgba(5, 4, 9, 0.6);
+  background: rgba(5, 4, 9, 0.28);
   border-top: 0;
   border-bottom: 0;
 }
@@ -2229,7 +2156,7 @@ body.pf-landing ::selection {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #000000;
+  background: rgba(5, 4, 9, 0.35);
   color: #ffffff;
   /* full viewport, same side gutter as Beats / Threshold / Portfolio */
   min-height: 100vh;
@@ -2264,10 +2191,13 @@ body.pf-landing ::selection {
   filter: drop-shadow(0 0 60px rgba(120, 84, 213, 0.22));
 }
 .pf .filter-deco--bl {
-  bottom: clamp(-28%, -24vh, -2%);
+  /* Pinned to section floor — no scroll drift (avoids a starfield gap) */
+  bottom: 0;
   left: clamp(-6%, -2vw, -1%);
   width: min(38vw, 460px);
   opacity: 0.9;
+  transform: none;
+  will-change: auto;
   filter: drop-shadow(0 0 50px rgba(120, 84, 213, 0.16));
 }
 
@@ -2914,7 +2844,8 @@ body.pf-landing .pf ~ .footer {
 .vprop {
   position: relative;
   z-index: var(--z-overlay);
-  background: rgba(5, 4, 9, 0.55);
+  /* Light veil only — stage footage is hidden from this section on; stars show through */
+  background: rgba(5, 4, 9, 0.28);
   border-top: 1px solid var(--pf-line-soft);
   padding: clamp(5rem, 10vh, 7rem) 0 clamp(6rem, 13vh, 9.5rem);
 }
@@ -3571,28 +3502,58 @@ body.pf-landing .pf ~ .footer {
     transform: translateX(-50%) !important;
     align-items: center !important;
     text-align: center !important;
-    max-width: min(20rem, 84vw) !important;
-    top: clamp(5.5rem, 12vh, 7.5rem) !important;
+    max-width: min(22rem, 86vw) !important;
+    top: clamp(5rem, 10vh, 6.5rem) !important;
+    gap: 0.5rem !important;
   }
   #orbitLayer .orbit-heading__title {
-    font-size: clamp(0.82rem, 2.8vw, 1rem) !important;
+    font-size: clamp(0.95rem, 2.6vw, 1.1rem) !important;
   }
   #orbitLayer .orbit-heading__title,
   #orbitLayer .orbit-heading__body {
     text-align: center !important;
   }
   #orbitLayer .orbit-heading__body {
-    max-width: 30ch !important;
-    font-size: clamp(0.66rem, 2.2vw, 0.76rem) !important;
+    max-width: 32ch !important;
+    font-size: clamp(0.72rem, 1.9vw, 0.82rem) !important;
+    line-height: 1.4 !important;
+  }
+  #orbitLayer .orbit-donut {
+    top: 52% !important;
   }
   #orbitLayer .orbit-petal__icon {
     width: 18px;
     height: 18px;
   }
   #orbitLayer .orbit-petal__label {
-    font-size: clamp(0.44rem, 1.15vw, 0.54rem) !important;
-    max-width: 8.5ch !important;
-    line-height: 1.12 !important;
+    font-size: clamp(0.48rem, 1.3vw, 0.58rem) !important;
+    max-width: 9ch !important;
+    line-height: 1.15 !important;
+  }
+}
+@media (max-width: 900px) and (max-height: 820px) {
+  #orbitLayer .orbit-heading {
+    top: clamp(4.5rem, 8.5vh, 5.75rem) !important;
+  }
+  #orbitLayer .orbit-heading__body {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden !important;
+  }
+  #orbitLayer .orbit-donut {
+    top: 50% !important;
+  }
+  .portfolio-detail--anchored {
+    bottom: clamp(3.75rem, 8.5vh, 5.5rem) !important;
+    max-height: min(22vh, 120px) !important;
+  }
+  .portfolio-detail--anchored h4 {
+    font-size: 0.72rem !important;
+  }
+  .portfolio-detail--anchored .portfolio-detail__list li {
+    font-size: 0.58rem !important;
+    line-height: 1.25 !important;
   }
 }
 @media (min-width: 901px) {
@@ -3611,41 +3572,47 @@ body.pf-landing .pf ~ .footer {
 }
 @media (max-width: 640px) {
   .persist-logo {
-    width: clamp(96px, 26vw, 140px);
+    width: clamp(110px, 30vw, 160px);
+  }
+  #orbitLayer .orbit-donut {
+    top: 52% !important;
   }
   #orbitLayer .orbit-petal__icon {
     width: 16px;
     height: 16px;
   }
   #orbitLayer .orbit-petal__label {
-    font-size: 0.44rem;
-    max-width: 8ch;
+    font-size: clamp(0.46rem, 2.1vw, 0.54rem);
+    max-width: 9ch;
   }
   #orbitLayer .orbit-heading {
-    top: clamp(5.25rem, 11.5vh, 7rem) !important;
+    top: clamp(5.25rem, 10.5vh, 6.75rem) !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     align-items: center !important;
     text-align: center !important;
-    max-width: min(18rem, 88vw) !important;
+    max-width: min(20rem, 90vw) !important;
+    gap: 0.45rem !important;
   }
   #orbitLayer .orbit-heading__title,
   #orbitLayer .orbit-heading__body {
     text-align: center !important;
   }
   #orbitLayer .orbit-heading__title {
-    font-size: clamp(0.78rem, 4.2vw, 0.95rem) !important;
+    font-size: clamp(1.05rem, 5.2vw, 1.28rem) !important;
   }
   #orbitLayer .orbit-heading__body {
-    max-width: 26ch !important;
-    font-size: 0.7rem !important;
+    max-width: 30ch !important;
+    font-size: clamp(0.78rem, 3.5vw, 0.92rem) !important;
+    line-height: 1.4 !important;
   }
   .portfolio-detail--anchored {
     left: 50%;
     right: auto;
     width: min(260px, 88vw);
-    bottom: clamp(2.75rem, 7vh, 3.75rem);
-    transform: translateX(-50%) translateY(14px);
+    bottom: clamp(4.75rem, 9vh, 6.25rem);
+    max-height: min(24vh, 150px);
+    transform: translateX(-50%) translateY(10px);
     align-items: center;
     text-align: center;
   }
@@ -3690,6 +3657,18 @@ body.pf-landing .pf ~ .footer {
   object-position: center center;
   z-index: 0;
   filter: none;
+  opacity: 0;
+  will-change: opacity;
+  /* Opacity is driven by the dual-buffer crossfade in FinalCtaSection */
+  transition: none;
+}
+.pf-final-cta-background.is-front {
+  opacity: 1;
+  z-index: 0;
+}
+.pf-final-cta-background.is-back {
+  opacity: 0;
+  z-index: 0;
 }
 
 .pf-final-cta-media__scrim {

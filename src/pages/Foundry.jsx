@@ -260,8 +260,6 @@ export default function Foundry() {
         {/* BEAT 3 — THRESHOLD / BACKSTORY */}
         <section className="beat beat--center" data-beat="2" id="threshold">
           <div className="beat__scrim" />
-          {/* Right-half glass / blur veil behind the stat cards */}
-          <div className="threshold-glass" aria-hidden="true" />
           <div className="beat__inner beat__inner--threshold">
             <div className="threshold-copy">
               <p className="threshold-eyebrow">Backstory</p>

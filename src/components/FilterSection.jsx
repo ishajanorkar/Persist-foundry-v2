@@ -6,9 +6,9 @@ gsap.registerPlugin(ScrollTrigger);
 
 /* ─────────────────────────────────────────────────────────────
    FILTER — "If You're Still Deciding, This Isn't for You."
-   Blueprint twin-column apply / don't-apply panel with deco
-   structures that drift upward on scroll (vertical parallax),
-   each at a different speed — matching UnfairStartSection.
+   Blueprint twin-column apply / don't-apply panel. Top-right
+   deco drifts on scroll; bottom-left stays pinned to the section
+   floor so no gap opens above the next block.
 ───────────────────────────────────────────────────────────── */
 
 const YES = [
@@ -25,10 +25,8 @@ const NO = [
   "The title matters more to you than the job does.",
 ];
 
-// Total upward drift (px) each deco shape travels as the section
-// passes through the viewport. Different values = different speeds.
+// Upward drift (px) for the top-right deco only
 const SCROLL_RANGE_TR = 560;
-const SCROLL_RANGE_BL = 290;
 
 export default function FilterSection() {
   const sectionRef = useRef(null);
@@ -61,7 +59,7 @@ export default function FilterSection() {
       return () => sectionObs.disconnect();
     }
 
-    // ---- Scroll parallax: each shape drifts upward at its own speed ----
+    // ---- Scroll parallax: top-right only; bottom-left stays pinned ----
     const tweens = [];
 
     if (decoTrRef.current) {
@@ -75,23 +73,6 @@ export default function FilterSection() {
             start: "top bottom",
             end: "bottom top",
             scrub: 1.5,
-            invalidateOnRefresh: true,
-          },
-        }),
-      );
-    }
-
-    if (decoBlRef.current) {
-      tweens.push(
-        gsap.to(decoBlRef.current, {
-          y: -SCROLL_RANGE_BL,
-          ease: "none",
-          force3D: true,
-          scrollTrigger: {
-            trigger: section,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
             invalidateOnRefresh: true,
           },
         }),

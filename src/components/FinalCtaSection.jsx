@@ -5,13 +5,17 @@ import "../foundry/foundry.css";
 
 /* ─────────────────────────────────────────────────────────────
    FINAL CTA — glass panel over looping landscape video bg.
-   Global sitewide CTA (also used on Foundry home with footer).
+   Dual-buffer crossfade so the loop join is seamless (no hard cut).
 ───────────────────────────────────────────────────────────── */
 
 const CTA_VIDEO_SRC = "/foundry/final-cta-bg.mp4";
+/** Seconds before end to start the next copy + crossfade */
+const CROSSFADE_SEC = 0.85;
 
 export default function FinalCtaSection({ footer = false }) {
-  const videoRef = useRef(null);
+  const mediaRef = useRef(null);
+  const videoARef = useRef(null);
+  const videoBRef = useRef(null);
 
   useEffect(() => {
     const finalCta = document.getElementById("apply");
@@ -39,57 +43,191 @@ export default function FinalCtaSection({ footer = false }) {
     return () => obs.disconnect();
   }, []);
 
-  // Play only while near viewport / tab visible — saves CPU & battery
+  // Seamless dual-video loop + play only while in view / tab visible
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    const a = videoARef.current;
+    const b = videoBRef.current;
+    const media = mediaRef.current;
+    if (!a || !b || !media) return;
 
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
     if (reduceMotion) {
-      video.pause();
+      a.pause();
+      b.pause();
       return;
     }
 
+    let active = a;
+    let idle = b;
     let inView = false;
-    const playSafe = () => {
-      const p = video.play();
+    let swapping = false;
+    let fadeRaf = 0;
+    let watchRaf = 0;
+    let fadeStart = 0;
+
+    const playSafe = (el) => {
+      const p = el.play();
       if (p && typeof p.catch === "function") p.catch(() => {});
     };
-    const sync = () => {
-      if (inView && !document.hidden) playSafe();
-      else video.pause();
+
+    const setLayer = (front, back) => {
+      front.classList.add("is-front");
+      front.classList.remove("is-back");
+      back.classList.add("is-back");
+      back.classList.remove("is-front");
+      front.style.opacity = "1";
+      back.style.opacity = "0";
+    };
+
+    setLayer(active, idle);
+
+    const stopWatch = () => {
+      if (watchRaf) cancelAnimationFrame(watchRaf);
+      watchRaf = 0;
+    };
+
+    const stopFade = () => {
+      if (fadeRaf) cancelAnimationFrame(fadeRaf);
+      fadeRaf = 0;
+    };
+
+    const finishSwap = (from, to) => {
+      from.pause();
+      try {
+        from.currentTime = 0;
+      } catch {
+        /* ignore seek errors mid-load */
+      }
+      from.style.opacity = "0";
+      to.style.opacity = "1";
+      setLayer(to, from);
+      active = to;
+      idle = from;
+      swapping = false;
+    };
+
+    const beginCrossfade = () => {
+      if (swapping || !inView || document.hidden) return;
+      const duration = active.duration;
+      if (!Number.isFinite(duration) || duration < CROSSFADE_SEC * 2) return;
+
+      swapping = true;
+      try {
+        idle.currentTime = 0;
+      } catch {
+        /* ignore */
+      }
+      playSafe(idle);
+
+      const from = active;
+      const to = idle;
+      fadeStart = performance.now();
+      const durMs = CROSSFADE_SEC * 1000;
+
+      const tick = (now) => {
+        const t = Math.min(1, (now - fadeStart) / durMs);
+        const e = t * t * (3 - 2 * t); // smoothstep
+        to.style.opacity = String(e);
+        from.style.opacity = String(1 - e);
+
+        if (t < 1) {
+          fadeRaf = requestAnimationFrame(tick);
+          return;
+        }
+        fadeRaf = 0;
+        finishSwap(from, to);
+      };
+
+      fadeRaf = requestAnimationFrame(tick);
+    };
+
+    const watch = () => {
+      watchRaf = 0;
+      if (!inView || document.hidden) return;
+
+      if (!swapping) {
+        const duration = active.duration;
+        if (
+          Number.isFinite(duration) &&
+          duration > 0 &&
+          active.currentTime >= duration - CROSSFADE_SEC
+        ) {
+          beginCrossfade();
+        }
+      }
+
+      if (inView && !document.hidden) {
+        watchRaf = requestAnimationFrame(watch);
+      }
+    };
+
+    const startWatch = () => {
+      if (watchRaf) return;
+      watchRaf = requestAnimationFrame(watch);
+    };
+
+    const syncPlayback = () => {
+      if (inView && !document.hidden) {
+        playSafe(active);
+        if (!swapping) idle.pause();
+        startWatch();
+      } else {
+        stopWatch();
+        stopFade();
+        swapping = false;
+        active.pause();
+        idle.pause();
+        setLayer(active, idle);
+      }
     };
 
     const io = new IntersectionObserver(
       (entries) => {
         inView = entries.some((e) => e.isIntersecting);
-        sync();
+        syncPlayback();
       },
       { rootMargin: "25% 0px", threshold: 0.01 },
     );
-    io.observe(video);
-    document.addEventListener("visibilitychange", sync);
+    io.observe(media);
+    document.addEventListener("visibilitychange", syncPlayback);
+
+    a.preload = "auto";
+    b.preload = "auto";
+    a.load();
+    b.load();
 
     return () => {
+      stopWatch();
+      stopFade();
       io.disconnect();
-      document.removeEventListener("visibilitychange", sync);
-      video.pause();
+      document.removeEventListener("visibilitychange", syncPlayback);
+      a.pause();
+      b.pause();
     };
   }, []);
 
   return (
     <div className="pf-final-cta-container">
-      <div className="pf-final-cta-media" aria-hidden="true">
+      <div className="pf-final-cta-media" aria-hidden="true" ref={mediaRef}>
         <video
-          ref={videoRef}
-          className="pf-final-cta-background"
+          ref={videoARef}
+          className="pf-final-cta-background is-front"
           src={CTA_VIDEO_SRC}
           muted
-          loop
           playsInline
-          preload="metadata"
+          preload="auto"
+          disablePictureInPicture
+          disableRemotePlayback
+        />
+        <video
+          ref={videoBRef}
+          className="pf-final-cta-background is-back"
+          src={CTA_VIDEO_SRC}
+          muted
+          playsInline
+          preload="auto"
           disablePictureInPicture
           disableRemotePlayback
         />
