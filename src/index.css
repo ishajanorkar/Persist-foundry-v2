@@ -4348,6 +4348,15 @@ body::before {
 }
 
 /* newsletter */
+.footer-newsletter-label {
+  margin: 0 0 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: var(--stone-soft);
+  line-height: 1.4;
+}
 .footer-newsletter {
   display: flex;
   gap: 0;

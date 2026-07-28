@@ -35,30 +35,6 @@ const BELIEFS = [
   },
 ];
 
-const DIVISIONS = [
-  {
-    label: "ECOSYSTEM CAPITAL",
-    title: "Persist Ventures",
-    body: "Our core investment arm focusing on seed and early-stage capital. Ventures acts as the strategic backbone, funding companies emerging from the foundry.",
-    linkLabel: "Go to Capital",
-    href: "https://persistventures.co/",
-  },
-  {
-    label: "CO-CREATION HIVE",
-    title: "Persist Foundry",
-    body: "The execution studio. Where developers, marketing leads, and experienced operators sit alongside you in active development, building your product.",
-    linkLabel: "Inside look",
-    to: "/",
-  },
-  {
-    label: "CORE R&D",
-    title: "Persist Studio",
-    body: "Our advanced laboratory researching next-generation machine intelligence and decentralized protocol systems, ensuring your venture uses bleeding-edge tech.",
-    linkLabel: "Explore Labs",
-    href: "#",
-  },
-];
-
 function CornerTicks({ size = 22 }) {
   const px = typeof size === "number" ? size : parseFloat(size) || 22;
   const offset = -px / 2;
@@ -523,52 +499,6 @@ export default function About() {
               we would rather tell you the truth early than watch you learn it
               late.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════ PEOPLE & DIVISIONS ═══════════════ */}
-      <section className="ab-people" id="people">
-        <div className="ab-inner">
-          <p className="ab-eyebrow ab-reveal" data-delay="0">
-            THE PEOPLE &amp; DIVISIONS
-          </p>
-          <h2 className="ab-people__headline ab-reveal" data-delay="100">
-            Part of something larger.
-          </h2>
-          <div className="ab-people__grid">
-            {DIVISIONS.map((col, i) => (
-              <div
-                className="ab-people-col ab-reveal"
-                key={col.title}
-                data-delay={String(i * 150)}
-              >
-                <CornerTicks size={16} />
-                <p className="ab-people-col__label">{col.label}</p>
-                <h3 className="ab-people-col__title">{col.title}</h3>
-                <p className="ab-people-col__body">{col.body}</p>
-                {col.to ? (
-                  <Link
-                    className="ab-people-col__link"
-                    to={col.to}
-                    data-magnetic
-                  >
-                    {col.linkLabel} <span aria-hidden="true">↗</span>
-                  </Link>
-                ) : (
-                  <a
-                    className="ab-people-col__link"
-                    href={col.href}
-                    data-magnetic
-                    {...(col.href?.startsWith("http")
-                      ? { target: "_blank", rel: "noopener noreferrer" }
-                      : {})}
-                  >
-                    {col.linkLabel} <span aria-hidden="true">↗</span>
-                  </a>
-                )}
-              </div>
-            ))}
           </div>
         </div>
       </section>

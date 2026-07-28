@@ -10,57 +10,89 @@ export default function Footer() {
   const handleSubscribe = async (e) => {
     e.preventDefault();
     const value = email.trim().toLowerCase();
-    if (!value || !value.includes("@") || !value.includes(".")) return;
+    if (!value || !value.includes("@") || !value.includes(".")) {
+      setStatus("error");
+      return;
+    }
 
     if (!SCRIPT_URL) {
       console.warn(
-        "VITE_GOOGLE_SCRIPT_URL is not set. Deploy google-apps-script/newsletter.gs and add the Web App URL to .env",
+        "VITE_GOOGLE_SCRIPT_URL is not set. Deploy google-apps-script/newsletter.gs and add the Web App URL to .env / Vercel",
       );
       setStatus("error");
       return;
     }
 
     setStatus("loading");
+
+    const fail = () => setStatus("error");
+    const ok = () => {
+      setStatus("success");
+      setEmail("");
+    };
+
+    // 1) Preferred: GET ?email= (works when Apps Script is public + CORS-readable)
     try {
-      // Apps Script web apps accept GET ?email= (see newsletter.gs doGet)
       const endpoint = `${SCRIPT_URL}${SCRIPT_URL.includes("?") ? "&" : "?"}email=${encodeURIComponent(value)}`;
       const res = await fetch(endpoint, {
         method: "GET",
         redirect: "follow",
       });
-
-      // Some deployments return opaque/redirected bodies; treat OK HTTP as success
-      // when JSON cannot be parsed, as long as the request completed.
-      let ok = res.ok;
+      const text = await res.text();
+      const looksHtml =
+        /^\s*<!doctype/i.test(text) ||
+        /^\s*<html/i.test(text) ||
+        /accounts\.google/i.test(text);
+      if (looksHtml) {
+        throw new Error("Apps Script is not public");
+      }
       try {
-        const json = await res.json();
-        ok = Boolean(json && json.success);
+        const json = JSON.parse(text);
+        if (json && json.success) {
+          ok();
+          return;
+        }
+        if (json && json.success === false) {
+          fail();
+          return;
+        }
       } catch {
-        ok = res.ok || res.type === "opaque";
+        if (res.ok) {
+          ok();
+          return;
+        }
       }
+    } catch {
+      /* fall through */
+    }
 
-      if (ok) {
-        setStatus("success");
-        setEmail("");
-      } else {
-        setStatus("error");
-      }
+    // 2) FormData POST (lands in e.parameter) — reliable with no-cors
+    try {
+      const body = new FormData();
+      body.append("email", value);
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body,
+      });
+      ok();
+      return;
+    } catch {
+      /* fall through */
+    }
+
+    // 3) JSON text/plain POST
+    try {
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ email: value }),
+      });
+      ok();
     } catch (err) {
-      // CORS edge-case: retry as no-cors POST (cannot read body → optimistic success)
-      try {
-        const body = new FormData();
-        body.append("email", value);
-        await fetch(SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          body,
-        });
-        setStatus("success");
-        setEmail("");
-      } catch {
-        console.error("Newsletter subscribe failed", err);
-        setStatus("error");
-      }
+      console.error("Newsletter subscribe failed", err);
+      fail();
     }
   };
 
@@ -76,6 +108,11 @@ export default function Footer() {
           </Link>
 
           <div className="footer-newsletter-wrap">
+            {status !== "success" && status !== "error" && (
+              <p className="footer-newsletter-label">
+                Subscribe to our newsletter
+              </p>
+            )}
             {/* ── form state ── */}
             <form
               className={`footer-newsletter${status === "success" || status === "error" ? " is-gone" : ""}`}
@@ -85,7 +122,7 @@ export default function Footer() {
                 className="footer-newsletter-input"
                 type="email"
                 placeholder="Your email"
-                aria-label="Subscribe to newsletter"
+                aria-label="Subscribe to our newsletter"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={status === "loading"}
