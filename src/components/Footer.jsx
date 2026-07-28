@@ -274,14 +274,19 @@ export default function Footer() {
         <div className="footer-nav-col">
           <div className="footer-nav-heading">Legal</div>
           <nav className="footer-nav-links">
-            <a href="#" className="footer-nav-link">
+            <Link to="/terms-of-service" className="footer-nav-link">
               Terms of Service
-            </a>
-            <a href="#" className="footer-nav-link">
+            </Link>
+            <Link to="/privacy-policy" className="footer-nav-link">
               Privacy Policy
-            </a>
-            <a href="#" className="footer-nav-link">
-              Cookie Policy
+            </Link>
+            <a
+              href="https://dia.wiki/"
+              className="footer-nav-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Decentralized Intelligence Agency
             </a>
           </nav>
         </div>

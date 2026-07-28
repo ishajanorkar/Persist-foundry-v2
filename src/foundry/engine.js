@@ -949,14 +949,18 @@ export default function initFoundry({ base = "/foundry" } = {}) {
           rgba(0,0,0,0.85) 50%, #000 60%);}
       .orbit-petal{position:absolute;inset:0;z-index:1;padding:0;border:0;cursor:pointer;
         isolation:isolate;
-        /* idle glass — darker charcoal, frosted so blueprint softens behind */
-        background:linear-gradient(160deg,
-          rgba(48,46,56,0.82) 0%,
-          rgba(32,30,40,0.88) 48%,
-          rgba(22,20,28,0.92) 100%);
-        -webkit-backdrop-filter:blur(16px) saturate(1.2);
-        backdrop-filter:blur(16px) saturate(1.2);
-        box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+        /* frosted charcoal glass — matched to navbar pill */
+        background:linear-gradient(165deg,
+          rgba(58,56,66,0.52) 0%,
+          rgba(30,28,38,0.7) 48%,
+          rgba(16,14,22,0.8) 100%);
+        -webkit-backdrop-filter:blur(28px) saturate(1.5);
+        backdrop-filter:blur(28px) saturate(1.5);
+        box-shadow:
+          inset 0.5px 1px 0 rgba(255,255,255,0.32),
+          inset 1px 0.5px 0 rgba(255,255,255,0.12),
+          inset 0 -1px 0 rgba(0,0,0,0.4),
+          inset -1px 0 0 rgba(0,0,0,0.18);
         /* active purple lives on ::before — opacity fade stays inside clip-path */
         --orbit-active-fill:radial-gradient(circle at 50% 50%,
           rgb(18,14,28) 0%,
@@ -971,14 +975,24 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         background:var(--orbit-active-fill);opacity:0;
         transition:opacity .35s var(--ease-out);}
       .orbit-petal:hover::before,.orbit-petal.is-featured::before{opacity:1;}
-      /* glow on the rim SVG only — never filter the petal (uncips a rectangle) */
+      /* soft static glass edge wash clipped with the petal */
+      .orbit-petal::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+        background:linear-gradient(145deg,
+          rgba(255,255,255,0.16) 0%,
+          rgba(255,255,255,0.04) 35%,
+          rgba(255,255,255,0) 60%,
+          rgba(255,255,255,0.06) 100%);
+        opacity:0.85;mix-blend-mode:soft-light;}
+      /* glow on the rim SVG only — never filter the petal (unclips a rectangle) */
       .orbit-seg-lines{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:visible;
         fill:none;}
-      .orbit-seg-rim{fill:none;stroke:rgba(220,224,234,0.5);stroke-width:1;
+      .orbit-seg-rim{fill:none;
+        stroke:rgba(255,255,255,0.32);
+        stroke-width:1.2;
         stroke-linecap:round;stroke-linejoin:round;
-        transition:stroke .35s var(--ease-out), filter .35s var(--ease-out);}
-      .orbit-seg-rim.is-lit{stroke:rgba(235,220,255,0.9);stroke-width:1.15;
-        filter:drop-shadow(0 0 6px rgba(150,110,230,0.85)) drop-shadow(0 0 14px rgba(110,70,200,0.55));}
+        transition:stroke .35s var(--ease-out),filter .35s var(--ease-out),stroke-width .35s var(--ease-out);}
+      .orbit-seg-rim.is-lit{stroke:rgba(255,255,255,0.92);stroke-width:1.35;
+        filter:drop-shadow(0 0 5px rgba(255,255,255,0.45)) drop-shadow(0 0 12px rgba(150,110,230,0.55));}
       .orbit-petal__content{position:absolute;transform:translate(-50%,-50%);
         display:flex;flex-direction:column;align-items:center;gap:12px;
         pointer-events:none;text-align:center;will-change:transform;z-index:3;}

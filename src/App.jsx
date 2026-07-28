@@ -13,12 +13,15 @@ import PortfolioCompany from './pages/PortfolioCompany'
 import Careers from './pages/Careers'
 import Contact from './pages/Contact'
 import ApplicationForm from './pages/ApplicationForm'
+import LegalPage from './pages/LegalPage'
+import { TERMS_OF_SERVICE, PRIVACY_POLICY } from './data/legalPages'
 
 function Layout() {
   const { pathname } = useLocation()
   // Foundry embeds CTA+footer in its scroll track; legacy home has its own CTA.
   const foundryHome = pathname === '/'
-  const showGlobalCta = pathname !== '/' && pathname !== '/legacy'
+  const isLegal = pathname === '/terms-of-service' || pathname === '/privacy-policy'
+  const showGlobalCta = pathname !== '/' && pathname !== '/legacy' && !isLegal
   return (
     <>
       <CustomCursor />
@@ -47,6 +50,14 @@ function Layout() {
         <Route
           path="/fellowship-program-application"
           element={<ApplicationForm formKey="fellowship" />}
+        />
+        <Route
+          path="/terms-of-service"
+          element={<LegalPage doc={TERMS_OF_SERVICE} />}
+        />
+        <Route
+          path="/privacy-policy"
+          element={<LegalPage doc={PRIVACY_POLICY} />}
         />
       </Routes>
       {showGlobalCta && <FinalCtaSection footer={false} />}
