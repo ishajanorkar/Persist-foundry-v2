@@ -105,12 +105,14 @@ const SPEEDS = {
   mobile: [-70, -95, -60, -100, -75, -90],
 };
 
-function PropCard({ card }) {
+function PropCard({ card, cardKey }) {
   return (
     <article className="vprop-card">
       <CornerTicks />
       <h3 className="vprop-card__title">{card.title}</h3>
-      <div className="vprop-card__icon">
+      <div
+        className={`vprop-card__icon${cardKey === "network" ? " vprop-card__icon--network" : ""}`}
+      >
         <img src={card.icon} alt={card.alt} loading="lazy" draggable="false" />
       </div>
       <div className="vprop-card__foot">
@@ -215,7 +217,7 @@ export default function UnfairStartSection() {
             className="vprop__cell"
             ref={(el) => (cellRefs.current[i] = el)}
           >
-            <PropCard card={CARDS[key]} />
+            <PropCard card={CARDS[key]} cardKey={key} />
           </div>
         ))}
       </div>

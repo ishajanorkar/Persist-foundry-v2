@@ -250,12 +250,6 @@ export default function Footer() {
           <div className="footer-nav-heading">Opportunities</div>
           <nav className="footer-nav-links">
             <Link
-              to="/fellowship-program-application"
-              className="footer-nav-link"
-            >
-              Apply — Cohort 2026
-            </Link>
-            <Link
               to="/apply-for-a-full-time-position"
               className="footer-nav-link"
             >

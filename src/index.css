@@ -279,30 +279,39 @@ body::before {
   display: block;
 }
 
-/* CENTER PILL — frosted dark glass capsule + traveling light rim
-   Blur only samples what’s behind this tube while the nav is visible. */
+/* CENTER PILL — frosted charcoal glass (ref + Five Ways forge segments)
+   Soft translucent fill, strong blur, uneven light-rim (top-left catch). */
 .nav-pill {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 2px;
-  background: rgba(51, 51, 56, 0.468);
-  border: 1px solid transparent;
-  border-radius: 100px;
+  gap: 3px;
   padding: 5px 6px;
-  backdrop-filter: blur(36px) saturate(140%);
-  -webkit-backdrop-filter: blur(36px) saturate(140%);
+  border-radius: 100px;
+  border: none;
+  background: linear-gradient(
+    165deg,
+    rgba(58, 56, 66, 0.52) 0%,
+    rgba(30, 28, 38, 0.7) 48%,
+    rgba(16, 14, 22, 0.8) 100%
+  );
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
-    0 8px 32px rgba(0, 0, 0, 0.35);
+    /* inner bevel — light from top-left */
+    inset 0.5px 1px 0 rgba(255, 255, 255, 0.38),
+    inset 1px 0.5px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    inset -1px 0 0 rgba(0, 0, 0, 0.2),
+    /* soft float */
+    0 10px 36px rgba(0, 0, 0, 0.42);
   isolation: isolate;
   overflow: visible;
   transition:
-    background 0.3s,
-    box-shadow 0.3s,
+    background 0.3s ease,
+    box-shadow 0.3s ease,
     opacity 0.35s ease,
     backdrop-filter 0.35s ease;
 }
@@ -312,6 +321,10 @@ body::before {
   -webkit-backdrop-filter: none;
   opacity: 0;
 }
+/*
+  Animated glass rim — traveling highlight like CTA conic border,
+  kept in white/silver so it reads as light on frosted glass.
+*/
 .nav-pill::before {
   content: "";
   position: absolute;
@@ -321,11 +334,13 @@ body::before {
   background: conic-gradient(
     from var(--nav-glass-angle),
     rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0.04) 38%,
-    rgba(255, 255, 255, 0.16) 46%,
-    rgba(255, 255, 255, 0.72) 50%,
-    rgba(255, 255, 255, 0.2) 54%,
-    rgba(255, 255, 255, 0.05) 62%,
+    rgba(255, 255, 255, 0.05) 32%,
+    rgba(255, 255, 255, 0.18) 42%,
+    rgba(255, 255, 255, 0.55) 47%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.45) 53%,
+    rgba(255, 255, 255, 0.14) 58%,
+    rgba(255, 255, 255, 0.05) 68%,
     rgba(255, 255, 255, 0.04) 100%
   );
   -webkit-mask:
@@ -340,44 +355,118 @@ body::before {
   pointer-events: none;
   z-index: 0;
 }
+/* Soft static base rim — keeps silhouette where the highlight isn’t */
+.nav-pill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.08) 28%,
+    rgba(255, 255, 255, 0.03) 55%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
+}
 .nav.is-scrolled .nav-pill {
-  background: rgba(51, 51, 56, 0.618);
+  background: linear-gradient(
+    165deg,
+    rgba(60, 58, 68, 0.62) 0%,
+    rgba(32, 30, 40, 0.78) 48%,
+    rgba(14, 12, 20, 0.88) 100%
+  );
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
-    0 10px 36px rgba(0, 0, 0, 0.42);
+    inset 0.5px 1px 0 rgba(255, 255, 255, 0.42),
+    inset 1px 0.5px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    inset -1px 0 0 rgba(0, 0, 0, 0.22),
+    0 12px 40px rgba(0, 0, 0, 0.5);
 }
 .nav-pill-link {
   position: relative;
   z-index: 1;
   padding: 7px 15px;
   border-radius: 100px;
+  border: none;
   font-size: 12.5px;
   font-family: var(--sans);
   font-weight: 400;
-  color: rgba(185, 178, 205, 0.78);
+  color: rgba(235, 235, 240, 0.72);
   text-decoration: none;
   white-space: nowrap;
   letter-spacing: 0.01em;
   transition:
     color 0.25s ease,
-    background 0.25s ease;
+    background 0.25s ease,
+    box-shadow 0.25s ease;
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  isolation: isolate;
+  overflow: hidden;
 }
 .nav-pill-chevron {
   opacity: 0.6;
   flex-shrink: 0;
 }
 .nav-pill-link:hover {
-  color: var(--paper);
-  background: rgba(46, 35, 75, 0.55);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow:
+    inset 0.5px 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 .nav-pill-link.is-active {
   color: #ffffff;
-  background: rgba(46, 35, 75, 0.88);
-  box-shadow: inset 0 1px 0 rgba(199, 184, 245, 0.12);
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  box-shadow:
+    inset 0.5px 1px 0 rgba(255, 255, 255, 0.35),
+    inset 1px 0.5px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    inset -1px 0 0 rgba(0, 0, 0, 0.15);
+}
+/* Active chip — same uneven glass rim as the outer pill */
+.nav-pill-link.is-active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.4) 16%,
+    rgba(255, 255, 255, 0.1) 40%,
+    rgba(255, 255, 255, 0.02) 60%,
+    rgba(255, 255, 255, 0.06) 82%,
+    rgba(255, 255, 255, 0.18) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .nav-dropdown {
@@ -399,15 +488,21 @@ body::before {
   transform: translateX(-50%) translateY(6px);
   min-width: 200px;
   padding: 8px;
-  border-radius: 14px;
-  background: rgba(10, 10, 12, 0.62);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(36px) saturate(140%);
-  -webkit-backdrop-filter: blur(36px) saturate(140%);
+  border-radius: 16px;
+  border: none;
+  background: linear-gradient(
+    165deg,
+    rgba(48, 46, 56, 0.72) 0%,
+    rgba(22, 20, 28, 0.88) 100%
+  );
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-    0 16px 40px rgba(0, 0, 0, 0.4);
+    inset 0.5px 1px 0 rgba(255, 255, 255, 0.38),
+    inset 1px 0.5px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    inset -1px 0 0 rgba(0, 0, 0, 0.2),
+    0 16px 44px rgba(0, 0, 0, 0.5);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -416,6 +511,33 @@ body::before {
     transform 0.2s ease,
     visibility 0.2s;
   z-index: 50;
+  isolation: isolate;
+  overflow: hidden;
+}
+.nav-dropdown-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0.4) 16%,
+    rgba(255, 255, 255, 0.08) 42%,
+    rgba(255, 255, 255, 0.02) 62%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
 }
 .nav-dropdown-panel::before {
   content: "";
@@ -434,32 +556,49 @@ body::before {
 }
 .nav-dropdown:hover .nav-dropdown-trigger,
 .nav-dropdown:focus-within .nav-dropdown-trigger {
-  color: var(--paper);
-  background: rgba(46, 35, 75, 0.55);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow:
+    inset 0.5px 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 .nav-dropdown.is-active .nav-dropdown-trigger {
   color: #ffffff;
-  background: rgba(46, 35, 75, 0.88);
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  box-shadow:
+    inset 0.5px 1px 0 rgba(255, 255, 255, 0.35),
+    inset 1px 0.5px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    inset -1px 0 0 rgba(0, 0, 0, 0.15);
 }
 .nav-dropdown-link {
+  position: relative;
+  z-index: 1;
   display: block;
   padding: 10px 14px;
   margin: 2px auto;
   border-radius: 10px;
+  border: 1px solid transparent;
   font-size: 12.5px;
   font-family: var(--sans);
   font-weight: 400;
-  color: rgba(165, 153, 194, 0.85);
+  color: rgba(235, 235, 240, 0.72);
   text-decoration: none;
   white-space: nowrap;
   transition:
     color 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 .nav-dropdown-link:hover,
 .nav-dropdown-link.is-active {
-  color: var(--paper);
-  background: rgba(120, 84, 213, 0.18);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Work With Us ÎÃÃ¶ mobile submenu */
@@ -1216,6 +1355,15 @@ body::before {
   .nav-mobile-cta::before {
     animation: none;
     background: rgba(199, 184, 245, 0.55);
+  }
+  .nav-pill::before {
+    animation: none;
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.7) 0%,
+      rgba(255, 255, 255, 0.2) 35%,
+      rgba(255, 255, 255, 0.06) 100%
+    );
   }
   .nav-cta::after,
   .btn-primary::after,
@@ -4115,6 +4263,8 @@ body::before {
 }
 
 .pf-final-cta-container .footer {
+  position: relative;
+  z-index: 2;
   border-top: none;
   background: #fff;
   background: linear-gradient(

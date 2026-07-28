@@ -2668,9 +2668,8 @@ body.pf-landing ::selection {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  /* background-color: rgba(22, 22, 22, 0.06); */
-  backdrop-filter: blur(3px) saturate(60%);
-  -webkit-backdrop-filter: blur(3px) saturate(60%);
+  /* no backdrop blur — was softening the background video */
+  background: transparent;
 }
 .pf-final-cta-container .final-cta-grid-bg,
 .pf-final-cta-container .final-cta-watermark,
@@ -3094,6 +3093,10 @@ body.pf-landing .pf ~ .footer {
   user-select: none;
   pointer-events: none;
 }
+/* Network asset has more empty canvas padding — scale to match visual weight */
+.vprop-card__icon--network img {
+  width: clamp(8.25rem, 19vh, 27rem);
+}
 .vprop-card__foot {
   position: relative;
   width: 100%;
@@ -3121,6 +3124,9 @@ body.pf-landing .pf ~ .footer {
   .vprop-card__icon img {
     width: clamp(12rem, 20vh, 22rem);
   }
+  .vprop-card__icon--network img {
+    width: clamp(14.5rem, 24vh, 26rem);
+  }
 }
 
 @media (max-width: 640px) {
@@ -3136,6 +3142,9 @@ body.pf-landing .pf ~ .footer {
   }
   .vprop-card__icon img {
     width: clamp(5rem, 17vh, 7rem);
+  }
+  .vprop-card__icon--network img {
+    width: clamp(6rem, 20vh, 8.5rem);
   }
   .vprop-card__foot p {
     font-size: clamp(0.66rem, 3vw, 0.74rem);
@@ -3660,21 +3669,48 @@ body.pf-landing .pf ~ .footer {
   position: relative;
   z-index: 1;
   background: #050609;
+  overflow: hidden;
+}
+
+/* Full-bleed video — fills the entire CTA container (no letterbox gaps) */
+.pf-final-cta-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 .pf-final-cta-background {
   position: absolute;
-  bottom: 18%;
-  left: 0;
+  inset: 0;
   width: 100%;
-  height: 85%;
+  height: 100%;
   object-fit: cover;
-  object-position: bottom;
-  z-index: 5;
+  object-position: center center;
+  z-index: 0;
+  filter: none;
 }
 
-@media (max-width: 640px) {
+.pf-final-cta-media__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(5, 6, 9, 0.22) 0%,
+    rgba(5, 6, 9, 0.1) 45%,
+    rgba(5, 6, 9, 0.5) 100%
+  );
+}
+
+.pf-final-cta-container > .final-cta {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
   .pf-final-cta-background {
-    bottom: 40%;
+    display: none;
   }
 }

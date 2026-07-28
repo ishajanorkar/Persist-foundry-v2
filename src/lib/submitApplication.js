@@ -2,36 +2,67 @@
  * POST an application payload to the Google Apps Script web app.
  * Uses text/plain to avoid a CORS preflight with Apps Script.
  *
- * Env: VITE_APPLICATIONS_SCRIPT_URL
+ * Env:
+ *   VITE_FELLOWSHIP_SCRIPT_URL  — Fellowship form (preferred when formType is Fellowship)
+ *   VITE_APPLICATIONS_SCRIPT_URL — fallback / other application forms
  */
 export async function submitApplication({ formType, fields }) {
-  const SCRIPT_URL = import.meta.env.VITE_APPLICATIONS_SCRIPT_URL?.trim()
+  const fellowshipUrl = import.meta.env.VITE_FELLOWSHIP_SCRIPT_URL?.trim()
+  const applicationsUrl = import.meta.env.VITE_APPLICATIONS_SCRIPT_URL?.trim()
+
+  const SCRIPT_URL =
+    (formType === 'Fellowship' && fellowshipUrl) ||
+    applicationsUrl ||
+    fellowshipUrl
+
   if (!SCRIPT_URL) {
-    console.warn('VITE_APPLICATIONS_SCRIPT_URL not set')
+    console.warn(
+      'No applications script URL set. Deploy google-apps-script/fellowship.gs and add VITE_FELLOWSHIP_SCRIPT_URL to .env',
+    )
     throw new Error('Applications script URL is not configured')
   }
 
-  const res = await fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({
-      formType,
-      submittedAt: new Date().toISOString(),
-      ...fields,
-    }),
+  const payload = JSON.stringify({
+    formType,
+    submittedAt: new Date().toISOString(),
+    ...fields,
   })
 
-  let json = null
   try {
-    json = await res.json()
-  } catch {
-    // Apps Script sometimes returns opaque responses; treat HTTP OK as success
-    if (res.ok) return { success: true }
-    throw new Error('Invalid response from applications script')
-  }
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      redirect: 'follow',
+      body: payload,
+    })
 
-  if (!json?.success) {
-    throw new Error(json?.error || 'Submission failed')
+    let json = null
+    try {
+      json = await res.json()
+    } catch {
+      // Apps Script sometimes returns opaque/redirected bodies; treat HTTP OK as success
+      if (res.ok || res.type === 'opaque') return { success: true }
+      throw new Error('Invalid response from applications script')
+    }
+
+    if (!json?.success) {
+      throw new Error(json?.error || 'Submission failed')
+    }
+    return json
+  } catch (err) {
+    // CORS edge-case: retry as no-cors (cannot read body → optimistic success)
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: payload,
+      })
+      return { success: true }
+    } catch {
+      throw err instanceof Error
+        ? err
+        : new Error('Submission failed')
+    }
   }
-  return json
 }

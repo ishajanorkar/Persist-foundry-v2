@@ -1,13 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import Footer from "./Footer";
 import "../foundry/foundry.css";
+
 /* ─────────────────────────────────────────────────────────────
-   FINAL CTA — glass panel: "Once on paper everything changes."
+   FINAL CTA — glass panel over looping landscape video bg.
    Global sitewide CTA (also used on Foundry home with footer).
 ───────────────────────────────────────────────────────────── */
 
+const CTA_VIDEO_SRC = "/foundry/final-cta-bg.mp4";
+
 export default function FinalCtaSection({ footer = false }) {
+  const videoRef = useRef(null);
+
   useEffect(() => {
     const finalCta = document.getElementById("apply");
     if (!finalCta) return;
@@ -34,13 +39,63 @@ export default function FinalCtaSection({ footer = false }) {
     return () => obs.disconnect();
   }, []);
 
+  // Play only while near viewport / tab visible — saves CPU & battery
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduceMotion) {
+      video.pause();
+      return;
+    }
+
+    let inView = false;
+    const playSafe = () => {
+      const p = video.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    };
+    const sync = () => {
+      if (inView && !document.hidden) playSafe();
+      else video.pause();
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        inView = entries.some((e) => e.isIntersecting);
+        sync();
+      },
+      { rootMargin: "25% 0px", threshold: 0.01 },
+    );
+    io.observe(video);
+    document.addEventListener("visibilitychange", sync);
+
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+      video.pause();
+    };
+  }, []);
+
   return (
     <div className="pf-final-cta-container">
-      <img
-        className="pf-final-cta-background"
-        src="/assets/cta.png"
-        alt="Final CTA Background"
-      />
+      <div className="pf-final-cta-media" aria-hidden="true">
+        <video
+          ref={videoRef}
+          className="pf-final-cta-background"
+          src={CTA_VIDEO_SRC}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          disablePictureInPicture
+          disableRemotePlayback
+        />
+        <div className="pf-final-cta-media__scrim" />
+      </div>
+
       <section className="final-cta" id="apply">
         <div className="final-cta-bg" aria-hidden="true" />
         <div className="final-cta-panel">
