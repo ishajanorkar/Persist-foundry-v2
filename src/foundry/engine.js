@@ -1494,7 +1494,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       },
     });
 
-    // Value props -> filter -> final CTA: stars only (no baked footage / video).
+    // Value props -> final CTA: stars only (no baked footage / video).
     // Hide the frame-sequence canvas and center flare; keep mouse-parallax stars.
     mkTrigger({
       trigger: "#valueProps",

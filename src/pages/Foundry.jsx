@@ -2,9 +2,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import "../foundry/foundry.css";
 import initFoundry from "../foundry/engine";
-import FilterSection from "../components/FilterSection";
 import FinalCtaSection from "../components/FinalCtaSection";
-import Footer from "../components/Footer";
 import ScrollFloat from "../components/ScrollFloat";
 import UnfairStartSection from "../components/UnfairStartSection";
 
@@ -130,7 +128,7 @@ export default function Foundry() {
                 stagger={0.02}
                 playOnce
               >
-                Back yourself to win big.
+                {"We fund founders ready to leave the safe path and\u00A0build."}
               </ScrollFloat>
               <div className="hero-cta-reveal">
                 <a
@@ -139,7 +137,7 @@ export default function Foundry() {
                   href="#apply"
                   data-magnetic
                 >
-                  Apply For Fellowship
+                  Apply for Fellowship
                   <svg
                     viewBox="0 0 16 16"
                     fill="none"
@@ -160,8 +158,8 @@ export default function Foundry() {
             </div>
             <p className="hero-aside" data-copy="hero-lead">
               <span ref={asideRevealRef} className="hero-aside-reveal__inner">
-                The rest will follow. Persist forges founders into the companies
-                they were meant to build.
+                Capital, structure, and a team that helps you become the company
+                you set out to build.
               </span>
             </p>
           </div>
@@ -269,12 +267,11 @@ export default function Foundry() {
                 founders
               </h2>
               <p className="threshold-body" data-copy="threshold-lead">
-                Started in 2016 to rethink founder support, Persist was inspired
-                by Thiel but open to everyone. It began as a PayPal-to-Ethereum
-                exchange that proved the model. Nine years later, Persist
-                remains founder-first and actively involved, having built thirty
-                companies alongside founders. The right support creates
-                exceptional companies.
+                Persist began in 2016 to rethink founder support — inspired by
+                Thiel, and open to everyone. What started as a PayPal-to-Ethereum
+                exchange became the model. Nine years on, we stay founder-first
+                and hands-on, having built thirty companies alongside the people
+                who lead them.
               </p>
             </div>
 
@@ -500,12 +497,11 @@ export default function Foundry() {
             <div className="pfolio__layout">
               <aside className="pfolio__aside">
                 <div className="pfolio__aside-inner">
-                  <h2 className="pfolio__title">Turning Ideas Into Impact.</h2>
+                  <h2 className="pfolio__title">Turning ideas into impact.</h2>
                   <p className="pfolio__sub">
-                    Discover our diverse range of impactful projects, featuring
-                    30 successful projects and many more coming soon, where
-                    collaboration drives success and transforms ideas into
-                    results.
+                    Thirty companies launched — and more on the way. A look at
+                    the ventures we&apos;ve built with founders, from first
+                    sketch to something that ships.
                   </p>
                   <a className="pfolio__cta" href="/portfolio">
                     View Portfolio <span aria-hidden="true">↗</span>
@@ -625,9 +621,6 @@ export default function Foundry() {
         {/* VALUE PROPS — horizontal 2-slide unfair-start cards */}
         <UnfairStartSection />
 
-        {/* FILTER — "Not for everyone. That's the point." twin columns (ported from legacy landing) */}
-        <FilterSection />
-
         {/* orbit / arm detail panel (scroll-driven + hover) */}
         <div className="portfolio-detail" id="armDetail">
           <div className="portfolio-detail__content" id="armContent">
@@ -647,7 +640,6 @@ export default function Foundry() {
           </span>
         </div>
 
-        {/* FINAL CTA — "Once on paper changes everything." (ported from legacy landing) */}
         <FinalCtaSection footer={true} />
       </main>
 

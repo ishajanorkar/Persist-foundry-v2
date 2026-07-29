@@ -242,18 +242,19 @@ export default function FinalCtaSection({ footer = false }) {
           <div className="pf-final-cta-copy">
             <p className="pf-final-cta-kicker">Now you know us</p>
             <h2 className="pf-final-cta-hero" id="finalHeadline">
-              <span className="pf-final-cta-hero-line">Once on paper</span>
+              <span className="pf-final-cta-hero-line">Once it&apos;s on paper,</span>
               <span className="pf-final-cta-hero-line">everything changes.</span>
             </h2>
             <p className="pf-final-cta-sub">
-              You&apos;ve made this bet a thousand times in your head.
+              You&apos;ve made this decision a thousand times in your head.
+              Put it somewhere real.
             </p>
             <Link
               className="pf-final-cta-link"
               data-magnetic
               to="/fellowship-program-application"
             >
-              Become A Founder <span aria-hidden="true">↗</span>
+              Become a founder <span aria-hidden="true">↗</span>
             </Link>
           </div>
         </div>

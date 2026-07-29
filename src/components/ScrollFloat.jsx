@@ -29,11 +29,11 @@ export default function ScrollFloat({
 
   const splitText = useMemo(() => {
     const text = typeof children === 'string' ? children : ''
-    // Word wrappers prevent mid-word line breaks; chars still animate like React Bits.
-    const tokens = text.split(/(\s+)/)
+    // Split on regular spaces only — keep \u00A0 so last-word pairs stay glued.
+    const tokens = text.split(/([ \t\f\v\r\n]+)/)
     let charIndex = 0
     return tokens.map((token, tokenIndex) => {
-      if (/^\s+$/.test(token)) {
+      if (/^[ \t\f\v\r\n]+$/.test(token)) {
         return (
           <span className="char" key={`s-${tokenIndex}`}>
             {'\u00A0'}
@@ -46,7 +46,7 @@ export default function ScrollFloat({
             const key = `c-${charIndex++}`
             return (
               <span className="char" key={key}>
-                {char}
+                {char === '\u00A0' ? '\u00A0' : char}
               </span>
             )
           })}
