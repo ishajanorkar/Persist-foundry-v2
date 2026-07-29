@@ -15,20 +15,31 @@ function getRevealDelay(order) {
 }
 
 function CellVisual({ company }) {
-  const [failed, setFailed] = useState(false)
-  const logo = company.logo
+  const [srcIndex, setSrcIndex] = useState(0)
   const thumbnail = getPortfolioThumbnail(company.id)
-  const displayImage = logo || thumbnail
-  const isScreenshot = !logo && Boolean(thumbnail)
+  const sources = [...new Set([company.logo, company.logoLive, thumbnail].filter(Boolean))]
+  const exhausted = srcIndex >= sources.length
+  const src = exhausted ? null : sources[srcIndex]
+  const usingBrandLogo = Boolean(src) && src !== thumbnail
+  const isScreenshot = Boolean(src) && !usingBrandLogo
   const initials = company.name.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase()
 
-  if (!displayImage || failed) {
+  if (!src) {
     return <span className="pf-cell-visual-fallback serif">{initials}</span>
   }
 
   return (
-    <div className={`pf-cell-visual-mark${isScreenshot ? ' is-screenshot' : ''}${company.logoClass ? ` ${company.logoClass}` : ''}`}>
-      <img src={displayImage} alt="" loading="lazy" draggable={false} onError={() => setFailed(true)} />
+    <div
+      className={`pf-cell-visual-mark${isScreenshot ? ' is-screenshot' : ''}${usingBrandLogo ? ' is-brand' : ''}${company.logoClass ? ` ${company.logoClass}` : ''}`}
+    >
+      <img
+        key={src}
+        src={src}
+        alt={company.name}
+        loading="lazy"
+        draggable={false}
+        onError={() => setSrcIndex((i) => i + 1)}
+      />
     </div>
   )
 }
@@ -41,7 +52,7 @@ function PortfolioCell({ company, index, revealOrder }) {
   return (
     <button
       type="button"
-      className={`pf-cell${!company.logo && thumbnail ? ' pf-cell--screenshot' : ''}`}
+      className={`pf-cell${!company.logoLive && !company.logo && thumbnail ? ' pf-cell--screenshot' : ''}`}
       style={{
         '--pf-reveal-delay': getRevealDelay(revealOrder),
         ...(company.hoverColor ? { '--pf-hover-accent': company.hoverColor } : {}),
@@ -54,6 +65,7 @@ function PortfolioCell({ company, index, revealOrder }) {
         <CellVisual company={company} />
       </div>
       <div className="pf-cell-foot">
+        <span className="pf-cell-name">{company.name}</span>
         <span className="pf-cell-tag">{company.tag}</span>
         <span className="pf-cell-arrow" aria-hidden="true">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">

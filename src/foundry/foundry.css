@@ -2571,20 +2571,12 @@ body.pf-landing ::selection {
 .pf .st-ghost {
   font-weight: 300;
 }
-.pf-final-cta-container .final-cta-hero {
-  font-size: clamp(2rem, 4.5vw, 3.5rem);
-}
-
-/* Final CTA — glass card panel over the Foundry stage */
-.pf-final-cta-container .final-cta {
+/* Final CTA — glass card panel (homepage look on every route) */
+.pf-final-cta-container .pf-final-cta {
   position: relative;
-  z-index: var(--z-overlay);
-  /* background: url("/assets/cta.png"); */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  z-index: var(--z-overlay, 2);
   min-height: 0;
-  padding: clamp(8rem, 16vh, 12rem) var(--gutter) clamp(3rem, 5vh, 4rem);
+  padding: clamp(8rem, 16vh, 12rem) var(--gutter, 40px) clamp(3rem, 5vh, 4rem);
   box-sizing: border-box;
   display: flex;
   justify-content: center;
@@ -2592,30 +2584,19 @@ body.pf-landing ::selection {
   text-align: center;
   cursor: none;
   overflow: visible;
+  color: #fff;
+  background: transparent;
 }
-.pf-final-cta-container .final-cta-bg {
+
+.pf-final-cta-container .pf-final-cta-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  /* no backdrop blur — was softening the background video */
   background: transparent;
 }
-.pf-final-cta-container .final-cta-grid-bg,
-.pf-final-cta-container .final-cta-watermark,
-.pf-final-cta-container .final-cta-noise,
-.pf-final-cta-container .final-cta-vignette,
-.pf-final-cta-container .final-cta-cohort,
-.pf-final-cta-container .final-cta-team,
-.pf-final-cta-container .final-cta-team-cap,
-.pf-final-cta-container .final-cta-stats,
-.pf-final-cta-container .final-cta-eyebrow,
-.pf-final-cta-container .final-cta-apply-btn,
-.pf-final-cta-container .final-cta-partner {
-  display: none !important;
-}
 
-.pf-final-cta-container .final-cta-panel {
+.pf-final-cta-container .pf-final-cta-panel {
   position: relative;
   width: 100%;
   max-width: min(1320px, 100%);
@@ -2629,15 +2610,14 @@ body.pf-landing ::selection {
   -webkit-backdrop-filter: blur(10px) saturate(90%);
 }
 
-/* Placeholder aurora — swap file at /public/assets/final-cta-bg.png */
-.pf-final-cta-container .final-cta-panel__bg {
+.pf-final-cta-container .pf-final-cta-panel__bg {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
 }
 
-.pf-final-cta-container .final-cta-panel__glow {
+.pf-final-cta-container .pf-final-cta-panel__glow {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -2656,7 +2636,7 @@ body.pf-landing ::selection {
     );
 }
 
-.pf-final-cta-container .final-cta-content {
+.pf-final-cta-container .pf-final-cta-copy {
   position: relative;
   z-index: 2;
   display: flex;
@@ -2671,7 +2651,7 @@ body.pf-landing ::selection {
   text-align: center;
 }
 
-.pf-final-cta-container .final-cta-kicker {
+.pf-final-cta-container .pf-final-cta-kicker {
   margin: 0 0 clamp(1.1rem, 2.2vh, 1.5rem);
   font-family: "Montserrat", var(--pf-display), system-ui, sans-serif;
   font-weight: 500;
@@ -2681,7 +2661,7 @@ body.pf-landing ::selection {
   color: rgba(210, 200, 235, 0.72);
 }
 
-.pf-final-cta-container .final-cta-hero {
+.pf-final-cta-container .pf-final-cta-hero {
   margin: 0;
   font-family: "Montserrat", var(--pf-display), system-ui, sans-serif;
   font-weight: 600;
@@ -2693,17 +2673,18 @@ body.pf-landing ::selection {
   max-width: 16ch;
   text-shadow: 0 0 48px rgba(4, 3, 10, 0.55);
 }
-.pf-final-cta-container .final-cta-hero-line1,
-.pf-final-cta-container .final-cta-hero-line2 {
+
+.pf-final-cta-container .pf-final-cta-hero-line {
   display: block;
   color: #ffffff;
   font-style: normal;
 }
-.pf-final-cta-container .final-cta-hero-line2 {
+
+.pf-final-cta-container .pf-final-cta-hero-line + .pf-final-cta-hero-line {
   margin-top: 0.02em;
 }
 
-.pf-final-cta-container .final-cta-sub {
+.pf-final-cta-container .pf-final-cta-sub {
   margin: clamp(1.15rem, 2.4vh, 1.65rem) 0 0;
   max-width: 36ch;
   font-family: "Montserrat", var(--pf-body), system-ui, sans-serif;
@@ -2713,7 +2694,7 @@ body.pf-landing ::selection {
   color: rgba(210, 200, 230, 0.72);
 }
 
-.pf-final-cta-container .final-cta-link {
+.pf-final-cta-container .pf-final-cta-link {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -2730,51 +2711,58 @@ body.pf-landing ::selection {
     color 0.3s ease,
     border-color 0.3s ease;
 }
-.pf-final-cta-container .final-cta-link:hover {
+
+.pf-final-cta-container .pf-final-cta-link:hover {
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.9);
 }
-.pf-final-cta-container .final-cta-link span {
+
+.pf-final-cta-container .pf-final-cta-link span {
   font-size: 0.95em;
   line-height: 1;
 }
 
 /* Soft staggered reveal */
-.pf-final-cta-container .final-cta-kicker,
-.pf-final-cta-container .final-cta-hero,
-.pf-final-cta-container .final-cta-sub,
-.pf-final-cta-container .final-cta-link {
+.pf-final-cta-container .pf-final-cta-kicker,
+.pf-final-cta-container .pf-final-cta-hero,
+.pf-final-cta-container .pf-final-cta-sub,
+.pf-final-cta-container .pf-final-cta-link {
   opacity: 0;
   transform: translateY(18px);
   transition:
     opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.pf-final-cta-container .final-cta.is-in-view .final-cta-kicker {
+
+.pf-final-cta-container .pf-final-cta.is-in-view .pf-final-cta-kicker {
   opacity: 1;
   transform: none;
   transition-delay: 0.05s;
 }
-.pf-final-cta-container .final-cta.is-in-view .final-cta-hero {
+
+.pf-final-cta-container .pf-final-cta.is-in-view .pf-final-cta-hero {
   opacity: 1;
   transform: none;
   transition-delay: 0.16s;
 }
-.pf-final-cta-container .final-cta.is-in-view .final-cta-sub {
+
+.pf-final-cta-container .pf-final-cta.is-in-view .pf-final-cta-sub {
   opacity: 1;
   transform: none;
   transition-delay: 0.28s;
 }
-.pf-final-cta-container .final-cta.is-in-view .final-cta-link {
+
+.pf-final-cta-container .pf-final-cta.is-in-view .pf-final-cta-link {
   opacity: 1;
   transform: none;
   transition-delay: 0.4s;
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .pf-final-cta-container .final-cta-kicker,
-  .pf-final-cta-container .final-cta-hero,
-  .pf-final-cta-container .final-cta-sub,
-  .pf-final-cta-container .final-cta-link {
+  .pf-final-cta-container .pf-final-cta-kicker,
+  .pf-final-cta-container .pf-final-cta-hero,
+  .pf-final-cta-container .pf-final-cta-sub,
+  .pf-final-cta-container .pf-final-cta-link {
     opacity: 1;
     transform: none;
     transition: none;
@@ -2782,17 +2770,17 @@ body.pf-landing ::selection {
 }
 
 @media (max-width: 720px) {
-  .pf-final-cta-container .final-cta {
+  .pf-final-cta-container .pf-final-cta {
     padding: clamp(3rem, 6vh, 4rem) clamp(1rem, 4vw, 1.25rem)
       clamp(3.5rem, 8vh, 5rem);
   }
-  .pf-final-cta-container .final-cta-panel {
+  .pf-final-cta-container .pf-final-cta-panel {
     border-radius: 20px;
   }
-  .pf-final-cta-container .final-cta-content {
+  .pf-final-cta-container .pf-final-cta-copy {
     padding: clamp(3rem, 8vh, 4.5rem) clamp(1.15rem, 4vw, 1.75rem);
   }
-  .pf-final-cta-container .final-cta-hero {
+  .pf-final-cta-container .pf-final-cta-hero {
     max-width: 12ch;
   }
 }
@@ -3659,7 +3647,9 @@ body.pf-landing .pf ~ .footer {
   filter: none;
   opacity: 0;
   will-change: opacity;
-  /* Opacity is driven by the dual-buffer crossfade in FinalCtaSection */
+  /* Slight scale crops baked-in corner watermark from the source clip */
+  transform: scale(1.08);
+  transform-origin: center center;
   transition: none;
 }
 .pf-final-cta-background.is-front {
@@ -3683,7 +3673,24 @@ body.pf-landing .pf ~ .footer {
   );
 }
 
-.pf-final-cta-container > .final-cta {
+/* Extra veil over video corner watermark */
+.pf-final-cta-media__scrim::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: min(280px, 42%);
+  height: min(220px, 40%);
+  background: radial-gradient(
+    ellipse 100% 100% at 100% 100%,
+    rgba(5, 6, 9, 0.92) 0%,
+    rgba(5, 6, 9, 0.55) 42%,
+    transparent 72%
+  );
+  pointer-events: none;
+}
+
+.pf-final-cta-container > .pf-final-cta {
   position: relative;
   z-index: 1;
 }

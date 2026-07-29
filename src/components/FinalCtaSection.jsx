@@ -234,22 +234,22 @@ export default function FinalCtaSection({ footer = false }) {
         <div className="pf-final-cta-media__scrim" />
       </div>
 
-      <section className="final-cta" id="apply">
-        <div className="final-cta-bg" aria-hidden="true" />
-        <div className="final-cta-panel">
-          <div className="final-cta-panel__bg" aria-hidden="true" />
-          <div className="final-cta-panel__glow" aria-hidden="true" />
-          <div className="final-cta-content">
-            <p className="final-cta-kicker">Now you know us</p>
-            <h2 className="final-cta-hero" id="finalHeadline">
-              <span className="final-cta-hero-line1">Once on paper</span>
-              <span className="final-cta-hero-line2">everything changes.</span>
+      <section className="pf-final-cta" id="apply">
+        <div className="pf-final-cta-bg" aria-hidden="true" />
+        <div className="pf-final-cta-panel">
+          <div className="pf-final-cta-panel__bg" aria-hidden="true" />
+          <div className="pf-final-cta-panel__glow" aria-hidden="true" />
+          <div className="pf-final-cta-copy">
+            <p className="pf-final-cta-kicker">Now you know us</p>
+            <h2 className="pf-final-cta-hero" id="finalHeadline">
+              <span className="pf-final-cta-hero-line">Once on paper</span>
+              <span className="pf-final-cta-hero-line">everything changes.</span>
             </h2>
-            <p className="final-cta-sub">
+            <p className="pf-final-cta-sub">
               You&apos;ve made this bet a thousand times in your head.
             </p>
             <Link
-              className="final-cta-link"
+              className="pf-final-cta-link"
               data-magnetic
               to="/fellowship-program-application"
             >

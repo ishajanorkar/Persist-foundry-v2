@@ -49,10 +49,10 @@ const PORTFOLIO_RAW = [
   },
   {
     id: 'bump',
-    name: 'Bump.fm',
+    name: 'Bump',
     tag: 'Music · Web3',
     tags: ['consumer', 'social'],
-    logo: '/assets/bumpfm.png',
+    logo: '/assets/bumpfm.svg',
     logoClass: 'is-compact',
     url: 'https://bump.fm/',
     description:
@@ -147,7 +147,7 @@ const PORTFOLIO_RAW = [
     name: 'Clo.ai',
     tag: 'AI · Wellness',
     tags: ['ai', 'consumer'],
-    logo: '/assets/clo-ai-logo.png',
+    logo: '/assets/clo-ai-logo.svg',
     hoverColor: '#DC838E',
     url: 'https://clo.ai/',
     description:
@@ -211,7 +211,7 @@ const PORTFOLIO_RAW = [
     name: 'CHAINREACH',
     tag: 'Influencer Marketing',
     tags: ['ai', 'media'],
-    logo: '/assets/chainreach.png',
+    logo: '/assets/chainreach.webp',
     logoClass: 'is-large',
     hoverColor: '#CDA434',
     url: 'https://chainreach.io/',
@@ -229,7 +229,7 @@ const PORTFOLIO_RAW = [
     name: 'Deepvid AI',
     tag: 'AI · Video',
     tags: ['ai', 'media'],
-    logo: '/assets/deepvid.ai.png',
+    logo: '/assets/deepvid.ai.webp',
     hoverColor: '#EC7467',
     url: 'https://deepvid.ai/',
     description:
@@ -302,7 +302,7 @@ const PORTFOLIO_RAW = [
     tag: 'Investment',
     tags: ['studio'],
     logo: '/assets/vital-ventures.png',
-    logoClass: 'is-large',
+    logoClass: 'is-invert',
     hoverColor: '#B8975A',
     url: 'https://vitalventures.com/',
     description:
@@ -324,7 +324,7 @@ const PORTFOLIO_RAW = [
     hoverColor: '#79378C',
     url: 'https://asiahouse.org/',
     description:
-      'Asia House is a global think tank and international engagement platform connecting business, government, and policy leaders across Asia, the Middle East, and Europe through strategic insights, high-level dialogue, research, and advisory services.',
+      'ASI House is a global think tank and international engagement platform connecting business, government, and policy leaders across Asia, the Middle East, and Europe through strategic insights, high-level dialogue, research, and advisory services.',
     founders: [
       founder('Jack Jay', {
         linkedin: 'https://www.linkedin.com/in/jack-jay-jackson-jesionowski/',
@@ -351,7 +351,7 @@ const PORTFOLIO_RAW = [
     description:
       'Your campus, unlocked by presence. Socialverse is a campus app built around real-world presence. Students enter their campus, access a local feed, discover active societies, use mini apps, and take part in moments that are tied to where they actually are.',
     founders: [
-      founder('Micheal Dadzie', {
+      founder('Michael Dadzie', {
         linkedin: 'https://www.linkedin.com/in/michaeldadzie/',
         telegram: 'https://t.me/michaeldadzie',
         whatsapp: 'https://wa.me/+233592233105',
@@ -376,7 +376,7 @@ const PORTFOLIO_RAW = [
     description:
       'Vible is redefining social media through a positive, reward-based ecosystem that transforms short-form content into a force for personal growth and global inspiration. Introducing the world\'s first vibe-optimized feed where creators earn for uplifting others and users get rewarded for supporting what makes life better.',
     founders: [
-      founder('Micheal Dadzie', {
+      founder('Michael Dadzie', {
         linkedin: 'https://www.linkedin.com/in/michaeldadzie/',
         telegram: 'https://t.me/michaeldadzie',
         whatsapp: 'https://wa.me/+233592233105',
@@ -466,7 +466,7 @@ const PORTFOLIO_RAW = [
     name: 'Shorts-lol',
     tag: 'AI · Video',
     tags: ['ai', 'media'],
-    logo: '/assets/shorts-lol.png',
+    logo: '/assets/shorts-lol.webp',
     hoverColor: '#093F89',
     url: 'https://shorts.lol/',
     description:
@@ -486,7 +486,7 @@ const PORTFOLIO_RAW = [
     name: 'WestX',
     tag: 'AI · Social',
     tags: ['ai', 'social'],
-    logo: '/assets/westx.png',
+    logo: '/assets/westx.webp',
     logoClass: 'is-shorter',
     hoverColor: '#3D0F5A',
     url: 'https://westx.com/',
@@ -567,7 +567,7 @@ const PORTFOLIO_RAW = [
     name: 'Game of Creators',
     tag: 'Creator Economy',
     tags: ['media', 'social'],
-    logo: '/assets/game-of-creators.png',
+    logo: '/assets/game-of-creators.svg',
     hoverColor: '#C27B16',
     url: 'https://gameofcreators.com/',
     description:
@@ -626,7 +626,7 @@ const PORTFOLIO_RAW = [
     name: 'Ascension Studios',
     tag: 'Film · Web3',
     tags: ['media', 'studio'],
-    logo: '/assets/aacension-studio.png',
+    logo: '/assets/aacension-studio.svg',
     logoClass: 'is-slightly-large',
     hoverColor: '#9EFF3E',
     url: 'https://ascensionstudio.com/',
@@ -639,7 +639,7 @@ const PORTFOLIO_RAW = [
     name: 'Meme Mates',
     tag: 'Dating',
     tags: ['consumer', 'social'],
-    logo: '/assets/meme-mates.png',
+    logo: '/assets/meme-mates.svg',
     hoverColor: '#653872',
     url: 'https://mememates.com/',
     description:
@@ -724,7 +724,7 @@ const PORTFOLIO_RAW = [
     name: 'Election Agency',
     tag: 'Civic · Nonprofit',
     tags: ['civic'],
-    logo: '/assets/election.org.png',
+    logo: '/assets/election.org.webp',
     logoClass: 'is-large',
     hoverColor: '#FC1723',
     url: 'https://electionagency.org/',
@@ -743,7 +743,7 @@ const PORTFOLIO_RAW = [
     name: 'Createathon',
     tag: 'Creator Platform',
     tags: ['media', 'social'],
-    logo: '/assets/createathon.png',
+    logo: '/assets/createathon.svg',
     logoClass: 'is-slightly-large',
     hoverColor: '#7149D2',
     url: 'https://createathon.com/',
@@ -873,7 +873,7 @@ export function getCompanyWebsite(companyId) {
 }
 
 export function getPortfolioImage(company) {
-  return company.logo || getPortfolioThumbnail(company.id) || null
+  return company.logoLive || company.logo || getPortfolioThumbnail(company.id) || null
 }
 
 export function getCompanyYear(company, index) {

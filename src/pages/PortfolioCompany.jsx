@@ -114,14 +114,13 @@ export default function PortfolioCompany() {
             </nav>
 
             <header className="pf-detail-hero">
+              {(company.logoLive || company.logo) && (
+                <div className="pf-detail-hero-logo" aria-hidden="true">
+                  <CompanyLogo company={company} />
+                </div>
+              )}
               <h1 className="pf-detail-title">{company.name}</h1>
             </header>
-
-            {(company.logoLive || company.logo) && (
-              <div className="pf-detail-logo-card">
-                <CompanyLogo company={company} />
-              </div>
-            )}
 
             <div className="pf-detail-main">
               <section className="pf-detail-section">
@@ -178,8 +177,8 @@ export default function PortfolioCompany() {
                     rel="noopener noreferrer"
                   >
                     <span>{visitLabel}</span>
-                    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
-                      <path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg className="nav-cta-arrow" viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
+                      <path d="M3.2 8h9.2M8.3 4.2 12.4 8 8.3 11.8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </a>
                 )}
@@ -191,8 +190,8 @@ export default function PortfolioCompany() {
                     rel="noopener noreferrer"
                   >
                     <span>Pitch Deck</span>
-                    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
-                      <path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg className="nav-cta-arrow" viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
+                      <path d="M3.2 8h9.2M8.3 4.2 12.4 8 8.3 11.8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </a>
                 )}

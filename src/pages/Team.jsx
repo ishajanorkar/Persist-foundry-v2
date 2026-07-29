@@ -406,10 +406,14 @@ function TeamCard({ person, revealDelay }) {
       {/* gradient scrim */}
       <div className="tm-scrim" aria-hidden="true"></div>
 
-      {/* bottom block — role, name rises, bio + socials fade+rise */}
-      <div className="tm-block">
-        <div className="tm-role">{person.role}</div>
+      {/* Name + role pinned to a fixed bottom axis on every card */}
+      <div className="tm-identity">
         <h3 className="tm-name">{person.name}</h3>
+        <div className="tm-role">{person.role}</div>
+      </div>
+
+      {/* Hover details expand upward above the identity strip */}
+      <div className="tm-block">
         <div className="tm-hairline" aria-hidden="true"></div>
         {hasBio && <p className="tm-bio">{person.bio}</p>}
         {hasSocials && (

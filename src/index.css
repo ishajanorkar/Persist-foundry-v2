@@ -7271,68 +7271,104 @@ body::before {
   );
 }
 
-/* ?? bottom block ? frosted glass on hover ?? */
-.tm-block {
+/* Identity strip — fixed distance from bottom on EVERY card (same Y axis) */
+.tm-identity {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 24px 22px 22px;
+  z-index: 4;
+  padding: 0 20px 22px;
+  display: grid;
+  grid-template-rows: 1.35em 1.2em;
+  row-gap: 6px;
+  align-content: end;
+  pointer-events: none;
+}
+
+.tm-name {
+  grid-row: 1;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(17px, 1.7vw, 21px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--paper);
+  margin: 0;
+  width: 100%;
+  height: 1.35em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transform: none;
+}
+
+.tm-role {
+  grid-row: 2;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(244, 241, 250, 0.62);
+  margin: 0;
+  width: 100%;
+  height: 1.2em;
+  line-height: 1.2;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Hover panel sits above the identity strip and grows upward */
+.tm-block {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 70px; /* clears fixed identity strip */
+  padding: 18px 20px 12px;
   z-index: 3;
   border-top: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: stretch;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
   transition:
+    max-height 0.45s cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 0.3s ease,
     background 0.45s ease,
     border-color 0.45s ease,
-    backdrop-filter 0.45s ease;
+    backdrop-filter 0.45s ease,
+    padding 0.45s ease;
 }
 .tm-card:hover .tm-block {
+  max-height: 220px;
+  opacity: 1;
+  pointer-events: auto;
   background: rgba(6, 3, 16, 0.62);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-top-color: rgba(139, 92, 246, 0.18);
 }
-.tm-role {
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--violet);
-  margin-bottom: 8px;
-}
-/* name rises on hover */
-.tm-name {
-  font-family: var(--display);
-  font-weight: 600;
-  font-size: clamp(18px, 1.8vw, 24px);
-  line-height: 1.05;
-  letter-spacing: -0.01em;
-  color: var(--paper);
-  margin: 0;
-  transform: translateY(10px);
-  transition: transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-.tm-card:hover .tm-name {
-  transform: translateY(0);
-}
-/* violet hairline draws left ? right beneath name */
+
 .tm-hairline {
   height: 1px;
   background: linear-gradient(90deg, transparent, #8b5cf6, transparent);
   transform: scaleX(0);
   transform-origin: left;
   opacity: 0;
-  margin-top: 0;
-  margin-bottom: 0;
+  margin: 0 0 10px;
+  flex-shrink: 0;
   transition:
-    transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) 0.12s,
-    opacity 0.35s ease 0.12s,
-    margin 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) 0.08s,
+    opacity 0.35s ease 0.08s;
 }
 .tm-card:hover .tm-hairline {
   transform: scaleX(1);
   opacity: 1;
-  margin-top: 12px;
-  margin-bottom: 10px;
 }
 /* bio slides up + fades in */
 .tm-bio {
@@ -7341,32 +7377,31 @@ body::before {
   font-size: 11.5px;
   line-height: 1.65;
   color: var(--stone-soft);
-  max-height: 0;
   opacity: 0;
-  overflow: hidden;
+  transform: translateY(6px);
   transition:
-    max-height 0.55s cubic-bezier(0.2, 0.7, 0.2, 1),
-    opacity 0.35s ease;
+    opacity 0.35s ease,
+    transform 0.45s ease;
 }
 .tm-card:hover .tm-bio {
-  max-height: 140px;
   opacity: 1;
+  transform: none;
 }
 /* socials fade + rise with delay */
 .tm-socials {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 16px;
+  margin-top: 14px;
   opacity: 0;
   transform: translateY(6px);
   transition:
-    opacity 0.35s ease 0.1s,
-    transform 0.45s ease 0.1s;
+    opacity 0.35s ease 0.08s,
+    transform 0.45s ease 0.08s;
 }
 .tm-card:hover .tm-socials {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
 }
 .tm-socials a {
   width: 28px;
@@ -7551,21 +7586,30 @@ body::before {
   }
   .tm-name {
     font-size: clamp(1.15rem, 5vw, 1.45rem);
-    transform: none;
+    height: 1.45em;
+  }
+  .tm-identity {
+    grid-template-rows: 1.45em 1.2em;
+    padding: 0 18px 20px;
   }
   .tm-role {
     font-size: 10px;
     letter-spacing: 0.14em;
   }
+  .tm-block {
+    bottom: 76px;
+    max-height: 240px;
+    opacity: 1;
+    pointer-events: auto;
+    background: rgba(6, 3, 16, 0.45);
+  }
   .tm-hairline {
     transform: scaleX(1);
     opacity: 1;
-    margin-top: 12px;
-    margin-bottom: 10px;
   }
   .tm-bio {
-    max-height: 200px;
     opacity: 1;
+    transform: none;
     font-size: 12px;
   }
   .tm-socials {
@@ -7577,20 +7621,21 @@ body::before {
   }
 }
 
-/* Touch devices ? keep name/role readable without hover */
+/* Touch devices — keep details readable without hover */
 @media (hover: none) {
-  .tm-name {
-    transform: none;
+  .tm-block {
+    max-height: 240px;
+    opacity: 1;
+    pointer-events: auto;
+    background: rgba(6, 3, 16, 0.45);
   }
   .tm-hairline {
     transform: scaleX(1);
     opacity: 1;
-    margin-top: 10px;
-    margin-bottom: 8px;
   }
   .tm-bio {
-    max-height: 120px;
     opacity: 0.92;
+    transform: none;
   }
   .tm-socials {
     opacity: 1;

@@ -18,10 +18,11 @@ import { TERMS_OF_SERVICE, PRIVACY_POLICY } from './data/legalPages'
 
 function Layout() {
   const { pathname } = useLocation()
-  // Foundry embeds CTA+footer in its scroll track; legacy home has its own CTA.
+  // Foundry home embeds CTA+footer in its scroll track.
   const foundryHome = pathname === '/'
   const isLegal = pathname === '/terms-of-service' || pathname === '/privacy-policy'
-  const showGlobalCta = pathname !== '/' && pathname !== '/legacy' && !isLegal
+  // Same homepage FinalCtaSection (with nested Footer) on every other content route.
+  const showGlobalCta = !foundryHome && pathname !== '/legacy' && !isLegal
   return (
     <>
       <CustomCursor />
@@ -60,8 +61,9 @@ function Layout() {
           element={<LegalPage doc={PRIVACY_POLICY} />}
         />
       </Routes>
-      {showGlobalCta && <FinalCtaSection footer={false} />}
-      {!foundryHome && <Footer />}
+      {showGlobalCta && <FinalCtaSection footer />}
+      {/* Legal / legacy still need a standalone footer (CTA carries its own on other routes) */}
+      {!foundryHome && !showGlobalCta && <Footer />}
     </>
   )
 }
