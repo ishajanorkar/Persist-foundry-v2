@@ -34,6 +34,7 @@ const PORTFOLIO_RAW = [
     tag: 'Robotics',
     tags: ['ai', 'consumer'],
     logo: '/assets/opendroids.png',
+    logoClass: 'is-slightly-compact',
     hoverColor: '#9E56EA',
     url: 'https://opendroids.com/',
     description:
@@ -53,7 +54,7 @@ const PORTFOLIO_RAW = [
     tag: 'Music · Web3',
     tags: ['consumer', 'social'],
     logo: '/assets/bumpfm.svg',
-    logoClass: 'is-compact',
+    logoClass: 'is-slightly-large',
     url: 'https://bump.fm/',
     description:
       'Bump.fm is a next-gen, Solana-native music platform where fans stake songs, not just stream them — turning every track into a prediction market and powering a Web3-driven cultural economy for artists and listeners alike.',
@@ -77,6 +78,7 @@ const PORTFOLIO_RAW = [
     tag: 'AI · Music',
     tags: ['ai', 'media'],
     logo: '/assets/song-gpt-logo.png',
+    logoClass: 'is-slightly-compact',
     url: 'https://songgpt.com/',
     description:
       'Song GPT is an AI-powered music creation platform with a ChatGPT-style interface, enabling smooth, collaborative songwriting. 150,000+ songs generated and counting.',
@@ -96,7 +98,7 @@ const PORTFOLIO_RAW = [
     tag: 'AI · Privacy',
     tags: ['ai', 'consumer'],
     logo: '/assets/facesearcha-i.png',
-    logoClass: 'is-large',
+    logoClass: 'is-extra-large',
     hoverColor: '#03348C',
     url: 'https://facesearchai.com/',
     description:
@@ -128,6 +130,7 @@ const PORTFOLIO_RAW = [
     tag: 'Media',
     tags: ['media', 'studio'],
     logo: '/assets/gifstudios.png',
+    logoClass: 'is-slightly-compact',
     hoverColor: '#DE6045',
     url: 'https://gifstudios.com/',
     description:
@@ -148,6 +151,7 @@ const PORTFOLIO_RAW = [
     tag: 'AI · Wellness',
     tags: ['ai', 'consumer'],
     logo: '/assets/clo-ai-logo.svg',
+    logoClass: 'is-extra-compact',
     hoverColor: '#DC838E',
     url: 'https://clo.ai/',
     description:
@@ -173,7 +177,7 @@ const PORTFOLIO_RAW = [
     tag: 'Venture Studio',
     tags: ['studio', 'media'],
     logo: '/assets/alpha.png',
-    logoClass: 'is-slightly-large',
+    logoClass: 'is-extra-large',
     hoverColor: '#27685B',
     url: 'https://alphabetski.com/',
     description:
@@ -212,7 +216,7 @@ const PORTFOLIO_RAW = [
     tag: 'Influencer Marketing',
     tags: ['ai', 'media'],
     logo: '/assets/chainreach.webp',
-    logoClass: 'is-large',
+    logoClass: 'is-compact',
     hoverColor: '#CDA434',
     url: 'https://chainreach.io/',
     description:
@@ -230,6 +234,7 @@ const PORTFOLIO_RAW = [
     tag: 'AI · Video',
     tags: ['ai', 'media'],
     logo: '/assets/deepvid.ai.webp',
+    logoClass: 'is-slightly-compact',
     hoverColor: '#EC7467',
     url: 'https://deepvid.ai/',
     description:
@@ -270,7 +275,7 @@ const PORTFOLIO_RAW = [
     tag: 'Hiring · Creatives',
     tags: ['talent', 'media'],
     logo: '/assets/flic.png',
-    logoClass: 'is-compact',
+    logoClass: 'is-slightly-large',
     hoverColor: '#A7003E',
     url: 'https://flic.app/',
     description:
@@ -302,7 +307,7 @@ const PORTFOLIO_RAW = [
     tag: 'Investment',
     tags: ['studio'],
     logo: '/assets/vital-ventures.png',
-    logoClass: 'is-invert',
+    logoClass: 'is-extra-large',
     hoverColor: '#B8975A',
     url: 'https://vitalventures.com/',
     description:
@@ -454,7 +459,7 @@ const PORTFOLIO_RAW = [
     tag: 'Influencer Marketing',
     tags: ['media', 'ai'],
     logo: '/assets/creatorship.png',
-    logoClass: 'is-large',
+    logoClass: 'is-slightly-large',
     hoverColor: '#EC5E3F',
     url: 'https://creatorships.com/',
     description:
@@ -513,6 +518,7 @@ const PORTFOLIO_RAW = [
     tag: 'Workspace',
     tags: ['studio'],
     logo: '/assets/collabio.png',
+    logoClass: 'is-slightly-compact',
     hoverColor: '#FFBE0B',
     url: 'https://collabio.com/',
     description:
@@ -567,7 +573,8 @@ const PORTFOLIO_RAW = [
     name: 'Game of Creators',
     tag: 'Creator Economy',
     tags: ['media', 'social'],
-    logo: '/assets/game-of-creators.svg',
+    logo: '/assets/game-of-creators.png',
+    logoClass: 'is-slightly-large',
     hoverColor: '#C27B16',
     url: 'https://gameofcreators.com/',
     description:
@@ -639,7 +646,8 @@ const PORTFOLIO_RAW = [
     name: 'Meme Mates',
     tag: 'Dating',
     tags: ['consumer', 'social'],
-    logo: '/assets/meme-mates.svg',
+    logo: '/assets/meme-mates.png',
+    logoClass: 'is-slightly-compact',
     hoverColor: '#653872',
     url: 'https://mememates.com/',
     description:
@@ -665,7 +673,7 @@ const PORTFOLIO_RAW = [
     tag: 'Community',
     tags: ['social', 'civic'],
     logo: '/assets/communion.png',
-    logoClass: 'is-slightly-large',
+    logoClass: 'is-slightly-compact',
     hoverColor: '#00AEEF',
     url: 'https://communion.app/',
     description:
@@ -756,8 +764,8 @@ const PORTFOLIO_RAW = [
     name: 'AMERICA HOUSE',
     tag: 'Movement',
     tags: ['civic'],
-    logo: '/assets/american-logo.png',
-    logoClass: 'is-slightly-large',
+    logo: '/assets/america-house.png',
+    logoClass: 'is-slightly-compact',
     hoverColor: '#082954',
     url: 'https://americahouse.com/',
     description:

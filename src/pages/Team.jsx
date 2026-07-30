@@ -406,40 +406,38 @@ function TeamCard({ person, revealDelay }) {
       {/* gradient scrim */}
       <div className="tm-scrim" aria-hidden="true"></div>
 
-      {/* Name + role pinned to a fixed bottom axis on every card */}
-      <div className="tm-identity">
+      {/* Bottom stack: Name → role → (hover) bio → socials */}
+      <div className="tm-content">
         <h3 className="tm-name">{person.name}</h3>
         <div className="tm-role">{person.role}</div>
-      </div>
-
-      {/* Hover details expand upward above the identity strip */}
-      <div className="tm-block">
-        <div className="tm-hairline" aria-hidden="true"></div>
-        {hasBio && <p className="tm-bio">{person.bio}</p>}
-        {hasSocials && (
-          <div className="tm-socials">
-            {person.li && (
-              <a
-                href={`https://www.linkedin.com/in/${person.li}/`}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${person.name} on LinkedIn`}
-              >
-                <LiIcon />
-              </a>
-            )}
-            {person.x && (
-              <a
-                href={`https://x.com/${person.x}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${person.name} on X`}
-              >
-                <XIcon />
-              </a>
-            )}
-          </div>
-        )}
+        <div className="tm-hover">
+          <div className="tm-hairline" aria-hidden="true"></div>
+          {hasBio && <p className="tm-bio">{person.bio}</p>}
+          {hasSocials && (
+            <div className="tm-socials">
+              {person.li && (
+                <a
+                  href={`https://www.linkedin.com/in/${person.li}/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${person.name} on LinkedIn`}
+                >
+                  <LiIcon />
+                </a>
+              )}
+              {person.x && (
+                <a
+                  href={`https://x.com/${person.x}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${person.name} on X`}
+                >
+                  <XIcon />
+                </a>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import "../foundry/foundry.css";
 import initFoundry from "../foundry/engine";
@@ -124,18 +125,21 @@ export default function Foundry() {
                 containerClassName="hero-scroll-float"
                 textClassName="hero-scroll-float-text"
                 animationDuration={1}
-                ease="back.inOut(2)"
+                ease="back.out(0.7)"
                 scrollStart="top bottom"
-                stagger={0.02}
+                stagger={0.012}
+                yPercentFrom={55}
+                scaleYFrom={1.35}
+                scaleXFrom={0.9}
                 playOnce
               >
                 {"Back yourself to\nwin\u00A0big."}
               </ScrollFloat>
               <div className="hero-cta-reveal">
-                <a
+                <Link
                   ref={ctaRevealRef}
                   className="btn-primary hero-cta-reveal__inner"
-                  href="#apply"
+                  to="/fellowship-program-application"
                   data-magnetic
                 >
                   Apply for Fellowship
@@ -154,7 +158,7 @@ export default function Foundry() {
                       strokeLinejoin="round"
                     />
                   </svg>
-                </a>
+                </Link>
               </div>
             </div>
             <p className="hero-aside" data-copy="hero-lead">
@@ -271,7 +275,7 @@ export default function Foundry() {
                 Persist began in 2016 to rethink founder support — inspired by
                 Thiel, and open to everyone. What started as a PayPal-to-Ethereum
                 exchange became the model. Nine years on, we stay founder-first
-                and hands-on, having built thirty companies alongside the people
+                and hands-on, having built 30 companies alongside the people
                 who lead them.
               </p>
             </div>
@@ -500,13 +504,13 @@ export default function Foundry() {
                 <div className="pfolio__aside-inner">
                   <h2 className="pfolio__title">Turning ideas into impact.</h2>
                   <p className="pfolio__sub">
-                    Thirty companies launched — and more on the way. A look at
+                    30 companies launched — and more on the way. A look at
                     the ventures we&apos;ve built with founders, from first
                     sketch to something that ships.
                   </p>
-                  <a className="pfolio__cta" href="/portfolio">
+                  <Link className="pfolio__cta" to="/portfolio">
                     View Portfolio <span aria-hidden="true">↗</span>
-                  </a>
+                  </Link>
                 </div>
               </aside>
 

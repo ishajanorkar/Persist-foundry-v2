@@ -114,10 +114,10 @@ body.pf-page .footer-top { padding-top: 48px; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 0;
-  min-height: 228px;
-  padding: 26px 22px 20px;
+  min-height: 200px;
+  padding: 28px 22px 22px;
   background: color-mix(in srgb, var(--paper) 1.2%, var(--void));
   color: var(--paper);
   text-align: center;
@@ -182,7 +182,7 @@ body.pf-page .footer-top { padding-top: 48px; }
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 72px;
+  height: 68px;
   margin-bottom: 16px;
   transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -199,7 +199,6 @@ body.pf-page .footer-top { padding-top: 48px; }
   gap: 4px;
   width: 100%;
   flex-shrink: 0;
-  margin-top: auto;
 }
 
 .pf-cell-name {
@@ -222,13 +221,13 @@ body.pf-page .footer-top { padding-top: 48px; }
   color: #fff;
 }
 
-/* Fixed logo slot — every mark lives in the same box */
+/* Shared logo slot — optical height capped so marks read even across aspect ratios */
 .pf-cell-visual-mark {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: min(132px, 78%);
-  height: 56px;
+  width: min(124px, 82%);
+  height: 52px;
   transition:
     opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
@@ -236,10 +235,10 @@ body.pf-page .footer-top { padding-top: 48px; }
 
 .pf-cell-visual-mark img {
   display: block;
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
   max-width: 100%;
-  max-height: 100%;
+  max-height: 42px;
   object-fit: contain;
   object-position: center;
   filter: none;
@@ -259,23 +258,42 @@ body.pf-page .footer-top { padding-top: 48px; }
   opacity: 0.95;
 }
 
-/* Size modifiers kept for detail pages — neutralize on the grid */
-.pf-cell-visual-mark.is-compact img,
-.pf-cell-visual-mark.is-extra-compact img,
-.pf-cell-visual-mark.is-slightly-compact img,
-.pf-cell-visual-mark.is-shorter img,
-.pf-cell-visual-mark.is-slightly-large img,
-.pf-cell-visual-mark.is-large img,
-.pf-cell-visual-mark.is-extra-large img,
-.pf-cell-visual-mark.is-screenshot img {
-  width: 100%;
-  height: 100%;
+/* Grid optical size modifiers — keep dense marks smaller, thin/wordmarks larger */
+.pf-cell-visual-mark.is-extra-compact img {
+  max-height: 28px;
+  max-width: 68%;
+}
+.pf-cell-visual-mark.is-compact img {
+  max-height: 32px;
+  max-width: 74%;
+}
+.pf-cell-visual-mark.is-slightly-compact img {
+  max-height: 36px;
+  max-width: 82%;
+}
+.pf-cell-visual-mark.is-shorter img {
+  max-height: 28px;
+  max-width: 92%;
+}
+.pf-cell-visual-mark.is-slightly-large img {
+  max-height: 48px;
   max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+}
+.pf-cell-visual-mark.is-large img {
+  max-height: 52px;
+  max-width: 100%;
+}
+.pf-cell-visual-mark.is-extra-large img {
+  max-height: 56px;
+  max-width: 100%;
 }
 
 .pf-cell-visual-mark.is-screenshot img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 42px;
+  object-fit: contain;
   filter: none;
   border-radius: 4px;
   opacity: 1;
@@ -377,7 +395,8 @@ body.pf-page .footer-top { padding-top: 48px; }
 
 /* Company detail — left scroll + sticky visual matching persist.org cards */
 .pf-detail {
-  padding: 0;
+  /* Clearance before global Final CTA so sticky column doesn't collide on release */
+  padding: 0 0 clamp(6.5rem, 16vh, 11rem);
 }
 
 .pf-detail-layout {
@@ -396,7 +415,7 @@ body.pf-page .footer-top { padding-top: 48px; }
 }
 
 .pf-detail-scroll {
-  padding: 128px 0 100px;
+  padding: 128px 0 clamp(5rem, 12vh, 8rem);
   display: flex;
   flex-direction: column;
   gap: 40px;
@@ -756,15 +775,15 @@ body.pf-page .footer-top { padding-top: 48px; }
   align-items: center;
   gap: 14px;
   min-width: 0;
-  flex: 1 1 220px;
-  max-width: 280px;
+  flex: 1 1 240px;
+  max-width: 300px;
 }
 
 .pf-detail-founder-photo {
   flex-shrink: 0;
-  width: 72px;
-  height: 72px;
-  border-radius: 6px;
+  width: 96px;
+  height: 96px;
+  border-radius: 8px;
   overflow: hidden;
   background: linear-gradient(165deg, rgba(120, 84, 213, 0.42) 0%, rgba(74, 46, 159, 0.72) 100%);
 }
@@ -783,7 +802,7 @@ body.pf-page .footer-top { padding-top: 48px; }
   justify-content: center;
   width: 100%;
   height: 100%;
-  font-size: 26px;
+  font-size: 32px;
   color: rgba(244, 241, 250, 0.9);
 }
 
@@ -811,7 +830,7 @@ body.pf-page .footer-top { padding-top: 48px; }
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin-top: 6px;
 }
 
@@ -819,8 +838,8 @@ body.pf-page .footer-top { padding-top: 48px; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border: 1px solid rgba(255, 250, 241, 0.28);
   border-radius: 999px;
   color: var(--paper);
@@ -842,8 +861,8 @@ body.pf-page .footer-top { padding-top: 48px; }
 
 .pf-detail-founder-links svg,
 .pf-detail-founder-links-icon {
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
   flex-shrink: 0;
 }
 
@@ -878,7 +897,7 @@ body.pf-page .footer-top { padding-top: 48px; }
   }
 
   .pf-detail-scroll {
-    padding: 8px 0 80px;
+    padding: 8px 0 clamp(4rem, 10vh, 6rem);
     gap: 32px;
   }
 
@@ -917,7 +936,7 @@ body.pf-page .footer-top { padding-top: 48px; }
   }
   .pf-detail-founders { gap: 14px; }
   .pf-detail-founder-card { max-width: none; flex: 1 1 100%; }
-  .pf-detail-scroll { padding: 8px 0 64px; gap: 28px; }
+  .pf-detail-scroll { padding: 8px 0 clamp(3.5rem, 10vh, 5.5rem); gap: 28px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

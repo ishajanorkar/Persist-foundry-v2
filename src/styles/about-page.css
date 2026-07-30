@@ -275,10 +275,27 @@
   gap: 0.25rem;
 }
 .ab-quote-card__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   font-family: "Montserrat", var(--montserrat), sans-serif;
   font-size: 0.95rem;
   font-weight: 600;
   color: #fffaf1;
+  text-decoration: none;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+.ab-quote-card__li {
+  flex: none;
+  opacity: 0.72;
+  transition: opacity 0.2s ease;
+}
+a.ab-quote-card__name:hover {
+  color: #ffffff;
+  opacity: 0.92;
+}
+a.ab-quote-card__name:hover .ab-quote-card__li {
+  opacity: 1;
 }
 .ab-quote-card__role {
   font-family: "Montserrat", var(--montserrat), sans-serif;
@@ -551,17 +568,14 @@
 .ab-mission__overlay {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(7, 5, 15, 0.55) 0%,
-      rgba(74, 46, 159, 0.75) 45%,
-      rgba(7, 5, 15, 0.75) 100%
-    ),
-    rgba(8, 0, 25, 0.28);
-  mix-blend-mode: multiply;
-  /* background: linear-gradient(0deg, #050609, #050609),
-linear-gradient(0deg, rgba(8, 0, 25, 0.75), rgba(8, 0, 25, 0.75)); */
+  /* Neutral charcoal wash — no purple cast (matches mission reference) */
+  background: linear-gradient(
+    180deg,
+    rgba(5, 6, 9, 0.52) 0%,
+    rgba(5, 6, 9, 0.58) 42%,
+    rgba(5, 6, 9, 0.72) 100%
+  );
+  mix-blend-mode: normal;
 }
 .ab-mission__content {
   position: relative;

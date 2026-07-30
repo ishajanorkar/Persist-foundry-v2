@@ -23,6 +23,10 @@ export default function ScrollFloat({
   scrub = true,
   /** When true, plays the float once as soon as the trigger enters view (better for above-the-fold heroes). */
   playOnce = false,
+  /** Morph intensity — lower = less stretch/bounce on reveal. */
+  yPercentFrom = 120,
+  scaleYFrom = 2.3,
+  scaleXFrom = 0.7,
   as: Tag = 'h2',
 }) {
   const containerRef = useRef(null)
@@ -73,9 +77,9 @@ export default function ScrollFloat({
     const fromVars = {
       willChange: 'opacity, transform',
       opacity: 0,
-      yPercent: 120,
-      scaleY: 2.3,
-      scaleX: 0.7,
+      yPercent: yPercentFrom,
+      scaleY: scaleYFrom,
+      scaleX: scaleXFrom,
       transformOrigin: '50% 0%',
     }
 
@@ -128,6 +132,9 @@ export default function ScrollFloat({
     stagger,
     scrub,
     playOnce,
+    yPercentFrom,
+    scaleYFrom,
+    scaleXFrom,
   ])
 
   return (

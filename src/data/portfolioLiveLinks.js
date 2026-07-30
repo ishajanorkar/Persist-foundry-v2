@@ -54,7 +54,7 @@ export const LIVE_PORTFOLIO_LINKS = {
   mend: {
     url: 'https://www.mendexperience.com/',
     pitchDeck: 'https://pitch.com/v/mend-pitchdeck-j9v2ge',
-    logo: 'https://cdn.prod.website-files.com/623eb8c6eb9b328644ade032/69cd72ee4c27cc0fa2fe6b9c_upscalemedia-transformed%201.png',
+    logo: '/assets/mend-logo.png',
     description:
       'Mend is an AI therapist designed to help users reflect, heal, and grow offering solo or partner-based sessions with emotional insights, conflict resolution, and a safe space for meaningful conversations.',
   },
@@ -96,7 +96,7 @@ export const LIVE_PORTFOLIO_LINKS = {
   'vital-ventures': {
     url: 'https://www.vitalventure.org/',
     pitchDeck: null,
-    logo: 'https://cdn.prod.website-files.com/623eb8c6eb9b328644ade032/69e5e670f7a928cb69b84878_logo.png',
+    logo: '/assets/vital-ventures.png',
     description:
       'Vital Ventures is a long-term oriented firm focused on studying, supporting, and building the foundational systems that will shape human civilization.',
   },
@@ -153,7 +153,7 @@ export const LIVE_PORTFOLIO_LINKS = {
   creatorships: {
     url: 'https://creatorships.org/',
     pitchDeck: 'https://pitch.com/v/creator-ships-pitch-deck-pcdxjv',
-    logo: 'https://cdn.prod.website-files.com/623eb8c6eb9b328644ade032/69175c032b17b8ac61f1917f_logo.png',
+    logo: '/assets/creatorship.png',
     description:
       'Creatorships is a performance-driven platform that helps brands supercharge influencer marketing through real-time dashboards, data-backed discovery of top micro/nano creators, and insights into competitor collaborations all powered by actual engagement metrics.',
   },
@@ -182,7 +182,7 @@ export const LIVE_PORTFOLIO_LINKS = {
   collabio: {
     url: 'https://www.collabio.live/',
     pitchDeck: null,
-    logo: 'https://cdn.prod.website-files.com/623eb8c6eb9b328644ade032/6844a3acf2d2d049077a46d0_collabio.png',
+    logo: '/assets/collabio.png',
     description:
       'Collabio is an all-in-one workspace for streamlined project and team management offering time tracking, task insights, activity reports, and real-time collaboration from one intuitive dashboard.',
   },
@@ -203,7 +203,7 @@ export const LIVE_PORTFOLIO_LINKS = {
   'game-of-creators': {
     url: 'https://www.gameofcreators.com/',
     pitchDeck: 'https://pitch.com/v/game-of-creators-solana-pitch-deck-4un2ze',
-    logo: 'https://cdn.prod.website-files.com/623eb8c6eb9b328644ade032/691f1488971524576cdf68d4_White%20Virtical.svg',
+    logo: '/assets/game-of-creators.png',
     description:
       'Game of Creators is democratizing brand deals by letting brands run creator contests for viral marketing enabling content creators to earn based on performance, not followers, and helping brands reach audiences without the hassle.',
   },
@@ -231,14 +231,14 @@ export const LIVE_PORTFOLIO_LINKS = {
   'meme-mates': {
     url: 'https://mememates.org/',
     pitchDeck: 'https://pitch.com/v/mememates-pitchdeck-67bng3',
-    logo: 'https://cdn.prod.website-files.com/623eb8c6eb9b328644ade032/69176eab7faa1f3d3f7709cf_2CBgx92VCOP3j5dpxeyRbscU.svg',
+    logo: '/assets/meme-mates.png',
     description:
       'MemeMates is a dating app that sparks real connections through humor using memes, mood boards, and music anthems to match users based on shared vibes and mutual interests.',
   },
   communion: {
     url: 'https://communionhub.org/',
     pitchDeck: 'https://www.canva.com/design/DAGo8SSJvFo/7tOv-BLyJHm4neq8U2L1oQ/edit',
-    logo: 'https://cdn.prod.website-files.com/623eb8c6eb9b328644ade032/68443ac324542ff47de50317_Asset%2012%20Communion.png',
+    logo: '/assets/communion.png',
     description:
       'The Communion app brings diverse communities together on one platform to share resources, join discussions, organize events, and support one another in a welcoming, collaborative space.',
   },
@@ -273,7 +273,7 @@ export const LIVE_PORTFOLIO_LINKS = {
   'america-house': {
     url: 'https://www.america.co/',
     pitchDeck: null,
-    logo: 'https://cdn.prod.website-files.com/623eb8c6eb9b328644ade032/69e60b6fa63cd513941d2513_5994683578601639198-removebg-preview.png',
+    logo: '/assets/america-house.png',
     description:
       'More than a residence, America House is the physical anchor for a digital uprising. We are reclaiming the narrative from the pillars of this compound.',
   },

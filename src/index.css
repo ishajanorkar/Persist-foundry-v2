@@ -4392,7 +4392,7 @@ body::before {
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: none;
-  color: rgba(220, 212, 235, 0.78);
+  color: rgba(199, 184, 245, 0.55);
   line-height: 1.4;
 }
 .footer-newsletter {
@@ -4423,7 +4423,8 @@ body::before {
   color: var(--stone);
 }
 .footer-newsletter-btn {
-  background: var(--violet);
+  /* Darker brand fill — same on home + every route */
+  background: var(--brand);
   border: none;
   cursor: pointer;
   padding: 12px 18px;
@@ -4437,7 +4438,7 @@ body::before {
   white-space: nowrap;
 }
 .footer-newsletter-btn:hover {
-  background: var(--violet-soft);
+  background: var(--violet);
 }
 .footer-newsletter-btn:disabled {
   opacity: 0.55;
@@ -4560,7 +4561,7 @@ body::before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: rgba(220, 212, 235, 0.78);
+  color: rgba(199, 184, 245, 0.55);
   text-decoration: none;
   transition:
     color 0.2s ease,
@@ -4568,7 +4569,7 @@ body::before {
     background 0.2s ease;
 }
 .footer-social-link:hover {
-  color: #ffffff;
+  color: var(--paper);
   border-color: rgba(120, 84, 213, 0.5);
   background: rgba(120, 84, 213, 0.12);
 }
@@ -4584,7 +4585,7 @@ body::before {
   font-size: 10px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: rgba(210, 200, 230, 0.72);
+  color: rgba(184, 168, 230, 0.55);
   font-weight: 500;
   margin-bottom: 20px;
 }
@@ -4596,13 +4597,13 @@ body::before {
 .footer-nav-link {
   font-size: 12px;
   letter-spacing: 0.08em;
-  color: rgba(236, 230, 245, 0.88);
+  color: rgba(199, 184, 245, 0.62);
   text-decoration: none;
   transition: color 0.2s ease;
   line-height: 1.4;
 }
 .footer-nav-link:hover {
-  color: #ffffff;
+  color: var(--paper);
 }
 
 /* bottom bar */
@@ -7287,23 +7288,22 @@ body::before {
   );
 }
 
-/* Identity strip — fixed distance from bottom on EVERY card (same Y axis) */
-.tm-identity {
+/* Bottom content stack — Name → role always; bio → socials on hover */
+.tm-content {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 4;
   padding: 0 20px 22px;
-  display: grid;
-  grid-template-rows: 1.35em 1.2em;
-  row-gap: 6px;
-  align-content: end;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   pointer-events: none;
 }
 
 .tm-name {
-  grid-row: 1;
   font-family: var(--display);
   font-weight: 600;
   font-size: clamp(17px, 1.7vw, 21px);
@@ -7320,7 +7320,6 @@ body::before {
 }
 
 .tm-role {
-  grid-row: 2;
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.16em;
@@ -7335,35 +7334,34 @@ body::before {
   text-overflow: ellipsis;
 }
 
-/* Hover panel sits above the identity strip and grows upward */
-.tm-block {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 70px; /* clears fixed identity strip */
-  padding: 18px 20px 12px;
-  z-index: 3;
-  border-top: 1px solid transparent;
+/* Expands beneath name/role on hover */
+.tm-hover {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   align-items: stretch;
+  gap: 0;
   max-height: 0;
   opacity: 0;
   overflow: hidden;
   pointer-events: none;
+  margin: 0 -20px;
+  padding: 0 20px;
+  border-top: 1px solid transparent;
   transition:
     max-height 0.45s cubic-bezier(0.2, 0.7, 0.2, 1),
     opacity 0.3s ease,
     background 0.45s ease,
     border-color 0.45s ease,
     backdrop-filter 0.45s ease,
-    padding 0.45s ease;
+    padding 0.45s ease,
+    margin 0.45s ease;
 }
-.tm-card:hover .tm-block {
+.tm-card:hover .tm-hover {
   max-height: 220px;
   opacity: 1;
   pointer-events: auto;
+  margin: 8px -20px 0;
+  padding: 12px 20px 2px;
   background: rgba(6, 3, 16, 0.62);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -7604,20 +7602,21 @@ body::before {
     font-size: clamp(1.15rem, 5vw, 1.45rem);
     height: 1.45em;
   }
-  .tm-identity {
-    grid-template-rows: 1.45em 1.2em;
+  .tm-content {
     padding: 0 18px 20px;
   }
   .tm-role {
     font-size: 10px;
     letter-spacing: 0.14em;
   }
-  .tm-block {
-    bottom: 76px;
+  .tm-hover {
     max-height: 240px;
     opacity: 1;
     pointer-events: auto;
+    margin: 8px -18px 0;
+    padding: 12px 18px 2px;
     background: rgba(6, 3, 16, 0.45);
+    border-top-color: rgba(139, 92, 246, 0.18);
   }
   .tm-hairline {
     transform: scaleX(1);
@@ -7639,11 +7638,14 @@ body::before {
 
 /* Touch devices — keep details readable without hover */
 @media (hover: none) {
-  .tm-block {
+  .tm-hover {
     max-height: 240px;
     opacity: 1;
     pointer-events: auto;
+    margin: 8px -20px 0;
+    padding: 12px 20px 2px;
     background: rgba(6, 3, 16, 0.45);
+    border-top-color: rgba(139, 92, 246, 0.18);
   }
   .tm-hairline {
     transform: scaleX(1);

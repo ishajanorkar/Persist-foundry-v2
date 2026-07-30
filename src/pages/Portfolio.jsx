@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import {
   PORTFOLIO,
   PORTFOLIO_CATEGORIES,
-  getCompanyYear,
   getPortfolioThumbnail,
 } from '../data/portfolio'
 
@@ -46,7 +45,6 @@ function CellVisual({ company }) {
 
 function PortfolioCell({ company, index, revealOrder }) {
   const navigate = useNavigate()
-  const year = getCompanyYear(company, index)
   const thumbnail = getPortfolioThumbnail(company.id)
 
   return (
@@ -60,7 +58,6 @@ function PortfolioCell({ company, index, revealOrder }) {
       onClick={() => navigate(`/portfolio/${company.id}`)}
       aria-label={`${company.name}, ${company.tag}`}
     >
-      <span className="pf-cell-year">{year}</span>
       <div className="pf-cell-visual">
         <CellVisual company={company} />
       </div>

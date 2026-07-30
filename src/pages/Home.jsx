@@ -710,7 +710,7 @@ export default function Home() {
                 We started Persist in 2016 to rethink founder support: building alongside founders, not from the sidelines.
               </p>
               <p className="impact-backstory-body">
-                Inspired by the Thiel Fellowship but built to be open to everyone, Persist began as one founder's answer to a broken system. What started as a PayPal-to-Ethereum exchange became proof that the right ecosystem changes everything. Nine years and thirty companies later, we stay true to our DNA — founder-first and deeply involved. Because when ambitious founders and the right support come together, exceptional companies are born.
+                Inspired by the Thiel Fellowship but built to be open to everyone, Persist began as one founder's answer to a broken system. What started as a PayPal-to-Ethereum exchange became proof that the right ecosystem changes everything. Nine years and 30 companies later, we stay true to our DNA — founder-first and deeply involved. Because when ambitious founders and the right support come together, exceptional companies are born.
               </p>
             </div>
           </div>
@@ -747,7 +747,7 @@ export default function Home() {
           <div className="portfolio-v2-header">
             <div>
               <h2 className="portfolio-v2-title"><em>They bet.</em><br />We backed it.</h2>
-              <div className="portfolio-v2-meta">Three of thirty.</div>
+              <div className="portfolio-v2-meta">3 of 30.</div>
             </div>
             <div className="portfolio-v2-sub">
               We don't pick winners. We pick people who can't stop. Here's what nine years of that looks like.
@@ -846,10 +846,10 @@ export default function Home() {
           </div>
 
           <div className="portfolio-v2-cta">
-            <p className="portfolio-v2-cta-label">Three of thirty. <em>The rest are just as relentless.</em></p>
-            <a href="/portfolio" className="portfolio-v2-cta-link" data-magnetic>
-              See all thirty <span className="arrow">→</span>
-            </a>
+            <p className="portfolio-v2-cta-label">3 of 30. <em>The rest are just as relentless.</em></p>
+            <Link to="/portfolio" className="portfolio-v2-cta-link" data-magnetic>
+              See all 30 <span className="arrow">→</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -1114,7 +1114,7 @@ export default function Home() {
             </span>
           </Link>
 
-          <a href="#" className="final-cta-partner">Or talk to a partner first</a>
+          <Link to="/contact" className="final-cta-partner">Or talk to a partner first</Link>
 
           {/* stats */}
           <div className="final-cta-stats" id="finalStats">
@@ -1154,30 +1154,35 @@ const PROG_DATA = [
     desc:'A focused sprint for the bet already in motion.',
     bullets:['8–12 week intensive','Capital + conviction up front','A room that moves at your pace'],
     cta:'Explore Accelerator',
+    to:'/fellowship-program-application',
     fill:'radial-gradient(circle at 38% 32%, #d3c2fb, #8f73e6 46%, #6849c9 100%)',
     shadow:'0 0 30px 4px rgba(133,99,224,0.55)', hasRing:false, size:38 },
   { idx:'02', name:'Co-Founder Bridge',  eyebrow:'02 · The Match',
     desc:'For the solo founder still missing the other half of the bet.',
     bullets:['Curated co-founder matching','Equity & alignment frameworks','Trial sprints before you commit'],
     cta:'Explore the Bridge',
+    to:'/apply-to-cofoundathon',
     fill:'radial-gradient(circle at 38% 32%, #c2cefb, #6f80df 48%, #4a59c4 100%)',
     shadow:'0 0 26px 3px rgba(96,116,216,0.5)', hasRing:false, size:27 },
   { idx:'03', name:'Studio for Companies', eyebrow:'03 · The Build',
     desc:'Embedded operators for companies scaling a proven bet.',
     bullets:['Senior operators on demand','Product, growth & ops','Outcomes, not retainers'],
     cta:'Explore the Studio',
+    to:'/contact',
     fill:'radial-gradient(circle at 38% 32%, #e6c9f6, #b576dd 48%, #8c4fc2 100%)',
     shadow:'0 0 34px 5px rgba(168,98,212,0.55)', hasRing:true, size:44 },
   { idx:'04', name:'Studio for Founders', eyebrow:'04 · The Forge',
     desc:'A standing studio for founders between bets.',
     bullets:['From idea to incorporation','Capital + craft on tap','Built beside other founders'],
     cta:'Explore Founders Studio',
+    to:'/fellowship-program-application',
     fill:'radial-gradient(circle at 38% 32%, #c1bef9, #7b76e6 48%, #514cc4 100%)',
     shadow:'0 0 28px 4px rgba(99,93,214,0.5)', hasRing:false, size:31 },
   { idx:'05', name:'Sub Studio Program',  eyebrow:'05 · The Orbit',
     desc:'A satellite track for the bets still taking shape.',
     bullets:['Part-time, low commitment','Full access to the network','Graduate into a room'],
     cta:'Explore Sub Studio',
+    to:'/fellowship-program-application',
     fill:'radial-gradient(circle at 38% 32%, #ebc3ec, #c878cd 48%, #a4509f 100%)',
     shadow:'0 0 24px 3px rgba(180,92,178,0.5)', hasRing:false, size:24 },
 ]
@@ -1370,7 +1375,7 @@ function ProgramsSection() {
               <ul className="prog-card-bullets">
                 {p.bullets.map(b=>(<li key={b}><span className="prog-card-pip"></span>{b}</li>))}
               </ul>
-              <a href="#apply" className="prog-card-cta">{p.cta}<span className="prog-card-cta-icon">↗</span></a>
+              <Link to={p.to} className="prog-card-cta">{p.cta}<span className="prog-card-cta-icon">↗</span></Link>
             </div>
           ))}
 
