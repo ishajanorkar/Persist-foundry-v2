@@ -224,7 +224,7 @@ export default function About() {
           (window.innerHeight / 2 - (r.top + r.height / 2)) /
           window.innerHeight;
         const y = p * factor * 100;
-        el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0) scale(1.08)`;
+        el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0) scale(1.02)`;
       });
     };
     window.addEventListener("scroll", updatePhotoParallax, { passive: true });
@@ -524,12 +524,22 @@ export default function About() {
       {/* ═══════════════ MISSION ═══════════════ */}
       <section className="ab-mission" id="mission">
         <div className="ab-mission__photo-wrap" aria-hidden="true">
-          <img
-            id="abMissionPhoto"
-            className="ab-mission__photo"
-            src="/assets/team.png"
-            alt=""
-          />
+          <picture>
+            <source
+              type="image/webp"
+              srcSet="/assets/about/mission-team-4x.webp"
+            />
+            <img
+              id="abMissionPhoto"
+              className="ab-mission__photo"
+              src="/assets/about/mission-team-4x.webp"
+              alt=""
+              width={3200}
+              height={1480}
+              decoding="async"
+              fetchPriority="low"
+            />
+          </picture>
           <div className="ab-mission__overlay" />
         </div>
         <div className="ab-mission__content">

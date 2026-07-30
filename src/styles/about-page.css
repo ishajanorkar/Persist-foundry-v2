@@ -6,7 +6,7 @@
 .ab-inner {
   max-width: 1360px;
   margin: 0 auto;
-  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  padding: 0 var(--gutter);
 }
 
 .ab-reveal {
@@ -74,7 +74,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(6rem, 12vh, 8rem) clamp(1.25rem, 4vw, 2.5rem)
+  padding: clamp(6rem, 12vh, 8rem) var(--gutter)
     clamp(3rem, 8vh, 5rem);
   background: #050609;
   overflow: hidden;
@@ -199,7 +199,7 @@
   z-index: 1;
   max-width: 1280px;
   margin: 0 auto;
-  padding: clamp(5.5rem, 14vh, 9rem) clamp(1.25rem, 4vw, 3.5rem);
+  padding: clamp(5.5rem, 14vh, 9rem) var(--gutter);
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.78fr);
   gap: clamp(2rem, 6vw, 5rem);
@@ -382,7 +382,7 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   justify-content: center;
   overflow: hidden;
   background: #000;
-  padding: clamp(4rem, 10vh, 7rem) clamp(1.25rem, 4vw, 2.5rem);
+  padding: clamp(4rem, 10vh, 7rem) var(--gutter);
 }
 .ab-inside__hands {
   position: absolute;
@@ -551,7 +551,7 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: clamp(5rem, 12vh, 8rem) clamp(1.25rem, 4vw, 2.5rem);
+  padding: clamp(5rem, 12vh, 8rem) var(--gutter);
 }
 .ab-mission__photo-wrap {
   position: absolute;
@@ -559,22 +559,39 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   z-index: 0;
   overflow: hidden;
 }
+.ab-mission__photo-wrap picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .ab-mission__photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 42%;
   will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  image-rendering: auto;
+  /* Avoid browser softening when scaled for cover */
+  -webkit-font-smoothing: antialiased;
 }
 .ab-mission__overlay {
   position: absolute;
   inset: 0;
-  /* Neutral charcoal wash — no purple cast (matches mission reference) */
-  background: linear-gradient(
-    180deg,
-    rgba(5, 6, 9, 0.52) 0%,
-    rgba(5, 6, 9, 0.58) 42%,
-    rgba(5, 6, 9, 0.72) 100%
-  );
+  /* Dark filter matching mission reference — keeps white copy readable */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4, 5, 8, 0.58) 0%,
+      rgba(4, 5, 8, 0.64) 45%,
+      rgba(4, 5, 8, 0.78) 100%
+    ),
+    radial-gradient(
+      ellipse 85% 70% at 50% 45%,
+      rgba(4, 5, 8, 0.18) 0%,
+      rgba(4, 5, 8, 0.55) 100%
+    );
   mix-blend-mode: normal;
 }
 .ab-mission__content {
@@ -610,7 +627,7 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
 .ab-cta__inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  padding: 0 var(--gutter);
 }
 .ab-cta__headline {
   margin: 0 0 1.1rem;
@@ -657,7 +674,7 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   .ab-hero {
     min-height: 100vh;
     min-height: 100dvh;
-    padding: 5.5rem clamp(1.25rem, 4vw, 2rem) 3rem;
+    padding: 5.5rem var(--gutter) 3rem;
     align-items: center;
     justify-content: center;
   }
@@ -748,7 +765,7 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
     /* width: min(62vw, 340px); */
   }
   .ab-inside__panel {
-    padding: clamp(2rem, 6vh, 3.5rem) clamp(1.25rem, 4vw, 2rem);
+    padding: clamp(2rem, 6vh, 3.5rem) var(--gutter);
   }
 }
 
@@ -756,7 +773,7 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   .ab-hero {
     min-height: 100vh;
     min-height: 100dvh;
-    padding: 5rem 1.25rem 2.5rem;
+    padding: 5rem var(--gutter) 2.5rem;
   }
   .ab-hero__model-wrap {
     top: 52%;

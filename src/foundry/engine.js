@@ -326,7 +326,9 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       } else {
         const approach = Math.max(0, Math.min(1, (p - 0.68) / 0.16));
         const hold = Math.max(thresholdO, approach);
-        stageFlareMask.style.opacity = (hold * 0.55).toFixed(3);
+        // Mobile: fully veil the baked center star; desktop keeps a soft wash
+        const maskStrength = isMobile ? 1 : 0.55;
+        stageFlareMask.style.opacity = (hold * maskStrength).toFixed(3);
       }
     }
   }
@@ -686,14 +688,14 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     // the ring clears the centered heading above + detail panel below.
     let D;
     if (vw <= 900) {
-      // Phones: larger ring + type; tablets: still height-aware so heading/detail clear.
-      const headingBudget = vw <= 640 ? 118 : 112;
-      const detailBudget = vw <= 640 ? 128 : 124;
-      const availH = Math.max(180, vh - headingBudget - detailBudget - 24);
-      const availW = vw * (vw <= 640 ? 0.86 : 0.62);
-      const scale = vw <= 640 ? 0.56 : 0.42;
+      // Mobile stack: left heading above, left detail below, wheel in the middle
+      const headingBudget = vw <= 640 ? 150 : 140;
+      const detailBudget = vw <= 640 ? 200 : 185;
+      const availH = Math.max(200, vh - headingBudget - detailBudget - 16);
+      const availW = vw * (vw <= 640 ? 0.92 : 0.72);
+      const scale = vw <= 640 ? 0.62 : 0.48;
       D = Math.round(Math.min(vmin * scale, availH, availW));
-      D = Math.max(vw <= 640 ? 200 : 180, Math.min(D, vw <= 640 ? 300 : 290));
+      D = Math.max(vw <= 640 ? 240 : 210, Math.min(D, vw <= 640 ? 340 : 310));
     } else if (vw < 1100) {
       D = Math.round(vmin * 0.48);
     } else if (vw < 1280) {
@@ -895,10 +897,28 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       ring.appendChild(petal);
       armNodes.push({ el: petal, arm, iconSvg });
 
-      petal.addEventListener("mouseenter", () => showArm(arm, petal));
-      petal.addEventListener("mouseleave", hideArm);
-      petal.addEventListener("focus", () => showArm(arm, petal));
-      petal.addEventListener("blur", hideArm);
+      petal.addEventListener("mouseenter", () => {
+        if (window.matchMedia("(max-width: 900px)").matches) return;
+        showArm(arm, petal);
+      });
+      petal.addEventListener("mouseleave", () => {
+        if (window.matchMedia("(max-width: 900px)").matches) return;
+        hideArm();
+      });
+      petal.addEventListener("focus", () => {
+        if (window.matchMedia("(max-width: 900px)").matches) return;
+        showArm(arm, petal);
+      });
+      petal.addEventListener("blur", () => {
+        if (window.matchMedia("(max-width: 900px)").matches) return;
+        hideArm();
+      });
+      // Mobile: tap to select and keep the detail panel open
+      petal.addEventListener("click", (e) => {
+        if (!window.matchMedia("(max-width: 900px)").matches) return;
+        e.preventDefault();
+        showArm(arm, petal);
+      });
     });
 
     const st = document.createElement("style");
@@ -1029,45 +1049,60 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       }
       @media (max-width:900px){
         .orbit-heading{
-          left:50%;transform:translateX(-50%);
-          max-width:min(22rem,86vw);top:clamp(5rem,10vh,6.5rem);
-          align-items:center;text-align:center;gap:0.5rem;
+          left:var(--gutter,20px);right:var(--gutter,20px);transform:none;
+          max-width:none;width:auto;top:clamp(4.75rem,9vh,5.75rem);
+          align-items:flex-start;text-align:left;gap:0.65rem;
         }
         .orbit-heading__title{
-          font-size:clamp(0.95rem,2.6vw,1.1rem);
-          text-align:center;
+          font-size:clamp(1.35rem,6.2vw,1.75rem);
+          text-align:left;line-height:1.15;
         }
         .orbit-heading__body{
-          max-width:32ch;font-size:clamp(0.72rem,1.9vw,0.82rem);
-          line-height:1.4;text-align:center;
+          max-width:none;width:100%;font-size:clamp(0.82rem,3.4vw,0.95rem);
+          line-height:1.45;text-align:left;color:rgba(168,172,184,0.78);
         }
-        /* mid band — detail sits just under the ring */
-        .orbit-donut{top:52%;}
-        .orbit-petal__icon{width:18px;height:18px;}
+        /* Mid stack between heading + detail */
+        .orbit-donut{top:48%;}
+        .orbit-petal__icon{width:20px;height:20px;}
         .orbit-petal__label{
-          font-size:clamp(0.48rem,1.3vw,0.58rem);
-          line-height:1.15;max-width:9ch;letter-spacing:-0.03em;
+          font-size:clamp(0.52rem,2.4vw,0.64rem);
+          line-height:1.15;max-width:10ch;letter-spacing:-0.03em;
         }
-        .orbit-petal__content{gap:6px;}
+        .orbit-petal__content{gap:7px;}
+        .orbit-petal{
+          --orbit-active-fill:radial-gradient(circle at 50% 50%,
+            rgb(28,18,58) 0%,
+            rgb(58,36,110) 32%,
+            rgb(98,68,170) 52%,
+            rgb(128,92,200) 66%,
+            rgb(158,122,220) 78%,
+            rgba(186,154,235,0.92) 90%);
+        }
+        .orbit-petal.is-featured{
+          box-shadow:
+            inset 0.5px 1px 0 rgba(255,255,255,0.28),
+            0 0 28px rgba(120,84,213,0.45),
+            0 0 56px rgba(88,66,180,0.28);
+        }
       }
       @media (max-width:900px) and (max-height:820px){
-        .orbit-heading{top:clamp(4.5rem,8.5vh,5.75rem);gap:0.35rem;}
-        .orbit-heading__body{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-        .orbit-donut{top:50%;}
+        .orbit-heading{top:clamp(4.35rem,8vh,5.35rem);gap:0.45rem;}
+        .orbit-heading__body{display:block;-webkit-line-clamp:unset;overflow:visible;}
+        .orbit-donut{top:47%;}
       }
       @media (max-width:640px){
         .orbit-heading{
-          left:50%;transform:translateX(-50%);
-          top:clamp(5.25rem,10.5vh,6.75rem);
-          gap:0.45rem;max-width:min(20rem,90vw);
-          align-items:center;text-align:center;
+          left:var(--gutter,20px);right:var(--gutter,20px);transform:none;
+          top:clamp(4.5rem,8.5vh,5.5rem);
+          gap:0.55rem;max-width:none;width:auto;
+          align-items:flex-start;text-align:left;
         }
-        .orbit-heading__title,.orbit-heading__body{text-align:center;}
-        .orbit-heading__title{font-size:clamp(1.05rem,5.2vw,1.28rem);}
-        .orbit-heading__body{max-width:30ch;font-size:clamp(0.78rem,3.5vw,0.92rem);line-height:1.4;}
-        .orbit-donut{top:52%;}
-        .orbit-petal__icon{width:16px;height:16px;}
-        .orbit-petal__label{font-size:clamp(0.46rem,2.1vw,0.54rem);max-width:9ch;}
+        .orbit-heading__title,.orbit-heading__body{text-align:left;}
+        .orbit-heading__title{font-size:clamp(1.4rem,6.8vw,1.7rem);}
+        .orbit-heading__body{max-width:none;font-size:clamp(0.84rem,3.6vw,0.95rem);line-height:1.45;}
+        .orbit-donut{top:48%;}
+        .orbit-petal__icon{width:18px;height:18px;}
+        .orbit-petal__label{font-size:clamp(0.5rem,2.3vw,0.6rem);max-width:10ch;}
       }`;
     document.head.appendChild(st);
     injectedStyle = st;
@@ -1166,17 +1201,29 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     clearCard();
   }
 
-  // Hover/focus shows the panel; scroll past the active wheel always dismisses it
-  // (mobile touch can leave hoverActive stuck true without a mouseleave).
+  // Hover/focus shows the panel; scroll past the active wheel always dismisses it.
+  // Mobile: tap-to-select stays open; auto-feature Accelerator when the wheel arrives.
   function updateFeatured(p, op) {
     lastProg = p;
     lastOp = op;
     const inActiveWheel = op > 0.35 && p > 0.3 && p < 0.94;
+    const mobile = window.matchMedia("(max-width: 900px)").matches;
     if (
       !inActiveWheel &&
       (featuredIndex !== -1 || armDetail?.classList.contains("show"))
     ) {
       clearCard();
+      return;
+    }
+    if (mobile && inActiveWheel) {
+      if (featuredIndex === -1 && armNodes.length) {
+        const pref =
+          armNodes.find((x) => x.arm.id === "accelerator") ||
+          armNodes[Math.floor(armNodes.length / 2)] ||
+          armNodes[0];
+        featuredIndex = armNodes.indexOf(pref);
+        featureArm(pref.arm, pref.el, pref.iconSvg || "", false);
+      }
       return;
     }
     if (
@@ -1365,7 +1412,10 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         if (threeCanvas) threeCanvas.style.opacity = "0";
         stopThree();
         // re-cover the baked center flare softly while Backstory is on screen again
-        if (stageFlareMask) stageFlareMask.style.opacity = "0.55";
+        if (stageFlareMask) {
+          const isMobile = window.matchMedia("(max-width: 1024px)").matches;
+          stageFlareMask.style.opacity = isMobile ? "1" : "0.55";
+        }
         if (canvas) canvas.style.filter = "";
       },
       onLeave: () => {
@@ -1385,8 +1435,10 @@ export default function initFoundry({ base = "/foundry" } = {}) {
 
         // Lift the soft veil smoothly as the zoom plays — no hard black flash
         if (stageFlareMask) {
+          const isMobile = window.matchMedia("(max-width: 1024px)").matches;
+          const base = isMobile ? 1 : 0.55;
           const lift = Math.min(1, orbitProgress / 0.28);
-          stageFlareMask.style.opacity = Math.max(0, 0.55 * (1 - lift)).toFixed(
+          stageFlareMask.style.opacity = Math.max(0, base * (1 - lift)).toFixed(
             3,
           );
         }

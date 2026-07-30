@@ -277,8 +277,7 @@ export default function FinalCtaSection({ footer = false }) {
           <div className="pf-final-cta-copy">
             <p className="pf-final-cta-kicker">Now you know us</p>
             <h2 className="pf-final-cta-hero" id="finalHeadline">
-              <span className="pf-final-cta-hero-line">Once on paper</span>
-              <span className="pf-final-cta-hero-line">everything changes.</span>
+              Once on paper changes everything.
             </h2>
             <p className="pf-final-cta-sub">
               You&apos;ve made this bet a thousand times in your head.

@@ -1,87 +1,96 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-const SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL?.trim();
+const SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL || "";
+
+const EXPLORE_LINKS = [
+  { label: "Home", to: "/" },
+  { label: "About", to: "/about" },
+  { label: "Portfolio", to: "/portfolio" },
+  { label: "Our Team", to: "/team" },
+  {
+    label: "Blog",
+    href: "https://ww.persist.org/free-courses",
+    external: true,
+  },
+];
+
+const OPPORTUNITY_LINKS = [
+  { label: "Job Application", to: "/apply-for-a-full-time-position" },
+  { label: "Co-Foundathon", to: "/apply-to-cofoundathon" },
+  { label: "Investor Application", to: "/investor-application" },
+  { label: "Careers", to: "/careers" },
+  { label: "Contact Us", to: "/contact" },
+];
+
+const LEGAL_LINKS = [
+  { label: "Terms of Service", to: "/terms-of-service" },
+  { label: "Privacy Policy", to: "/privacy-policy" },
+  {
+    label: "Decentralized Intelligence Agency",
+    href: "https://dia.wiki/",
+    external: true,
+  },
+];
+
+function IconLinkedIn() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.23 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.73V1.73C24 .77 23.21 0 22.23 0z" />
+    </svg>
+  );
+}
+
+function IconInstagram() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.64-.07-4.85s.01-3.58.07-4.85C2.38 3.92 3.9 2.38 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16zm0-2.16C8.74 0 8.33.01 7.05.07 2.7.27.27 2.69.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98 1.28.06 1.69.07 4.95.07s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95C23.73 2.7 21.31.27 16.95.07 15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.41-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z" />
+    </svg>
+  );
+}
+
+function IconYouTube() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M23.5 6.2a3.02 3.02 0 0 0-2.13-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.37.56A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.13 2.14c1.87.56 9.37.56 9.37.56s7.5 0 9.37-.56a3.02 3.02 0 0 0 2.13-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.75 15.02V8.98L15.5 12l-5.75 3.02z" />
+    </svg>
+  );
+}
+
+function NavLink({ link }) {
+  if (link.external) {
+    return (
+      <a
+        href={link.href}
+        className="footer-nav-link"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {link.label}
+      </a>
+    );
+  }
+  return (
+    <Link to={link.to} className="footer-nav-link">
+      {link.label}
+    </Link>
+  );
+}
 
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle"); // idle | loading | success | error
 
-  const handleSubscribe = async (e) => {
+  async function handleSubscribe(e) {
     e.preventDefault();
-    const value = email.trim().toLowerCase();
-    if (!value || !value.includes("@") || !value.includes(".")) {
-      setStatus("error");
-      return;
-    }
-
+    const value = email.trim();
+    if (!value) return;
     if (!SCRIPT_URL) {
-      console.warn(
-        "VITE_GOOGLE_SCRIPT_URL is not set. Deploy google-apps-script/newsletter.gs and add the Web App URL to .env / Vercel",
-      );
       setStatus("error");
       return;
     }
 
     setStatus("loading");
-
-    const fail = () => setStatus("error");
-    const ok = () => {
-      setStatus("success");
-      setEmail("");
-    };
-
-    // 1) Preferred: GET ?email= (works when Apps Script is public + CORS-readable)
-    try {
-      const endpoint = `${SCRIPT_URL}${SCRIPT_URL.includes("?") ? "&" : "?"}email=${encodeURIComponent(value)}`;
-      const res = await fetch(endpoint, {
-        method: "GET",
-        redirect: "follow",
-      });
-      const text = await res.text();
-      const looksHtml =
-        /^\s*<!doctype/i.test(text) ||
-        /^\s*<html/i.test(text) ||
-        /accounts\.google/i.test(text);
-      if (looksHtml) {
-        throw new Error("Apps Script is not public");
-      }
-      try {
-        const json = JSON.parse(text);
-        if (json && json.success) {
-          ok();
-          return;
-        }
-        if (json && json.success === false) {
-          fail();
-          return;
-        }
-      } catch {
-        if (res.ok) {
-          ok();
-          return;
-        }
-      }
-    } catch {
-      /* fall through */
-    }
-
-    // 2) FormData POST (lands in e.parameter) — reliable with no-cors
-    try {
-      const body = new FormData();
-      body.append("email", value);
-      await fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body,
-      });
-      ok();
-      return;
-    } catch {
-      /* fall through */
-    }
-
-    // 3) JSON text/plain POST
     try {
       await fetch(SCRIPT_URL, {
         method: "POST",
@@ -89,21 +98,20 @@ export default function Footer() {
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ email: value }),
       });
-      ok();
-    } catch (err) {
-      console.error("Newsletter subscribe failed", err);
-      fail();
+      setStatus("success");
+      setEmail("");
+    } catch {
+      setStatus("error");
     }
-  };
+  }
 
   return (
     <footer className="footer">
-      {/* ── top grid ── */}
       <div className="footer-top">
-        {/* col 1 — brand + newsletter + socials */}
+        {/* Brand + newsletter + socials */}
         <div className="footer-brand-col">
           <Link to="/" className="footer-logo">
-            <img src="/pv-favicon.png" alt="Persist" />
+            <img src="/pv-favicon.png" alt="" />
             <span className="footer-logo-name">Persist</span>
           </Link>
 
@@ -113,9 +121,11 @@ export default function Footer() {
                 Subscribe to our newsletter
               </p>
             )}
-            {/* ── form state ── */}
+
             <form
-              className={`footer-newsletter${status === "success" || status === "error" ? " is-gone" : ""}`}
+              className={`footer-newsletter${
+                status === "success" || status === "error" ? " is-gone" : ""
+              }`}
               onSubmit={handleSubscribe}
             >
               <input
@@ -134,28 +144,18 @@ export default function Footer() {
                 disabled={status === "loading"}
               >
                 {status === "loading" ? (
-                  <span
-                    className="footer-newsletter-spinner"
-                    aria-hidden="true"
-                  />
+                  <span className="footer-newsletter-spinner" aria-hidden="true" />
                 ) : (
                   "Subscribe"
                 )}
               </button>
             </form>
 
-            {/* ── success card ── */}
             {status === "success" && (
-              <div className="footer-newsletter-card is-success">
-                <span className="fnc-icon">
+              <div className="footer-newsletter-card is-success" role="status">
+                <span className="fnc-icon" aria-hidden="true">
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <circle
-                      cx="9"
-                      cy="9"
-                      r="8.25"
-                      stroke="currentColor"
-                      strokeWidth="1.3"
-                    />
+                    <circle cx="9" cy="9" r="8.25" stroke="currentColor" strokeWidth="1.3" />
                     <path
                       d="M5.5 9l2.5 2.5L12.5 6"
                       stroke="currentColor"
@@ -166,170 +166,93 @@ export default function Footer() {
                   </svg>
                 </span>
                 <div className="fnc-text">
-                  <strong>You're in.</strong>
-                  <span>Welcome to the circle — we'll be in touch.</span>
+                  <strong>Subscribed</strong>
+                  <span>You&apos;re on the list.</span>
                 </div>
               </div>
             )}
 
-            {/* ── error card ── */}
             {status === "error" && (
-              <div className="footer-newsletter-card is-error">
-                <span className="fnc-icon">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <circle
-                      cx="9"
-                      cy="9"
-                      r="8.25"
-                      stroke="currentColor"
-                      strokeWidth="1.3"
-                    />
-                    <path
-                      d="M9 5.5v4M9 11.5v1"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
+              <div className="footer-newsletter-card is-error" role="alert">
                 <div className="fnc-text">
-                  <strong>Something went wrong.</strong>
-                  <span>Check your connection and try again.</span>
+                  <strong>Something went wrong</strong>
+                  <span>Please try again.</span>
                 </div>
-                <button className="fnc-retry" onClick={() => setStatus("idle")}>
+                <button
+                  type="button"
+                  className="fnc-retry"
+                  onClick={() => setStatus("idle")}
+                >
                   Retry
                 </button>
               </div>
             )}
           </div>
 
-          <div className="footer-socials">
+          <div className="footer-socials" aria-label="Social links">
             <a
+              className="footer-social-link"
               href="https://www.linkedin.com/company/persist-ventures/"
               target="_blank"
               rel="noopener noreferrer"
-              className="footer-social-link"
               aria-label="LinkedIn"
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-              </svg>
+              <IconLinkedIn />
             </a>
             <a
+              className="footer-social-link"
               href="https://www.instagram.com/persistventures/"
               target="_blank"
               rel="noopener noreferrer"
-              className="footer-social-link"
               aria-label="Instagram"
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-              </svg>
+              <IconInstagram />
             </a>
             <a
+              className="footer-social-link"
               href="https://www.youtube.com/@persistventures"
               target="_blank"
               rel="noopener noreferrer"
-              className="footer-social-link"
               aria-label="YouTube"
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-              </svg>
+              <IconYouTube />
             </a>
           </div>
         </div>
 
-        {/* col 2 — Explore */}
-        <div className="footer-nav-col">
-          <div className="footer-nav-heading">Explore</div>
-          <nav className="footer-nav-links">
-            <Link to="/" className="footer-nav-link">
-              Home
-            </Link>
-            <Link to="/about" className="footer-nav-link">
-              About
-            </Link>
-            <Link to="/portfolio" className="footer-nav-link">
-              Portfolio
-            </Link>
-            <Link to="/team" className="footer-nav-link">
-              Our Team
-            </Link>
-            <a
-              href="https://ww.persist.org/free-courses"
-              className="footer-nav-link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Blog
-            </a>
-          </nav>
-        </div>
+        <div className="footer-nav-cols">
+          {/* Explore */}
+          <div className="footer-nav-col">
+            <div className="footer-nav-heading">Explore</div>
+            <nav className="footer-nav-links" aria-label="Explore">
+              {EXPLORE_LINKS.map((link) => (
+                <NavLink key={link.label} link={link} />
+              ))}
+            </nav>
+          </div>
 
-        {/* col 3 — Opportunities */}
-        <div className="footer-nav-col">
-          <div className="footer-nav-heading">Opportunities</div>
-          <nav className="footer-nav-links">
-            <Link
-              to="/apply-for-a-full-time-position"
-              className="footer-nav-link"
-            >
-              Job Application
-            </Link>
-            <Link to="/apply-to-cofoundathon" className="footer-nav-link">
-              Co-Foundathon
-            </Link>
-            <Link to="/investor-application" className="footer-nav-link">
-              Investor Application
-            </Link>
-            <Link to="/careers" className="footer-nav-link">
-              Careers
-            </Link>
-            <Link to="/contact" className="footer-nav-link">
-              Contact Us
-            </Link>
-          </nav>
-        </div>
+          {/* Opportunities */}
+          <div className="footer-nav-col">
+            <div className="footer-nav-heading">Opportunities</div>
+            <nav className="footer-nav-links" aria-label="Opportunities">
+              {OPPORTUNITY_LINKS.map((link) => (
+                <NavLink key={link.label} link={link} />
+              ))}
+            </nav>
+          </div>
 
-        {/* col 4 — Legal */}
-        <div className="footer-nav-col">
-          <div className="footer-nav-heading">Legal</div>
-          <nav className="footer-nav-links">
-            <Link to="/terms-of-service" className="footer-nav-link">
-              Terms of Service
-            </Link>
-            <Link to="/privacy-policy" className="footer-nav-link">
-              Privacy Policy
-            </Link>
-            <a
-              href="https://dia.wiki/"
-              className="footer-nav-link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Decentralized Intelligence Agency
-            </a>
-          </nav>
+          {/* Legal */}
+          <div className="footer-nav-col">
+            <div className="footer-nav-heading">Legal</div>
+            <nav className="footer-nav-links" aria-label="Legal">
+              {LEGAL_LINKS.map((link) => (
+                <NavLink key={link.label} link={link} />
+              ))}
+            </nav>
+          </div>
         </div>
       </div>
 
-      {/* ── bottom bar ── */}
       <div className="footer-bottom">
         <span>© 2026 Persist Foundry · All rights reserved</span>
       </div>
