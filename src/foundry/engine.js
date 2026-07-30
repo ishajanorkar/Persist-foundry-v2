@@ -556,7 +556,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     );
     camera.position.z = 14;
 
-    const N = window.innerWidth < 768 ? 420 : 900;
+    const N = window.innerWidth < 768 ? 210 : 450;
     const geo = new THREE.BufferGeometry();
     const pos = new Float32Array(N * 3);
     for (let i = 0; i < N; i++) {
@@ -1494,7 +1494,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       },
     });
 
-    // Value props -> final CTA: stars only (no baked footage / video).
+    // Value props -> filter -> final CTA: stars only (no baked footage / video).
     // Hide the frame-sequence canvas and center flare; keep mouse-parallax stars.
     mkTrigger({
       trigger: "#valueProps",

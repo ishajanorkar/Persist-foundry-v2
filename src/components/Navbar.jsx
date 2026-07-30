@@ -130,6 +130,16 @@ export default function Navbar() {
                     type="button"
                     className={`nav-pill-link nav-dropdown-trigger${active ? " is-active" : ""}`}
                     aria-haspopup="menu"
+                    aria-expanded="false"
+                    tabIndex={-1}
+                    onMouseDown={(e) => {
+                      // Desktop is hover-only — don't let a click focus-stick the menu open
+                      e.preventDefault();
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.currentTarget.blur();
+                    }}
                   >
                     {label}
                     <svg

@@ -29,11 +29,14 @@ export default function ScrollFloat({
 
   const splitText = useMemo(() => {
     const text = typeof children === 'string' ? children : ''
-    // Split on regular spaces only — keep \u00A0 so last-word pairs stay glued.
+    // Split on spaces/newlines — keep \u00A0 glued; render \n as <br>.
     const tokens = text.split(/([ \t\f\v\r\n]+)/)
     let charIndex = 0
     return tokens.map((token, tokenIndex) => {
       if (/^[ \t\f\v\r\n]+$/.test(token)) {
+        if (/\n/.test(token)) {
+          return <br key={`br-${tokenIndex}`} />
+        }
         return (
           <span className="char" key={`s-${tokenIndex}`}>
             {'\u00A0'}

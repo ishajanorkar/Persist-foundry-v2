@@ -390,7 +390,7 @@ body.pf-page .footer-top { padding-top: 48px; }
   max-width: none;
   margin: 0;
   /* Match navbar horizontal inset exactly */
-  padding: 0 var(--gutter, 40px);
+  padding: 0 var(--gutter, 64px);
   box-sizing: border-box;
   min-height: 100vh;
 }
@@ -864,7 +864,7 @@ body.pf-page .footer-top { padding-top: 48px; }
   .pf-detail-layout {
     grid-template-columns: 1fr;
     gap: 28px;
-    padding: 0 var(--gutter, 22px);
+    padding: 0 var(--gutter, 28px);
   }
 
   .pf-detail-visual {

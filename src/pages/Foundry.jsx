@@ -3,6 +3,7 @@ import { gsap } from "gsap";
 import "../foundry/foundry.css";
 import initFoundry from "../foundry/engine";
 import FinalCtaSection from "../components/FinalCtaSection";
+import FilterSection from "../components/FilterSection";
 import ScrollFloat from "../components/ScrollFloat";
 import UnfairStartSection from "../components/UnfairStartSection";
 
@@ -128,7 +129,7 @@ export default function Foundry() {
                 stagger={0.02}
                 playOnce
               >
-                {"We fund founders ready to leave the safe path and\u00A0build."}
+                {"Back yourself to\nwin\u00A0big."}
               </ScrollFloat>
               <div className="hero-cta-reveal">
                 <a
@@ -620,6 +621,9 @@ export default function Foundry() {
 
         {/* VALUE PROPS — horizontal 2-slide unfair-start cards */}
         <UnfairStartSection />
+
+        {/* FILTER — Apply if / Don't apply if */}
+        <FilterSection />
 
         {/* orbit / arm detail panel (scroll-driven + hover) */}
         <div className="portfolio-detail" id="armDetail">

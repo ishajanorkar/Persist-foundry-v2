@@ -10,7 +10,7 @@ import "../foundry/foundry.css";
 
 const CTA_VIDEO_SRC = "/foundry/final-cta-bg.mp4";
 /** Seconds before end to start the next copy + crossfade */
-const CROSSFADE_SEC = 0.85;
+const CROSSFADE_SEC = 1.45;
 
 export default function FinalCtaSection({ footer = false }) {
   const mediaRef = useRef(null);
@@ -79,6 +79,8 @@ export default function FinalCtaSection({ footer = false }) {
       back.classList.remove("is-front");
       front.style.opacity = "1";
       back.style.opacity = "0";
+      front.style.zIndex = "1";
+      back.style.zIndex = "0";
     };
 
     setLayer(active, idle);
@@ -111,7 +113,16 @@ export default function FinalCtaSection({ footer = false }) {
     const beginCrossfade = () => {
       if (swapping || !inView || document.hidden) return;
       const duration = active.duration;
-      if (!Number.isFinite(duration) || duration < CROSSFADE_SEC * 2) return;
+      if (!Number.isFinite(duration) || duration < CROSSFADE_SEC * 2) {
+        // Fallback: hard-reset if duration isn't usable yet
+        try {
+          active.currentTime = 0;
+        } catch {
+          /* ignore */
+        }
+        playSafe(active);
+        return;
+      }
 
       swapping = true;
       try {
@@ -119,6 +130,10 @@ export default function FinalCtaSection({ footer = false }) {
       } catch {
         /* ignore */
       }
+      // Incoming layer must stack above — DOM order alone can't do A←B fades
+      idle.style.zIndex = "2";
+      active.style.zIndex = "1";
+      idle.style.opacity = "0";
       playSafe(idle);
 
       const from = active;
@@ -143,21 +158,22 @@ export default function FinalCtaSection({ footer = false }) {
       fadeRaf = requestAnimationFrame(tick);
     };
 
+    const maybeStartCrossfade = () => {
+      if (swapping || !inView || document.hidden) return;
+      const duration = active.duration;
+      if (
+        Number.isFinite(duration) &&
+        duration > 0 &&
+        active.currentTime >= duration - CROSSFADE_SEC
+      ) {
+        beginCrossfade();
+      }
+    };
+
     const watch = () => {
       watchRaf = 0;
       if (!inView || document.hidden) return;
-
-      if (!swapping) {
-        const duration = active.duration;
-        if (
-          Number.isFinite(duration) &&
-          duration > 0 &&
-          active.currentTime >= duration - CROSSFADE_SEC
-        ) {
-          beginCrossfade();
-        }
-      }
-
+      maybeStartCrossfade();
       if (inView && !document.hidden) {
         watchRaf = requestAnimationFrame(watch);
       }
@@ -183,6 +199,17 @@ export default function FinalCtaSection({ footer = false }) {
       }
     };
 
+    const onEnded = (e) => {
+      if (e.target !== active) return;
+      // Tab throttle or late seek can skip the pre-end window — still blend
+      beginCrossfade();
+    };
+
+    const onTimeUpdate = (e) => {
+      if (e.target !== active) return;
+      maybeStartCrossfade();
+    };
+
     const io = new IntersectionObserver(
       (entries) => {
         inView = entries.some((e) => e.isIntersecting);
@@ -192,6 +219,10 @@ export default function FinalCtaSection({ footer = false }) {
     );
     io.observe(media);
     document.addEventListener("visibilitychange", syncPlayback);
+    a.addEventListener("ended", onEnded);
+    b.addEventListener("ended", onEnded);
+    a.addEventListener("timeupdate", onTimeUpdate);
+    b.addEventListener("timeupdate", onTimeUpdate);
 
     a.preload = "auto";
     b.preload = "auto";
@@ -203,6 +234,10 @@ export default function FinalCtaSection({ footer = false }) {
       stopFade();
       io.disconnect();
       document.removeEventListener("visibilitychange", syncPlayback);
+      a.removeEventListener("ended", onEnded);
+      b.removeEventListener("ended", onEnded);
+      a.removeEventListener("timeupdate", onTimeUpdate);
+      b.removeEventListener("timeupdate", onTimeUpdate);
       a.pause();
       b.pause();
     };
@@ -242,19 +277,18 @@ export default function FinalCtaSection({ footer = false }) {
           <div className="pf-final-cta-copy">
             <p className="pf-final-cta-kicker">Now you know us</p>
             <h2 className="pf-final-cta-hero" id="finalHeadline">
-              <span className="pf-final-cta-hero-line">Once it&apos;s on paper,</span>
+              <span className="pf-final-cta-hero-line">Once on paper</span>
               <span className="pf-final-cta-hero-line">everything changes.</span>
             </h2>
             <p className="pf-final-cta-sub">
-              You&apos;ve made this decision a thousand times in your head.
-              Put it somewhere real.
+              You&apos;ve made this bet a thousand times in your head.
             </p>
             <Link
               className="pf-final-cta-link"
               data-magnetic
               to="/fellowship-program-application"
             >
-              Become a founder <span aria-hidden="true">↗</span>
+              Become A Founder <span aria-hidden="true">↗</span>
             </Link>
           </div>
         </div>

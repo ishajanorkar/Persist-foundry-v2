@@ -62,7 +62,7 @@
 
   --maxw: 1320px;
   /* Match shared Navbar horizontal padding (kept in sync via media queries below) */
-  --gutter: 48px;
+  --gutter: 64px;
 
   /* ---- Motion ---- */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -567,9 +567,7 @@ body.pf-landing ::selection {
   letter-spacing: -0.04em;
   text-align: left;
   color: #ffffff;
-  text-shadow:
-    0 0 48px rgba(4, 3, 10, 0.9),
-    0 2px 20px rgba(4, 3, 10, 0.75);
+  text-shadow: 0 1px 10px rgba(4, 3, 10, 0.35);
   white-space: normal;
   word-break: normal;
   overflow-wrap: break-word;
@@ -2577,7 +2575,7 @@ body.pf-landing ::selection {
   position: relative;
   z-index: var(--z-overlay, 2);
   min-height: 0;
-  padding: clamp(8rem, 16vh, 12rem) var(--gutter, 48px) clamp(3rem, 5vh, 4rem);
+  padding: clamp(8rem, 16vh, 12rem) var(--gutter, 64px) clamp(3rem, 5vh, 4rem);
   box-sizing: border-box;
   display: flex;
   justify-content: center;
@@ -2605,19 +2603,10 @@ body.pf-landing ::selection {
   border-radius: 28px;
   overflow: hidden;
   isolation: isolate;
-  border: 1px solid rgba(232, 224, 255, 0.32);
-  background: linear-gradient(
-    165deg,
-    rgba(28, 22, 48, 0.92) 0%,
-    rgba(12, 9, 22, 0.94) 55%,
-    rgba(10, 8, 20, 0.96) 100%
-  );
-  backdrop-filter: blur(24px) saturate(130%);
-  -webkit-backdrop-filter: blur(24px) saturate(130%);
-  box-shadow:
-    0 32px 100px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(114, 114, 114, 0.16);
+  backdrop-filter: blur(10px) saturate(90%);
+  -webkit-backdrop-filter: blur(10px) saturate(90%);
 }
 
 .pf-final-cta-container .pf-final-cta-panel__bg {
@@ -2711,20 +2700,23 @@ body.pf-landing ::selection {
   margin-top: clamp(1.75rem, 3.5vh, 2.5rem);
   padding-bottom: 5px;
   font-family: "Montserrat", var(--pf-body), system-ui, sans-serif;
-  font-weight: 400;
-  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  font-weight: 500;
+  font-size: clamp(1.05rem, 1.3vw, 1.2rem);
   letter-spacing: -0.01em;
-  color: rgba(245, 240, 255, 0.92);
+  color: #ffffff;
   text-decoration: none;
-  border-bottom: 1px solid rgba(245, 240, 255, 0.55);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
   transition:
     color 0.3s ease,
-    border-color 0.3s ease;
+    border-color 0.3s ease,
+    opacity 0.3s ease;
 }
 
 .pf-final-cta-container .pf-final-cta-link:hover {
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.9);
+  border-color: #ffffff;
+  opacity: 0.88;
 }
 
 .pf-final-cta-container .pf-final-cta-link span {
@@ -3184,7 +3176,8 @@ body.pf-landing .pf ~ .footer {
   line-height: 1;
 }
 
-/* Right column — each card is one full viewport; next rises from below */
+/* Right column — each card owns one full viewport so the next
+   never peeks until the user scrolls into it */
 .pfolio-stack {
   position: relative;
   display: flex;
@@ -3199,16 +3192,17 @@ body.pf-landing .pf ~ .footer {
 .pfolio-card {
   position: sticky;
   top: 0;
-  height: 65vh;
-  min-height: 65vh;
+  height: 100svh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 1.1rem;
   margin: 0;
-  /* reduced top padding; outer edge uses site gutter */
-  padding: clamp(4.25rem, 7vh, 5.25rem) var(--gutter)
-    clamp(1.5rem, 4vh, 2.25rem) clamp(1.25rem, 3vw, 2.5rem);
+  /* Extra top/bottom padding so the card content breathes and
+     stays clear of the fixed nav while filling the viewport */
+  padding: clamp(5.5rem, 11vh, 7.5rem) var(--gutter)
+    clamp(2.75rem, 7vh, 4.5rem) clamp(1.25rem, 3vw, 2.5rem);
   box-sizing: border-box;
   background: #000000;
   border: 0;
@@ -3655,6 +3649,7 @@ body.pf-landing .pf ~ .footer {
   object-position: center center;
   z-index: 0;
   filter: none;
+  /* Opacity + stacking controlled by JS for seamless dual-buffer fade */
   opacity: 0;
   will-change: opacity;
   /* Slight scale crops baked-in corner watermark from the source clip */
@@ -3663,11 +3658,9 @@ body.pf-landing .pf ~ .footer {
   transition: none;
 }
 .pf-final-cta-background.is-front {
-  opacity: 1;
-  z-index: 0;
+  z-index: 1;
 }
 .pf-final-cta-background.is-back {
-  opacity: 0;
   z-index: 0;
 }
 
@@ -3677,9 +3670,9 @@ body.pf-landing .pf ~ .footer {
   z-index: 1;
   background: linear-gradient(
     180deg,
-    rgba(5, 6, 9, 0.32) 0%,
-    rgba(5, 6, 9, 0.18) 45%,
-    rgba(5, 6, 9, 0.58) 100%
+    rgba(5, 6, 9, 0.22) 0%,
+    rgba(5, 6, 9, 0.1) 45%,
+    rgba(5, 6, 9, 0.5) 100%
   );
 }
 

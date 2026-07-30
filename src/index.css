@@ -29,6 +29,8 @@
   --mono: "Montserrat", system-ui, -apple-system, sans-serif;
   --body: "Montserrat", system-ui, -apple-system, sans-serif;
   --cta-angle: 0deg;
+  /* Sitewide horizontal inset — nav, Foundry beats, and page sections share this */
+  --gutter: 64px;
 }
 
 @property --cta-angle {
@@ -211,7 +213,7 @@ body::before {
   right: 0;
   z-index: 100;
   /* Horizontal inset shared with Foundry --gutter */
-  padding: 16px var(--gutter, 48px);
+  padding: 16px var(--gutter, 64px);
   display: flex;
   align-items: center;
   /* Full-width frosted bar — keeps logo / pill / CTA readable over page content */
@@ -236,7 +238,7 @@ body::before {
   transform: none !important;
 }
 .nav.is-scrolled {
-  padding: 12px var(--gutter, 48px);
+  padding: 12px var(--gutter, 64px);
   background: rgba(5, 4, 12, 0.82);
   border-bottom-color: rgba(199, 184, 245, 0.12);
   box-shadow: 0 14px 48px rgba(0, 0, 0, 0.4);
@@ -510,6 +512,25 @@ body::before {
   align-items: center;
   z-index: 1;
 }
+.nav-dropdown:hover {
+  z-index: 60;
+}
+/* Invisible hover bridge so the cursor can travel from trigger → menu
+   without leaving :hover (panel’s old ::before was clipped by overflow). */
+.nav-dropdown::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 100%;
+  width: max(100%, 220px);
+  height: 22px;
+  z-index: 49;
+  pointer-events: none;
+}
+.nav-dropdown:hover::before {
+  pointer-events: auto;
+}
 .nav-dropdown-trigger {
   appearance: none;
   background: transparent;
@@ -518,36 +539,35 @@ body::before {
 }
 .nav-dropdown-panel {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 8px);
   left: 50%;
-  transform: translateX(-50%) translateY(6px);
+  transform: translateX(-50%);
   min-width: 200px;
   padding: 8px;
   border-radius: 16px;
   border: none;
   background: linear-gradient(
     165deg,
-    rgba(48, 46, 56, 0.72) 0%,
-    rgba(22, 20, 28, 0.88) 100%
+    rgba(18, 16, 26, 0.94) 0%,
+    rgba(8, 7, 14, 0.98) 100%
   );
-  backdrop-filter: blur(28px) saturate(150%);
-  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  backdrop-filter: blur(40px) saturate(140%);
+  -webkit-backdrop-filter: blur(40px) saturate(140%);
   box-shadow:
-    inset 0.5px 1px 0 rgba(255, 255, 255, 0.38),
-    inset 1px 0.5px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
-    inset -1px 0 0 rgba(0, 0, 0, 0.2),
-    0 16px 44px rgba(0, 0, 0, 0.5);
+    inset 0.5px 1px 0 rgba(255, 255, 255, 0.22),
+    inset 1px 0.5px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    inset -1px 0 0 rgba(0, 0, 0, 0.25),
+    0 18px 48px rgba(0, 0, 0, 0.65);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity 0.2s ease,
-    transform 0.2s ease,
-    visibility 0.2s;
+    opacity 0.18s ease,
+    visibility 0.18s;
   z-index: 50;
   isolation: isolate;
-  overflow: hidden;
+  overflow: visible;
 }
 .nav-dropdown-panel::after {
   content: "";
@@ -574,23 +594,12 @@ body::before {
   pointer-events: none;
   z-index: 0;
 }
-.nav-dropdown-panel::before {
-  content: "";
-  position: absolute;
-  top: -12px;
-  left: 0;
-  right: 0;
-  height: 12px;
-}
-.nav-dropdown:hover .nav-dropdown-panel,
-.nav-dropdown:focus-within .nav-dropdown-panel {
+.nav-dropdown:hover .nav-dropdown-panel {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
 }
-.nav-dropdown:hover .nav-dropdown-trigger,
-.nav-dropdown:focus-within .nav-dropdown-trigger {
+.nav-dropdown:hover .nav-dropdown-trigger {
   color: #fff;
   background: rgba(255, 255, 255, 0.07);
   box-shadow:
@@ -621,7 +630,7 @@ body::before {
   font-size: 12.5px;
   font-family: var(--sans);
   font-weight: 400;
-  color: rgba(235, 235, 240, 0.72);
+  color: rgba(245, 242, 250, 0.88);
   text-decoration: none;
   white-space: nowrap;
   transition:
@@ -632,8 +641,8 @@ body::before {
 .nav-dropdown-link:hover,
 .nav-dropdown-link.is-active {
   color: #fff;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* Work With Us ÎÃÃ¶ mobile submenu */
@@ -4333,7 +4342,7 @@ body::before {
   display: grid;
   grid-template-columns: 1.6fr 1fr 1fr 1fr;
   gap: 48px;
-  padding: 72px clamp(24px, 5vw, 80px) 64px;
+  padding: 72px var(--gutter, 64px) 64px;
   border-bottom: 1px solid var(--hairline);
 }
 
@@ -4383,7 +4392,7 @@ body::before {
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: none;
-  color: var(--stone-soft);
+  color: rgba(220, 212, 235, 0.78);
   line-height: 1.4;
 }
 .footer-newsletter {
@@ -4551,7 +4560,7 @@ body::before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--stone-soft);
+  color: rgba(220, 212, 235, 0.78);
   text-decoration: none;
   transition:
     color 0.2s ease,
@@ -4559,7 +4568,7 @@ body::before {
     background 0.2s ease;
 }
 .footer-social-link:hover {
-  color: var(--paper);
+  color: #ffffff;
   border-color: rgba(120, 84, 213, 0.5);
   background: rgba(120, 84, 213, 0.12);
 }
@@ -4575,7 +4584,7 @@ body::before {
   font-size: 10px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--stone-soft);
+  color: rgba(210, 200, 230, 0.72);
   font-weight: 500;
   margin-bottom: 20px;
 }
@@ -4587,13 +4596,13 @@ body::before {
 .footer-nav-link {
   font-size: 12px;
   letter-spacing: 0.08em;
-  color: var(--stone);
+  color: rgba(236, 230, 245, 0.88);
   text-decoration: none;
   transition: color 0.2s ease;
   line-height: 1.4;
 }
 .footer-nav-link:hover {
-  color: var(--paper);
+  color: #ffffff;
 }
 
 /* bottom bar */
@@ -4601,14 +4610,14 @@ body::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px clamp(24px, 5vw, 80px);
+  padding: 20px var(--gutter, 64px);
   font-size: 10.5px;
   letter-spacing: 0.14em;
-  color: rgba(199, 184, 245, 0.3);
+  color: rgba(220, 212, 235, 0.55);
   text-transform: none;
 }
 .footer-bottom-right {
-  color: rgba(199, 184, 245, 0.2);
+  color: rgba(220, 212, 235, 0.45);
 }
 
 /* ================== LOADER ================== */
@@ -4739,13 +4748,13 @@ body::before {
 /* ?? Small laptop + tablet + phone: switch to hamburger ?? */
 @media (max-width: 1200px) {
   :root {
-    --gutter: 24px;
+    --gutter: 32px;
   }
   .nav {
-    padding: 16px var(--gutter, 24px);
+    padding: 16px var(--gutter, 32px);
   }
   .nav.is-scrolled {
-    padding: 12px var(--gutter, 24px);
+    padding: 12px var(--gutter, 32px);
   }
   .nav-pill {
     display: none;
@@ -4769,13 +4778,13 @@ body::before {
 /* ?? Large tablet / phone ?? */
 @media (max-width: 968px) {
   :root {
-    --gutter: 22px;
+    --gutter: 28px;
   }
   .nav {
-    padding: 16px var(--gutter, 22px);
+    padding: 16px var(--gutter, 28px);
   }
   .nav.is-scrolled {
-    padding: 12px var(--gutter, 22px);
+    padding: 12px var(--gutter, 28px);
   }
 
   /* Hero panels */
@@ -5150,13 +5159,13 @@ body::before {
   .footer-top {
     grid-template-columns: 1fr 1fr;
     gap: 36px;
-    padding: 48px 24px 40px;
+    padding: 48px var(--gutter, 28px) 40px;
   }
   .footer-brand-col {
     grid-column: 1 / -1;
   }
   .footer-bottom {
-    padding: 16px 24px;
+    padding: 16px var(--gutter, 28px);
     flex-direction: column;
     gap: 8px;
     text-align: center;
