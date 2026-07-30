@@ -14,15 +14,41 @@ import Careers from './pages/Careers'
 import Contact from './pages/Contact'
 import ApplicationForm from './pages/ApplicationForm'
 import LegalPage from './pages/LegalPage'
+import NotFound from './pages/NotFound'
 import { TERMS_OF_SERVICE, PRIVACY_POLICY } from './data/legalPages'
+
+const KNOWN_PATHS = new Set([
+  '/',
+  '/legacy',
+  '/about',
+  '/team',
+  '/portfolio',
+  '/careers',
+  '/contact',
+  '/apply-for-a-full-time-position',
+  '/apply-to-cofoundathon',
+  '/investor-application',
+  '/fellowship-program-application',
+  '/terms-of-service',
+  '/privacy-policy',
+])
+
+function isKnownRoute(pathname) {
+  if (KNOWN_PATHS.has(pathname)) return true
+  // Portfolio company detail pages
+  if (/^\/portfolio\/[^/]+\/?$/.test(pathname)) return true
+  return false
+}
 
 function Layout() {
   const { pathname } = useLocation()
   // Foundry home embeds CTA+footer in its scroll track.
   const foundryHome = pathname === '/'
   const isLegal = pathname === '/terms-of-service' || pathname === '/privacy-policy'
+  const known = isKnownRoute(pathname)
   // Same homepage FinalCtaSection (with nested Footer) on every other content route.
-  const showGlobalCta = !foundryHome && pathname !== '/legacy' && !isLegal
+  // Skip on 404 / unknown URLs so the not-found page stays the focus.
+  const showGlobalCta = known && !foundryHome && pathname !== '/legacy' && !isLegal
   return (
     <>
       <CustomCursor />
@@ -60,9 +86,10 @@ function Layout() {
           path="/privacy-policy"
           element={<LegalPage doc={PRIVACY_POLICY} />}
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       {showGlobalCta && <FinalCtaSection footer />}
-      {/* Legal / legacy still need a standalone footer (CTA carries its own on other routes) */}
+      {/* Legal / 404 / legacy still need a standalone footer (CTA carries its own on other routes) */}
       {!foundryHome && !showGlobalCta && <Footer />}
     </>
   )

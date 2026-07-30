@@ -702,7 +702,6 @@ export default function Home() {
           {/* backstory row */}
           <div className="impact-backstory">
             <div className="impact-backstory-label">
-              <span className="impact-backstory-pip"></span>
               Backstory
             </div>
             <div className="impact-backstory-content">
@@ -1072,7 +1071,6 @@ export default function Home() {
         <div className="final-cta-content">
           {/* cohort meta */}
           <div className="final-cta-cohort">
-            <span className="final-cta-cohort-pip"></span>
             <span>Cohort 2026</span>
             <span className="final-cta-cohort-sep">/</span>
             <span>Open</span>
@@ -1092,7 +1090,6 @@ export default function Home() {
               <div className="final-cta-team-shade" aria-hidden="true"></div>
             </div>
             <figcaption className="final-cta-team-cap">
-              <span className="final-cta-team-pip"></span>
               The team you'll build alongside
             </figcaption>
           </figure>

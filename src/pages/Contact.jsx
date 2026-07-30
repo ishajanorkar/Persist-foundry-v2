@@ -72,7 +72,6 @@ export default function Contact() {
             {/* ── left copy ── */}
             <div className="ct-copy">
               <div className="ct-eyebrow ct-reveal" data-delay="0">
-                <span className="ct-pip" />
                 Contact Us
               </div>
               <h1 className="ct-headline ct-reveal" data-delay="80">

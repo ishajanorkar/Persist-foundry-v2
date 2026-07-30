@@ -21,6 +21,9 @@ const MAKE_BASE = 'https://hook.eu2.make.com'
  * Each role: Make webhook (legacy) + video field name
  * (CFO uses applicant-loom-link; others use applicant-portfolio-link).
  * CFO → Google Sheet via VITE_CAREERS_CFO_SCRIPT_URL.
+ * Roles with Apps Script URLs in submitCareerApplication.js
+ * (CFO, VFM, Accel CEO, Startup / Venture Studio / Recruiting Founder)
+ * post to their sheets; others still use Make.com until wired.
  */
 const CATEGORIES = [
   {
@@ -544,7 +547,6 @@ export default function Careers() {
         <div className="cr-hero-vignette" aria-hidden="true" />
         <div className="cr-inner cr-hero-inner">
           <div className="cr-eyebrow cr-reveal" data-delay="0">
-            <span className="cr-pip" />
             Careers
           </div>
           <h1 className="cr-hero-headline cr-reveal" data-delay="100">

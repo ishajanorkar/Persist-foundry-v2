@@ -744,10 +744,12 @@ body.pf-page .footer-ref { padding-top: 24px; }
 
 .pf-detail-cta:hover {
   background: linear-gradient(135deg, var(--violet) 0%, var(--violet-deep) 100%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   box-shadow:
-    0 0 0 3px rgba(120, 84, 213, 0.22),
-    0 10px 40px rgba(120, 84, 213, 0.55),
-    0 0 48px rgba(120, 84, 213, 0.35),
+    0 4px 18px rgba(120, 84, 213, 0.28),
+    0 10px 36px rgba(120, 84, 213, 0.32),
+    0 18px 56px rgba(74, 46, 159, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
   transform: translateY(-2px) scale(1.02);
   gap: 10px;

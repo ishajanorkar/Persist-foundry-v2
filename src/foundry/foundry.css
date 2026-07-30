@@ -119,6 +119,24 @@ body.pf-landing ::selection {
   color: inherit;
   text-decoration: none;
 }
+/* Keep shared footer link colors intact inside Foundry scroll-track */
+.pf .footer .footer-nav-link,
+.pf .footer .footer-social-link {
+  color: rgba(230, 224, 245, 0.88);
+}
+.pf .footer .footer-nav-link:hover,
+.pf .footer .footer-social-link:hover {
+  color: #fff;
+}
+.pf .footer .footer-nav-heading {
+  color: rgba(220, 212, 235, 0.78);
+}
+.pf .footer .footer-newsletter-label {
+  color: rgba(230, 224, 245, 0.82);
+}
+.pf .footer .footer-bottom {
+  color: rgba(220, 212, 235, 0.62);
+}
 .pf img {
   max-width: 100%;
   display: block;
@@ -605,8 +623,13 @@ body.pf-landing ::selection {
 #hero .hero-cta-reveal {
   overflow: hidden;
   display: inline-flex;
-  /* Extra room so the rise doesn't clip the button shadow */
-  padding-bottom: 2px;
+  /* Room for the rise-in; hover unlocks overflow so glow isn't clipped to a rect */
+  padding: 14px 18px 18px;
+  margin: -14px -18px -18px;
+}
+#hero .hero-cta-reveal:has(.btn-primary:hover),
+#hero .hero-cta-reveal:has(.btn-primary:focus-visible) {
+  overflow: visible;
 }
 #hero .hero-cta-reveal__inner {
   will-change: transform, opacity;
@@ -1563,7 +1586,7 @@ body.pf-landing ::selection {
 /* ---------- Portfolio hover detail panel (three.js finale) ---------- */
 .portfolio-detail {
   position: fixed;
-  z-index: 60;
+  z-index: 80;
   left: 50%;
   bottom: 6vh;
   top: auto;
@@ -1750,6 +1773,14 @@ body.pf-landing ::selection {
   .portfolio-detail--anchored .portfolio-detail__list li {
     font-size: clamp(0.64rem, 0.85vw, 0.74rem);
     max-width: 26ch;
+  }
+}
+
+/* Short laptop viewports (e.g. Nest Hub Max 1280×800) — keep detail clear of wheel */
+@media (max-height: 860px) and (min-width: 901px) {
+  .portfolio-detail--anchored {
+    bottom: clamp(1.5rem, 5vh, 3rem);
+    width: min(300px, 28vw);
   }
 }
 

@@ -693,15 +693,17 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       const detailBudget = vw <= 640 ? 200 : 185;
       const availH = Math.max(200, vh - headingBudget - detailBudget - 16);
       const availW = vw * (vw <= 640 ? 0.92 : 0.72);
-      const scale = vw <= 640 ? 0.62 : 0.48;
+      const scale = vw <= 640 ? 0.58 : 0.44;
       D = Math.round(Math.min(vmin * scale, availH, availW));
-      D = Math.max(vw <= 640 ? 240 : 210, Math.min(D, vw <= 640 ? 340 : 310));
+      D = Math.max(vw <= 640 ? 220 : 200, Math.min(D, vw <= 640 ? 300 : 280));
     } else if (vw < 1100) {
-      D = Math.round(vmin * 0.48);
+      D = Math.round(vmin * 0.42);
     } else if (vw < 1280) {
-      D = Math.round(vmin * 0.56);
+      D = Math.round(vmin * 0.46);
+    } else if (vw < 1440) {
+      D = Math.round(vmin * 0.52);
     } else {
-      D = Math.round(vmin * 0.66);
+      D = Math.round(vmin * 0.56);
     }
     const Ro = D / 2;
     const Ri = Ro * 0.52;
@@ -899,23 +901,38 @@ export default function initFoundry({ base = "/foundry" } = {}) {
 
       petal.addEventListener("mouseenter", () => {
         if (window.matchMedia("(max-width: 900px)").matches) return;
+        if (!orbitHoverLive) return;
+        clearTimeout(hideArmTO);
         showArm(arm, petal);
       });
       petal.addEventListener("mouseleave", () => {
         if (window.matchMedia("(max-width: 900px)").matches) return;
-        hideArm();
+        // Brief delay so moving between adjacent segments doesn't flash the panel off
+        clearTimeout(hideArmTO);
+        hideArmTO = setTimeout(() => {
+          if (!orbitHoverLive) {
+            hideArm();
+            return;
+          }
+          const overPetal = armNodes.some((x) => x.el.matches(":hover"));
+          if (!overPetal) hideArm();
+        }, 120);
       });
       petal.addEventListener("focus", () => {
         if (window.matchMedia("(max-width: 900px)").matches) return;
+        if (!orbitHoverLive) return;
+        clearTimeout(hideArmTO);
         showArm(arm, petal);
       });
       petal.addEventListener("blur", () => {
         if (window.matchMedia("(max-width: 900px)").matches) return;
-        hideArm();
+        clearTimeout(hideArmTO);
+        hideArmTO = setTimeout(() => hideArm(), 120);
       });
       // Mobile: tap to select and keep the detail panel open
       petal.addEventListener("click", (e) => {
         if (!window.matchMedia("(max-width: 900px)").matches) return;
+        if (!orbitHoverLive) return;
         e.preventDefault();
         showArm(arm, petal);
       });
@@ -979,7 +996,9 @@ export default function initFoundry({ base = "/foundry" } = {}) {
           transparent 0%, transparent 28%, rgba(0,0,0,0.3) 38%,
           rgba(0,0,0,0.85) 50%, #000 60%);}
       .orbit-petal{position:absolute;inset:0;z-index:1;padding:0;border:0;cursor:pointer;
-        isolation:isolate;
+        /* off by default — JS enables only while the Five Ways wheel is live
+           (children with pe:auto ignore a parent's pe:none, so this must start none) */
+        pointer-events:none;isolation:isolate;
         /* frosted charcoal glass — matched to navbar pill */
         background:linear-gradient(165deg,
           rgba(58,56,66,0.52) 0%,
@@ -1112,14 +1131,37 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   }
 
   /* ---- ARM detail card: hover-only (bottom-right) ----
-     Details appear only while a segment is hovered/focused. Scroll no longer
-     auto-cycles the panel. */
+     Details appear only while a segment is hovered/focused inside the live
+     Five Ways wheel. Outside that window the fixed panel must never show,
+     and petals must not receive pointer events (opacity:0 still hits). */
   let featuredIndex = -1;
   let hoverActive = false;
+  let orbitHoverLive = false;
   let lastProg = 0;
   let lastOp = 0;
   let swapTO = 0;
+  let hideArmTO = 0;
   const armContent = document.getElementById("armContent");
+
+  function isActiveWheel(p, op) {
+    // Settled wheel only — not during entry zoom, exit fade, or portfolio glide
+    return op > 0.35 && p > 0.32 && p < 0.9 && orbitFade > 0.5;
+  }
+
+  /** Enable petal hits only while the wheel is the focused scene.
+      Never flip #orbitLayer to auto — it is full-viewport and would steal
+      hovers across the page. Petals use pe:auto in CSS which bypasses a
+      parent's pe:none, so each petal must be toggled explicitly. */
+  function setOrbitPointerEvents(enabled) {
+    orbitHoverLive = !!enabled;
+    if (orbitLayer) orbitLayer.style.pointerEvents = "none";
+    if (orbitDonut) orbitDonut.style.pointerEvents = enabled ? "auto" : "none";
+    if (orbitRing) orbitRing.style.pointerEvents = enabled ? "auto" : "none";
+    armNodes.forEach(({ el }) => {
+      el.style.pointerEvents = enabled ? "auto" : "none";
+    });
+    if (!enabled) clearCard();
+  }
 
   function setCardText(arm, iconSvg) {
     if (armTitle) armTitle.textContent = arm.title;
@@ -1152,6 +1194,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   }
   function clearCard() {
     clearTimeout(swapTO);
+    clearTimeout(hideArmTO);
     hoverActive = false;
     if (!armDetail) return;
     armDetail.classList.remove("show", "is-swapping");
@@ -1162,7 +1205,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   }
 
   function featureArm(arm, nodeEl, iconSvg, crossfade) {
-    if (!armDetail) return;
+    if (!armDetail || !orbitHoverLive) return;
     armDetail.style.left =
       armDetail.style.top =
       armDetail.style.right =
@@ -1174,6 +1217,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     clearTimeout(swapTO);
 
     const apply = () => {
+      if (!orbitHoverLive) return;
       setCardText(arm, iconSvg);
       armDetail.classList.add("show");
       armDetail.classList.remove("is-swapping");
@@ -1189,6 +1233,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   }
 
   function showArm(arm, nodeEl) {
+    if (!orbitHoverLive) return;
     hoverActive = true;
     const hit = armNodes.find((x) => x.arm === arm) || {};
     const el = nodeEl || hit.el;
@@ -1201,21 +1246,19 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     clearCard();
   }
 
-  // Hover/focus shows the panel; scroll past the active wheel always dismisses it.
+  // Hover/focus shows the panel; leaving the live wheel always dismisses it.
   // Mobile: tap-to-select stays open; auto-feature Accelerator when the wheel arrives.
   function updateFeatured(p, op) {
     lastProg = p;
     lastOp = op;
-    const inActiveWheel = op > 0.35 && p > 0.3 && p < 0.94;
+    const inActiveWheel = isActiveWheel(p, op);
     const mobile = window.matchMedia("(max-width: 900px)").matches;
-    if (
-      !inActiveWheel &&
-      (featuredIndex !== -1 || armDetail?.classList.contains("show"))
-    ) {
-      clearCard();
-      return;
-    }
-    if (mobile && inActiveWheel) {
+
+    setOrbitPointerEvents(inActiveWheel);
+
+    if (!inActiveWheel) return;
+
+    if (mobile) {
       if (featuredIndex === -1 && armNodes.length) {
         const pref =
           armNodes.find((x) => x.arm.id === "accelerator") ||
@@ -1262,13 +1305,12 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       if (content)
         content.style.transform = `translate(-50%, -50%) rotate(${(-deg).toFixed(3)}deg)`;
     });
-    // one pointer-events toggle on the container: petals stay hoverable while
-    // the ring is visible, but a faded ring must not catch hovers over the
-    // sections beneath (which would pop the detail card from nowhere)
-    orbitDonut.style.pointerEvents = vis > 0.35 ? "auto" : "none";
-    if (orbitRing) orbitRing.style.pointerEvents = vis > 0.35 ? "auto" : "none";
-    // Fixed body panel must not outlive the wheel (esp. after touch hover)
-    if (vis <= 0.35 && armDetail?.classList.contains("show")) clearCard();
+    // Hits + detail card are gated by updateFeatured / setOrbitPointerEvents —
+    // never enable the full-viewport #orbitLayer, and never leave petals
+    // hoverable when the wheel has faded (opacity alone does not block hits).
+    if (!isActiveWheel(lastProg, op * orbitFade) && vis <= 0.35) {
+      setOrbitPointerEvents(false);
+    }
   }
 
   /** Show/hide the eclipse moon + Three.js center flare together. */
@@ -1406,6 +1448,8 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       onLeaveBack: () => {
         // scrolled back up out of the section — fully hide the wheel
         if (orbitLayer) orbitLayer.style.opacity = "0";
+        orbitFade = 0;
+        setOrbitPointerEvents(false);
         clearCard();
         starZoom = 0;
         starFieldOpacity = 0;
@@ -1420,6 +1464,8 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       },
       onLeave: () => {
         // scrolled past Five Ways — drop the fixed detail so it can't overlay portfolio
+        orbitFade = 0;
+        setOrbitPointerEvents(false);
         clearCard();
         setOrbitGlobeVisible(false);
       },
@@ -1521,6 +1567,12 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         if (orbitLayer)
           orbitLayer.style.opacity = String(Math.max(0, 1 - gRaw * 2.4));
         if (orbitHeading) orbitHeading.style.opacity = "0";
+        // As soon as portfolio glide starts, kill petal hits + detail card —
+        // the layer may still be partially visible / pe would otherwise leak
+        if (gRaw > 0.001) {
+          orbitFade = Math.max(0, 1 - gRaw * 2.4);
+          setOrbitPointerEvents(false);
+        }
         // Live starfield only — no eclipse globe, no baked footage flare
         starFieldOpacity = 1;
         if (threeCanvas) threeCanvas.style.opacity = "1";
@@ -1538,7 +1590,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         window.PF._gliding = gRaw > 0.001;
         window.PF._glideG = g;
         window.PF._glideRaw = gRaw;
-        if (gRaw > 0.02 && armDetail?.classList.contains("show")) clearCard();
+        if (gRaw > 0.001) clearCard();
         if (g > 0.001) computeNavTarget();
         setLogo(1, g);
         if (navSlot) navSlot.style.pointerEvents = g > 0.55 ? "auto" : "none";

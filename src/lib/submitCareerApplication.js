@@ -7,6 +7,7 @@
  *   VITE_CAREERS_ACCEL_CEO_SCRIPT_URL
  *   VITE_CAREERS_STARTUP_FOUNDER_SCRIPT_URL
  *   VITE_CAREERS_VENTURE_STUDIO_SCRIPT_URL
+ *   VITE_CAREERS_RECRUITING_FOUNDER_SCRIPT_URL
  *
  * Uses FormData + no-cors (Apps Script does not send CORS headers).
  * Prefers a quick GET health-check so a private ("sign-in required")
@@ -19,6 +20,7 @@ const ROLE_SCRIPT_ENV = {
   'pv-accelerator-ceo': 'VITE_CAREERS_ACCEL_CEO_SCRIPT_URL',
   'startup-founder': 'VITE_CAREERS_STARTUP_FOUNDER_SCRIPT_URL',
   'venture-studio-founder': 'VITE_CAREERS_VENTURE_STUDIO_SCRIPT_URL',
+  'recruiting-company-founder': 'VITE_CAREERS_RECRUITING_FOUNDER_SCRIPT_URL',
 }
 
 export function getCareerScriptUrl(roleId) {

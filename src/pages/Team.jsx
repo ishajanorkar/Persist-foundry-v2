@@ -387,14 +387,21 @@ function TeamCard({ person, revealDelay }) {
   const hasBio = !!person.bio
   const hasSocials = !!(person.li || person.x)
   return (
-    <div className="tm-card tm-reveal-el" data-delay={revealDelay || '0'}>
+    <div
+      className="tm-card tm-reveal-el"
+      data-delay={revealDelay || '0'}
+      tabIndex={0}
+      role="button"
+      aria-expanded="false"
+      aria-label={`${person.name}, ${person.role}. Activate to show details.`}
+    >
 
       {/* full-bleed portrait */}
       <div className={`tm-portrait${hasImg ? ' tm-portrait--photo' : ''}`}>
         {hasImg && (
           <img
             src={person.img}
-            alt={person.name}
+            alt=""
             className="tm-portrait-img"
             loading="lazy"
             decoding="async"
@@ -406,7 +413,7 @@ function TeamCard({ person, revealDelay }) {
       {/* gradient scrim */}
       <div className="tm-scrim" aria-hidden="true"></div>
 
-      {/* Bottom stack: Name → role → (hover) bio → socials */}
+      {/* Bottom stack: Name → role → (hover/tap) bio → socials */}
       <div className="tm-content">
         <h3 className="tm-name">{person.name}</h3>
         <div className="tm-role">{person.role}</div>
@@ -421,6 +428,7 @@ function TeamCard({ person, revealDelay }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`${person.name} on LinkedIn`}
+                  data-tm-social
                 >
                   <LiIcon />
                 </a>
@@ -431,6 +439,7 @@ function TeamCard({ person, revealDelay }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`${person.name} on X`}
+                  data-tm-social
                 >
                   <XIcon />
                 </a>
@@ -457,7 +466,39 @@ export default function Team() {
       btn.addEventListener('mouseleave', () => { btn.style.transform = '' })
     })
 
-    /* scroll reveal */
+    /* Tap / click — toggle bio+socials (mobile, tablets, small laptops) */
+    const cards = Array.from(document.querySelectorAll('.tm-card'))
+    const setOpen = (card, open) => {
+      card.classList.toggle('is-open', open)
+      card.setAttribute('aria-expanded', open ? 'true' : 'false')
+    }
+    const closeAll = (except) => {
+      cards.forEach((c) => {
+        if (c !== except) setOpen(c, false)
+      })
+    }
+    const onCardActivate = (e) => {
+      const card = e.currentTarget
+      if (e.target.closest('[data-tm-social]')) return
+      const next = !card.classList.contains('is-open')
+      closeAll(card)
+      setOpen(card, next)
+    }
+    const onCardKey = (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return
+      e.preventDefault()
+      onCardActivate(e)
+    }
+    const onDocPointer = (e) => {
+      if (e.target.closest('.tm-card')) return
+      closeAll()
+    }
+    cards.forEach((card) => {
+      card.addEventListener('click', onCardActivate)
+      card.addEventListener('keydown', onCardKey)
+    })
+    document.addEventListener('pointerdown', onDocPointer)
+
     /* scroll-reveal — observe + immediately reveal anything already on-screen */
     const revealEls = document.querySelectorAll('.tm-reveal-el')
     const revealObs = new IntersectionObserver((entries) => {
@@ -490,6 +531,11 @@ export default function Team() {
 
     return () => {
       window.removeEventListener('scroll', updateProgress)
+      document.removeEventListener('pointerdown', onDocPointer)
+      cards.forEach((card) => {
+        card.removeEventListener('click', onCardActivate)
+        card.removeEventListener('keydown', onCardKey)
+      })
       revealObs.disconnect()
     }
   }, [])
@@ -507,8 +553,6 @@ export default function Team() {
           {/* page header */}
           <div className="tm-page-head tm-reveal-el" data-delay="0">
             <div className="tm-page-kicker">
-              <span className="tm-kicker-dash"></span>
-              <span className="tm-kicker-pip"></span>
               Our Team
             </div>
             <h1 className="tm-page-headline">Team Persist</h1>
@@ -533,8 +577,6 @@ export default function Team() {
         <div className="tm-blob tm-blob-join"></div>
         <div className="tm-join-inner">
           <div className="tm-join-eyebrow tm-reveal-el" data-delay="0">
-            <span className="tm-kicker-dash"></span>
-            <span className="tm-kicker-pip"></span>
             Join the team
           </div>
           <h2 className="tm-join-headline tm-reveal-el" data-delay="100">
