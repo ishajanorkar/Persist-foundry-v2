@@ -3615,7 +3615,7 @@ body.pf-landing .pf ~ .footer {
     max-width: none;
   }
   .pf .footer-newsletter-wrap {
-    max-width: 22rem;
+    max-width: 26rem;
   }
   .pf .footer-nav-cols {
     grid-template-columns: repeat(3, minmax(0, 1fr));

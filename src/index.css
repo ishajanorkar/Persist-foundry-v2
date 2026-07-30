@@ -4451,7 +4451,7 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 0;
-  max-width: 22rem;
+  max-width: 28rem;
   width: 100%;
 }
 
@@ -4568,7 +4568,7 @@ body::before {
   position: relative;
   margin-bottom: 32px;
   width: 100%;
-  max-width: 20rem;
+  max-width: 26rem;
 }
 .footer-newsletter {
   margin-bottom: 0; /* wrap owns the bottom gap now */
@@ -5321,7 +5321,7 @@ body::before {
     max-width: none;
   }
   .footer-newsletter-wrap {
-    max-width: 22rem;
+    max-width: 26rem;
   }
   .footer-nav-cols {
     grid-template-columns: repeat(3, minmax(0, 1fr));
