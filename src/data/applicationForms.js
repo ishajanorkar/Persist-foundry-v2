@@ -58,7 +58,7 @@ export const APPLICATION_FORMS = {
   cofoundathon: {
     formType: 'Cofoundathon',
     path: '/apply-to-cofoundathon',
-    title: 'Start Your Co-Foundathon Journey',
+    title: 'Start Your Co-Founder Journey',
     subtitle:
       'Tell us a bit about yourself so we can evaluate your fit for the program and prepare your onboarding call.',
     sheetTab: 'Cofoundathon',
@@ -260,7 +260,7 @@ export const WORK_WITH_US_LINKS = [
     formKey: 'fullTime',
   },
   {
-    label: 'Co-Foundathon',
+    label: 'Co-Founder Application',
     to: '/apply-to-cofoundathon',
     formKey: 'cofoundathon',
   },

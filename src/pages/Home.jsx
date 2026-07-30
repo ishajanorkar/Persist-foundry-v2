@@ -1157,7 +1157,7 @@ const PROG_DATA = [
   { idx:'02', name:'Co-Founder Bridge',  eyebrow:'02 · The Match',
     desc:'For the solo founder still missing the other half of the bet.',
     bullets:['Curated co-founder matching','Equity & alignment frameworks','Trial sprints before you commit'],
-    cta:'Explore the Bridge',
+    cta:'Co-Founder Application',
     to:'/apply-to-cofoundathon',
     fill:'radial-gradient(circle at 38% 32%, #c2cefb, #6f80df 48%, #4a59c4 100%)',
     shadow:'0 0 26px 3px rgba(96,116,216,0.5)', hasRing:false, size:27 },

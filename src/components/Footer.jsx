@@ -17,7 +17,7 @@ const EXPLORE_LINKS = [
 
 const OPPORTUNITY_LINKS = [
   { label: "Job Application", to: "/apply-for-a-full-time-position" },
-  { label: "Co-Foundathon", to: "/apply-to-cofoundathon" },
+  { label: "Co-Founder Application", to: "/apply-to-cofoundathon" },
   { label: "Investor Application", to: "/investor-application" },
   { label: "Careers", to: "/careers" },
   { label: "Contact Us", to: "/contact" },

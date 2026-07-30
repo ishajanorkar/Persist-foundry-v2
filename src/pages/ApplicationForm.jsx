@@ -5,7 +5,7 @@ import { submitApplication } from "../lib/submitApplication";
 
 const EYEBROW_BY_KEY = {
   fullTime: "Job Application",
-  cofoundathon: "Co-Foundathon",
+  cofoundathon: "Co-Founder Application",
   investor: "Investor Application",
   fellowship: "Persist Foundry",
 };

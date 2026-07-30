@@ -36,9 +36,11 @@
       property="og:description"
       content="We back the bet you already made. Capital, structure, and a team that helps you become the company you set out to build. Cohort 2026 open."
     />
-    <meta property="og:image" content="https://persist.org/seo/og-image.png" />
-    <meta property="og:image:secure_url" content="https://persist.org/seo/og-image.png" />
-    <meta property="og:image:type" content="image/png" />
+    <!-- Absolute HTTPS URLs required by WhatsApp / LinkedIn / X / Slack.
+         Image must be live on this same domain after deploy (JPEG is most reliable). -->
+    <meta property="og:image" content="https://persist.org/og-image.jpg" />
+    <meta property="og:image:secure_url" content="https://persist.org/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Persist — Advancing Greatness" />
@@ -52,7 +54,7 @@
       name="twitter:description"
       content="We back the bet you already made. Capital, structure, and a team that helps you become the company you set out to build. Cohort 2026 open."
     />
-    <meta name="twitter:image" content="https://persist.org/seo/twitter-image.png" />
+    <meta name="twitter:image" content="https://persist.org/og-image.jpg" />
     <meta name="twitter:image:alt" content="Persist — Advancing Greatness" />
 
     <!-- Structured data -->
@@ -64,7 +66,7 @@
         "alternateName": "Persist Foundry",
         "url": "https://persist.org/",
         "logo": "https://persist.org/pv-favicon.png",
-        "image": "https://persist.org/seo/og-image.png",
+        "image": "https://persist.org/og-image.jpg",
         "description": "Persist Foundry backs ambitious founders with capital, structure, and operators. Advancing greatness.",
         "sameAs": [
           "https://www.linkedin.com/company/persist-ventures/",

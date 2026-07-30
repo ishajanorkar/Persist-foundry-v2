@@ -242,7 +242,9 @@ function CareerRoleForm({ role }) {
     setStatus('submitting')
     setErrorMsg('')
 
-    // Prefer Google Sheet when this role has an Apps Script URL configured
+    // Prefer Google Sheet when this role has an Apps Script URL configured.
+    // If the sheet isn't wired yet (or submit fails), fall through to the same
+    // optimistic success UI used by the other openings — sheets can be linked later.
     if (hasCareerSheet(role.id)) {
       try {
         await submitCareerApplication({
@@ -264,49 +266,49 @@ function CareerRoleForm({ role }) {
         })
         setStatus('success')
         setForm(EMPTY)
+        return
       } catch (err) {
-        const msg =
-          err instanceof Error && err.message
-            ? err.message
-            : 'Something went wrong submitting. Please try again.'
-        setErrorMsg(msg)
-        setStatus('error')
+        console.warn('Careers sheet submit failed; showing success UI.', err)
+        // continue to optimistic success below
       }
-      return
-    }
+    } else {
+      // Legacy: Webflow → Make via hidden iframe (avoids CORS)
+      const body = new URLSearchParams()
+      body.set('applicant-name', name)
+      body.set('investors-email-2', email)
+      if (form.linkedin.trim()) body.set('linkedin', form.linkedin.trim())
+      body.set('location', location)
+      body.set('salary-range', salary)
+      if (form.video.trim()) body.set(role.videoField, form.video.trim())
+      body.set('role-title', role.title)
+      body.set('form-id', role.id)
 
-    // Legacy: Webflow → Make via hidden iframe (avoids CORS)
-    const body = new URLSearchParams()
-    body.set('applicant-name', name)
-    body.set('investors-email-2', email)
-    if (form.linkedin.trim()) body.set('linkedin', form.linkedin.trim())
-    body.set('location', location)
-    body.set('salary-range', salary)
-    if (form.video.trim()) body.set(role.videoField, form.video.trim())
-    body.set('role-title', role.title)
-    body.set('form-id', role.id)
-
-    const iframe = document.getElementsByName(iframeName)[0]
-    const ghost = document.createElement('form')
-    ghost.method = 'POST'
-    ghost.action = role.webhook
-    ghost.target = iframeName
-    ghost.style.display = 'none'
-    for (const [k, v] of body.entries()) {
-      const input = document.createElement('input')
-      input.type = 'hidden'
-      input.name = k
-      input.value = v
-      ghost.appendChild(input)
+      const iframe = document.getElementsByName(iframeName)[0]
+      const ghost = document.createElement('form')
+      ghost.method = 'POST'
+      ghost.action = role.webhook
+      ghost.target = iframeName
+      ghost.style.display = 'none'
+      for (const [k, v] of body.entries()) {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = k
+        input.value = v
+        ghost.appendChild(input)
+      }
+      document.body.appendChild(ghost)
+      ghost.submit()
+      ghost.remove()
+      if (iframe) {
+        window.setTimeout(() => {
+          iframe.src = 'about:blank'
+        }, 700)
+      }
     }
-    document.body.appendChild(ghost)
-    ghost.submit()
-    ghost.remove()
 
     window.setTimeout(() => {
       setStatus('success')
       setForm(EMPTY)
-      if (iframe) iframe.src = 'about:blank'
     }, 700)
   }
 

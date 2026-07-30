@@ -16,8 +16,14 @@ export async function submitApplication({ formType, fields }) {
     fellowshipUrl
 
   if (!SCRIPT_URL) {
+    const needed =
+      formType === 'Fellowship'
+        ? 'VITE_FELLOWSHIP_SCRIPT_URL'
+        : 'VITE_APPLICATIONS_SCRIPT_URL'
     console.warn(
-      'No applications script URL set. Deploy google-apps-script/fellowship.gs and add VITE_FELLOWSHIP_SCRIPT_URL to .env',
+      `No applications script URL set for ${formType}. Deploy google-apps-script/${
+        formType === 'Fellowship' ? 'fellowship' : 'applications'
+      }.gs and add ${needed} to .env / Vercel env, then redeploy.`,
     )
     throw new Error('Applications script URL is not configured')
   }
