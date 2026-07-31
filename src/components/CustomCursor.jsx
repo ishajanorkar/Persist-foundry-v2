@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 const HOVER_SEL =
-  'a, button, [role="button"], input[type="submit"], input[type="button"], .cr-card-apply, .cr-cta, .cr-modal-close, .ap-submit, .ap-again, .pf-card, .pf-cell, .pf-filter-btn, .pf-detail-cta, .filter-col, .backed-logo, .offer-card, .tm-card, .ct-submit'
+  'a, button, [role="button"], input[type="submit"], input[type="button"], .cr-card-apply, .cr-cta, .cr-modal-close, .ap-submit, .ap-again, .pf-card, .pf-cell, .pf-filter-btn, .pf-detail-cta, .filter-col, .backed-logo, .offer-card, .tm-card, .ct-social-link'
 
 /**
  * Sitewide custom brand cursor. Mount once in App layout.

@@ -3,6 +3,35 @@
    Visual language aligned with About (.ab-*).
    ====================================================== */
 
+.ab-corner-ticks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.ab-corner-ticks img {
+  position: absolute;
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+.ab-corner-ticks__tl {
+  top: -11px;
+  left: -11px;
+}
+.ab-corner-ticks__tr {
+  top: -11px;
+  right: -11px;
+}
+.ab-corner-ticks__bl {
+  bottom: -11px;
+  left: -11px;
+}
+.ab-corner-ticks__br {
+  bottom: -11px;
+  right: -11px;
+}
+
 .ap-page {
   position: relative;
   min-height: 100vh;
@@ -163,6 +192,14 @@
 .ap-input:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+textarea.ap-input,
+.ap-input--area {
+  resize: vertical;
+  min-height: 140px;
+  line-height: 1.5;
+  font-family: inherit;
 }
 
 .ap-help {

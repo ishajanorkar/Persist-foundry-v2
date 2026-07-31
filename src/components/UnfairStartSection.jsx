@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import CornerTicks from "../about/CornerTicks";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -108,7 +107,6 @@ const SPEEDS = {
 function PropCard({ card, cardKey }) {
   return (
     <article className="vprop-card">
-      <CornerTicks />
       <h3 className="vprop-card__title">{card.title}</h3>
       <div
         className={`vprop-card__icon${cardKey === "network" ? " vprop-card__icon--network" : ""}`}

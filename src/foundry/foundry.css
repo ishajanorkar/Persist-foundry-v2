@@ -120,13 +120,17 @@ body.pf-landing ::selection {
   text-decoration: none;
 }
 /* Keep shared footer link colors intact inside Foundry scroll-track */
-.pf .footer .footer-nav-link,
-.pf .footer .footer-social-link {
+.pf .footer .footer-nav-link {
   color: rgba(230, 224, 245, 0.88);
 }
-.pf .footer .footer-nav-link:hover,
-.pf .footer .footer-social-link:hover {
+.pf .footer .footer-social-link {
+  color: rgba(230, 224, 245, 0.7);
+}
+.pf .footer .footer-nav-link:hover {
   color: #fff;
+}
+.pf .footer .footer-social-link:hover {
+  color: rgba(245, 242, 255, 0.95);
 }
 .pf .footer .footer-nav-heading {
   color: rgba(220, 212, 235, 0.78);

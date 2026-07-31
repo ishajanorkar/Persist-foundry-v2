@@ -319,11 +319,14 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       // Soft hero wash on mobile (match Funded-by depth); light on desktop
       const scrimMul = i === 2 ? 0 : i === 0 ? (isMobile ? 0.7 : 0.45) : 0.95;
       if (scrim) scrim.style.opacity = (o * scrimMul).toFixed(3);
-      // Soft stage fade on hero / tether; none on backstory
+      // Soft stage fade on hero / tether; light veil on backstory so baked
+      // stars read ~half as dense without going fully black
       if (i === 0) stageO = Math.max(stageO, o * (isMobile ? 0.38 : 0.18));
       if (i === 1) stageO = Math.max(stageO, o * 0.92);
-      // i === 2 (threshold/backstory): intentionally no stage fade
-      if (i === 2) thresholdO = o;
+      if (i === 2) {
+        thresholdO = o;
+        stageO = Math.max(stageO, o * (isMobile ? 0.45 : 0.38));
+      }
     }
     if (stageFade) stageFade.style.opacity = stageO.toFixed(3);
     // Soft Backstory veil — track the beat like Tether's stageFade (no hard snap to black)
@@ -583,7 +586,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     );
     camera.position.z = 14;
 
-    const N = isLitePerf ? 140 : window.innerWidth < 768 ? 210 : 450;
+    const N = isLitePerf ? 70 : window.innerWidth < 768 ? 105 : 225;
     const geo = new THREE.BufferGeometry();
     const pos = new Float32Array(N * 3);
     for (let i = 0; i < N; i++) {
@@ -598,7 +601,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     const starTex = makeStarTexture();
     const mat = new THREE.PointsMaterial({
-      size: 0.42,
+      size: isLitePerf ? 0.32 : 0.36,
       map: starTex,
       transparent: true,
       depthWrite: false,
