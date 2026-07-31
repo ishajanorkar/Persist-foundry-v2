@@ -6,9 +6,11 @@
    ============================================================ */
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import * as THREE from "three";
 
 gsap.registerPlugin(ScrollTrigger);
+
+/** Lazy-loaded — keeps Three.js (~160KB+) out of the initial mobile parse. */
+let THREE = null;
 
 export default function initFoundry({ base = "/foundry" } = {}) {
   /* ---- app config: frame anchors + the five Persist arms ---- */
@@ -110,7 +112,13 @@ export default function initFoundry({ base = "/foundry" } = {}) {
 
   const frames = new Array(CFG.count);
   const loaded = new Array(CFG.count).fill(false);
-  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  // Phones / Save-Data: fewer pixels + sparse frame set (biggest load win)
+  const isLitePerf =
+    window.matchMedia("(max-width: 768px), (pointer: coarse)").matches ||
+    !!navigator.connection?.saveData ||
+    /2g/.test(navigator.connection?.effectiveType || "");
+  let dpr = Math.min(window.devicePixelRatio || 1, isLitePerf ? 1.25 : 2);
+  const FRAME_STEP = isLitePerf ? 4 : 1;
 
   function frameURL(i) {
     const n = String(i + 1).padStart(CFG.pad, "0");
@@ -157,7 +165,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   }
 
   function resizeCanvas() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, isLitePerf ? 1.25 : 2);
     cw = window.innerWidth;
     ch = window.innerHeight;
     canvas.width = Math.round(cw * dpr);
@@ -418,25 +426,40 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     const loaderPct = document.getElementById("loaderPct");
     const loader = document.getElementById("loader");
 
+    // Always front-load beat anchors so scrub never blanks early
     const priority = [A.hero, A.tether, A.what, A.threshold, CFG.count - 1];
-    for (let i = 0; i < 50; i++) priority.push(i);
+    if (!isLitePerf) {
+      for (let i = 0; i < 50; i++) priority.push(i);
+    }
     const seen = new Set();
     const ordered = priority.filter((i) => !seen.has(i) && seen.add(i));
-    for (let i = 0; i < CFG.count; i++)
-      if (!seen.has(i)) {
-        ordered.push(i);
-        seen.add(i);
+
+    if (isLitePerf) {
+      // ~1/4 of frames (~3.5MB vs ~14MB) — nearest-neighbor fill on scrub
+      for (let i = 0; i < CFG.count; i += FRAME_STEP) {
+        if (!seen.has(i)) {
+          ordered.push(i);
+          seen.add(i);
+        }
       }
+    } else {
+      for (let i = 0; i < CFG.count; i++) {
+        if (!seen.has(i)) {
+          ordered.push(i);
+          seen.add(i);
+        }
+      }
+    }
 
     let done = 0;
-    const total = CFG.count;
+    const total = ordered.length;
     const updateLoader = () => {
-      const pct = Math.round((done / total) * 100);
+      const pct = Math.round((done / Math.max(1, total)) * 100);
       if (loaderBar) loaderBar.style.width = pct + "%";
       if (loaderPct) loaderPct.textContent = String(pct).padStart(3, "0");
     };
 
-    const REVEAL_AT = 18;
+    const REVEAL_AT = isLitePerf ? 5 : 18;
     let revealed = false;
     const revealIfReady = () => {
       if (revealed || done < REVEAL_AT) return;
@@ -446,7 +469,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       document.dispatchEvent(new Event("pf:ready"));
     };
 
-    const CONC = 6;
+    const CONC = isLitePerf ? 3 : 6;
     let idx = 0;
     async function worker() {
       while (idx < ordered.length && !killed) {
@@ -542,12 +565,14 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   }
 
   function initThree() {
+    if (!THREE || !threeCanvas) return;
     renderer = new THREE.WebGLRenderer({
       canvas: threeCanvas,
       alpha: true,
-      antialias: true,
+      antialias: !isLitePerf,
+      powerPreference: isLitePerf ? "low-power" : "default",
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isLitePerf ? 1.25 : 2));
     renderer.setClearColor(0x000000, 0);
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(
@@ -558,7 +583,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     );
     camera.position.z = 14;
 
-    const N = window.innerWidth < 768 ? 210 : 450;
+    const N = isLitePerf ? 140 : window.innerWidth < 768 ? 210 : 450;
     const geo = new THREE.BufferGeometry();
     const pos = new Float32Array(N * 3);
     for (let i = 0; i < N; i++) {
@@ -641,6 +666,25 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     raf = requestAnimationFrame(render);
   }
   function startThree() {
+    if (killed) return;
+    if (!renderer) {
+      // Fire-and-forget dynamic import — first orbit scroll pulls Three.js
+      if (!THREE) {
+        if (startThree._loading) return;
+        startThree._loading = import("three")
+          .then((mod) => {
+            THREE = mod;
+            startThree._loading = null;
+            if (!killed) startThree();
+          })
+          .catch(() => {
+            startThree._loading = null;
+          });
+        return;
+      }
+      initThree();
+      if (!renderer) return;
+    }
     if (!running) {
       running = true;
       onResizeThree();
@@ -1642,11 +1686,8 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   }
 
   function initFinale() {
-    if (!THREE) {
-      console.warn("Three.js not loaded");
-      return;
-    }
-    // lift the hover panel out of the scroll-track stacking context
+    // Three.js loads on-demand via startThree() when the orbit/starfield begins —
+    // keep orbit UI + scroll wiring independent so first paint isn't blocked.
     if (armDetail && armDetail.parentElement !== document.body) {
       // lift the panel to <body>, but on cleanup RETURN it to its original
       // parent — removing it outright orphans the React-owned node, and the
@@ -1657,7 +1698,6 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         if (armDetail && armHome) armHome.appendChild(armDetail);
       });
     }
-    initThree();
     buildOrbit();
     setLogo(0, 0);
     wireScroll();
@@ -1686,7 +1726,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     on(document, "pf:ready", onReady);
     const hardFallback = setTimeout(
       () => loader && loader.classList.add("done"),
-      6000,
+      isLitePerf ? 2200 : 6000,
     );
     cleanups.push(() => clearTimeout(hardFallback));
 

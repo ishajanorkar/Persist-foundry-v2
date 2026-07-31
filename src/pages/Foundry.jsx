@@ -1,12 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import "../foundry/foundry.css";
 import initFoundry from "../foundry/engine";
-import FinalCtaSection from "../components/FinalCtaSection";
 import FilterSection from "../components/FilterSection";
 import ScrollFloat from "../components/ScrollFloat";
 import UnfairStartSection from "../components/UnfairStartSection";
+
+const FinalCtaSection = lazy(() => import("../components/FinalCtaSection"));
 
 /* ============================================================
    PERSIST FOUNDRY — alternative cinematic landing.
@@ -648,7 +649,9 @@ export default function Foundry() {
           </span>
         </div>
 
-        <FinalCtaSection footer={true} />
+        <Suspense fallback={null}>
+          <FinalCtaSection footer={true} />
+        </Suspense>
       </main>
 
       {/* scroll cue */}

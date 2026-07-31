@@ -4,6 +4,7 @@ import {
   getCompanyById,
   getPortfolioThumbnail,
 } from '../data/portfolio'
+import '../styles/portfolio-page.css'
 
 const LiIcon = () => (
   <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">

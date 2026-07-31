@@ -4,6 +4,7 @@ import {
   INSIDE_HAND_TIMELINE,
   getInsideHandPreset,
 } from "../about/insideHands.config";
+import "../styles/about-page.css";
 
 /* ─────────────────────────────────────────────────────────────
    ABOUT — redesigned secondary page.

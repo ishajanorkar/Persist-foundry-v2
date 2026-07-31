@@ -224,15 +224,33 @@ export default function FinalCtaSection({ footer = false }) {
     a.addEventListener("timeupdate", onTimeUpdate);
     b.addEventListener("timeupdate", onTimeUpdate);
 
-    a.preload = "auto";
-    b.preload = "auto";
-    a.load();
-    b.load();
+    a.preload = "none";
+    b.preload = "none";
+    let warmed = false;
+    const warm = () => {
+      if (warmed) return;
+      warmed = true;
+      a.preload = "auto";
+      b.preload = "auto";
+      a.load();
+      b.load();
+    };
+
+    const once = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        warm();
+        once.disconnect();
+      },
+      { rootMargin: "50% 0px", threshold: 0.01 },
+    );
+    once.observe(media);
 
     return () => {
       stopWatch();
       stopFade();
       io.disconnect();
+      once.disconnect();
       document.removeEventListener("visibilitychange", syncPlayback);
       a.removeEventListener("ended", onEnded);
       b.removeEventListener("ended", onEnded);
@@ -252,7 +270,7 @@ export default function FinalCtaSection({ footer = false }) {
           src={CTA_VIDEO_SRC}
           muted
           playsInline
-          preload="auto"
+          preload="none"
           disablePictureInPicture
           disableRemotePlayback
         />
@@ -262,7 +280,7 @@ export default function FinalCtaSection({ footer = false }) {
           src={CTA_VIDEO_SRC}
           muted
           playsInline
-          preload="auto"
+          preload="none"
           disablePictureInPicture
           disableRemotePlayback
         />

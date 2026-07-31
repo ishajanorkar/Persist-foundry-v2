@@ -5,6 +5,7 @@ import {
   PORTFOLIO_CATEGORIES,
   getPortfolioThumbnail,
 } from '../data/portfolio'
+import '../styles/portfolio-page.css'
 
 const REVEAL_BASE_MS = 30
 const REVEAL_STEP_MS = 18
