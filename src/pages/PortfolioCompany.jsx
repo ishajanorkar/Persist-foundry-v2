@@ -65,13 +65,13 @@ function FounderLinks({ founder }) {
 
 function CompanyLogo({ company }) {
   const initials = company.name.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase()
-  const src = company.logoLive || company.logo
+  const src = company.logo || company.logoLive
   if (src) {
     return (
       <img
         src={src}
         alt=""
-        className={`pf-detail-logo-img${company.logoClass ? ` ${company.logoClass}` : ''}${company.logoLive ? ' is-remote' : ''}`}
+        className={`pf-detail-logo-img${company.logoClass ? ` ${company.logoClass}` : ''}${!company.logo && company.logoLive ? ' is-remote' : ''}`}
       />
     )
   }
@@ -108,11 +108,28 @@ export default function PortfolioCompany() {
       <article className="pf-detail">
         <div className="pf-detail-layout">
           <div className="pf-detail-scroll">
-            <nav className="pf-detail-crumb" aria-label="Breadcrumb">
-              <Link to="/portfolio">Portfolio</Link>
-              <span aria-hidden="true">/</span>
-              <span>{company.name}</span>
-            </nav>
+            <div className="pf-detail-top">
+              <Link to="/portfolio" className="pf-detail-back">
+                <span className="pf-detail-back-arrow" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path
+                      d="M9.5 3.5 5 8l4.5 4.5"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+                <span className="pf-detail-back-label">Go back</span>
+              </Link>
+
+              <nav className="pf-detail-crumb" aria-label="Breadcrumb">
+                <Link to="/portfolio">Portfolio</Link>
+                <span aria-hidden="true">/</span>
+                <span>{company.name}</span>
+              </nav>
+            </div>
 
             <header className="pf-detail-hero">
               {(company.logoLive || company.logo) && (

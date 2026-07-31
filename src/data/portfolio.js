@@ -33,9 +33,8 @@ const PORTFOLIO_RAW = [
     name: 'Open Droids',
     tag: 'Robotics',
     tags: ['ai', 'consumer'],
-    logo: '/assets/opendroids.png',
-    logoClass: 'is-slightly-compact',
-    hoverColor: '#9E56EA',
+    logo: '/assets/portfolio-white/open-droids.png',
+        hoverColor: '#9E56EA',
     url: 'https://opendroids.com/',
     description:
       'Open Droids is revolutionizing smart living through practical, human-centric robotics designed for homes, hospitality, and elderly care. Introducing our most advanced home robot yet: a seamless, intuitive, and intelligent companion that transforms cleaning and chores into effortless automation.',
@@ -53,9 +52,9 @@ const PORTFOLIO_RAW = [
     name: 'Bump',
     tag: 'Music · Web3',
     tags: ['consumer', 'social'],
-    logo: '/assets/bumpfm.svg',
-    logoClass: 'is-slightly-large',
-    url: 'https://bump.fm/',
+    logo: '/assets/portfolio-white/bump.png',
+    logoClass: 'is-wordmark',
+        url: 'https://bump.fm/',
     description:
       'Bump.fm is a next-gen, Solana-native music platform where fans stake songs, not just stream them — turning every track into a prediction market and powering a Web3-driven cultural economy for artists and listeners alike.',
     founders: [
@@ -77,9 +76,8 @@ const PORTFOLIO_RAW = [
     name: 'Song GPT',
     tag: 'AI · Music',
     tags: ['ai', 'media'],
-    logo: '/assets/song-gpt-logo.png',
-    logoClass: 'is-slightly-compact',
-    url: 'https://songgpt.com/',
+    logo: '/assets/portfolio-white/song-gpt.png',
+        url: 'https://songgpt.com/',
     description:
       'Song GPT is an AI-powered music creation platform with a ChatGPT-style interface, enabling smooth, collaborative songwriting. 150,000+ songs generated and counting.',
     founders: [
@@ -97,9 +95,8 @@ const PORTFOLIO_RAW = [
     name: 'Face Search AI',
     tag: 'AI · Privacy',
     tags: ['ai', 'consumer'],
-    logo: '/assets/facesearcha-i.png',
-    logoClass: 'is-extra-large',
-    hoverColor: '#03348C',
+    logo: '/assets/portfolio-white/face-search-ai.png',
+        hoverColor: '#03348C',
     url: 'https://facesearchai.com/',
     description:
       'Face Search AI is a simple and smart tool that helps you take control of your online presence. Just upload a photo to see where it appears on the internet in seconds. With over 1M++ users, Face Search AI has grown into a fast-rising platform trusted by people worldwide. As privacy concerns grow, Face Search AI empowers individuals to stay aware, secure, and confident online by helping them monitor and manage their digital footprint.',
@@ -129,9 +126,8 @@ const PORTFOLIO_RAW = [
     name: 'Gif Studios',
     tag: 'Media',
     tags: ['media', 'studio'],
-    logo: '/assets/gifstudios.png',
-    logoClass: 'is-slightly-compact',
-    hoverColor: '#DE6045',
+    logo: '/assets/portfolio-white/gif-studios.png',
+        hoverColor: '#DE6045',
     url: 'https://gifstudios.com/',
     description:
       'GIF Studios creates custom, high-ranking GIFs for brands on Giphy and Tenor — boosting engagement and visibility across iOS and Android. Trusted by top names like Pudgy Penguin, we help brands connect through fun, memorable visuals.',
@@ -150,9 +146,8 @@ const PORTFOLIO_RAW = [
     name: 'Clo.ai',
     tag: 'AI · Wellness',
     tags: ['ai', 'consumer'],
-    logo: '/assets/clo-ai-logo.svg',
-    logoClass: 'is-extra-compact',
-    hoverColor: '#DC838E',
+    logo: '/assets/portfolio-white/clo-ai.png',
+        hoverColor: '#DC838E',
     url: 'https://clo.ai/',
     description:
       'CLO is a voice-first AI confidant designed to help you reflect before you react. By fostering open and judgment-free conversations, CLO brings clarity to your thoughts and emotions, empowering you to strengthen your relationships through deeper understanding and self-awareness.',
@@ -176,9 +171,8 @@ const PORTFOLIO_RAW = [
     name: 'Alphabetski',
     tag: 'Venture Studio',
     tags: ['studio', 'media'],
-    logo: '/assets/alpha.png',
-    logoClass: 'is-extra-large',
-    hoverColor: '#27685B',
+    logo: '/assets/portfolio-white/alphabetski.png',
+        hoverColor: '#27685B',
     url: 'https://alphabetski.com/',
     description:
       'Alphabetski is a venture studio that builds and scales AI-driven products at the intersection of media and the creator economy, creating tools and platforms that help creators produce, grow, and monetize content more effectively.',
@@ -195,9 +189,8 @@ const PORTFOLIO_RAW = [
     name: 'Mend',
     tag: 'AI · Health',
     tags: ['ai', 'consumer'],
-    logo: '/assets/mend-logo.png',
-    logoClass: 'is-compact',
-    hoverColor: '#8537FE',
+    logo: '/assets/portfolio-white/mend.png',
+        hoverColor: '#8537FE',
     url: 'https://mend.app/',
     description:
       'Mend is an AI therapist designed to help users reflect, heal, and grow — offering solo or partner-based sessions with emotional insights, conflict resolution, and a safe space for meaningful conversations.',
@@ -215,9 +208,8 @@ const PORTFOLIO_RAW = [
     name: 'CHAINREACH',
     tag: 'Influencer Marketing',
     tags: ['ai', 'media'],
-    logo: '/assets/chainreach.webp',
-    logoClass: 'is-compact',
-    hoverColor: '#CDA434',
+    logo: '/assets/portfolio-white/chainreach.png',
+        hoverColor: '#CDA434',
     url: 'https://chainreach.io/',
     description:
       'ChainReach is an AI-powered influencer marketing platform that connects brands and creators to launch, manage, and track campaigns with verified results, using smart-contract systems to ensure secure payments and transparent collaboration.',
@@ -233,9 +225,8 @@ const PORTFOLIO_RAW = [
     name: 'Deepvid AI',
     tag: 'AI · Video',
     tags: ['ai', 'media'],
-    logo: '/assets/deepvid.ai.webp',
-    logoClass: 'is-slightly-compact',
-    hoverColor: '#EC7467',
+    logo: '/assets/portfolio-white/deepvid-ai.png',
+        hoverColor: '#EC7467',
     url: 'https://deepvid.ai/',
     description:
       'Deepvid AI is a viral video and music generation platform that lets users create TikTok-style content from images, videos, or PDFs and generate custom, share-worthy music with ease.',
@@ -254,9 +245,8 @@ const PORTFOLIO_RAW = [
     name: 'Persist Designs',
     tag: 'Design Studio',
     tags: ['studio'],
-    logo: '/assets/persist-designs.png',
-    logoClass: 'is-slightly-compact',
-    hoverColor: '#3D2D58',
+    logo: '/assets/portfolio-white/persist-designs.png',
+        hoverColor: '#3D2D58',
     url: 'https://persistventures.com/',
     description:
       'At Persist Designs, we craft logos, websites, packaging, UI/UX, and marketing materials that look great and work even better. While we collaborate across time zones, our core focus is branding for all Persist projects.',
@@ -274,9 +264,8 @@ const PORTFOLIO_RAW = [
     name: 'Flic',
     tag: 'Hiring · Creatives',
     tags: ['talent', 'media'],
-    logo: '/assets/flic.png',
-    logoClass: 'is-slightly-large',
-    hoverColor: '#A7003E',
+    logo: '/assets/portfolio-white/flic.png',
+        hoverColor: '#A7003E',
     url: 'https://flic.app/',
     description:
       'Flic is the first swipe-based hiring platform built for video editors and creatives — connecting clients and editors through short reels, real-time previews, and instant matches for seamless collaboration.',
@@ -293,9 +282,8 @@ const PORTFOLIO_RAW = [
     name: 'Swissmote',
     tag: 'Talent',
     tags: ['talent'],
-    logo: '/assets/swissmote-logo.png',
-    logoClass: 'is-slightly-large',
-    hoverColor: '#C1282D',
+    logo: '/assets/portfolio-white/swissmote.png',
+        hoverColor: '#C1282D',
     url: 'https://swissmote.com/',
     description:
       'Swissmote is a global recruitment partner connecting businesses with top remote talent primarily from India and emerging markets through tailored hiring solutions, strategic partnerships, and a commitment to long-term growth.',
@@ -306,9 +294,9 @@ const PORTFOLIO_RAW = [
     name: 'Vital Ventures',
     tag: 'Investment',
     tags: ['studio'],
-    logo: '/assets/vital-ventures.png',
-    logoClass: 'is-extra-large',
-    hoverColor: '#B8975A',
+    logo: '/assets/portfolio-white/vital-ventures.png',
+    logoClass: 'is-line-mark',
+        hoverColor: '#B8975A',
     url: 'https://vitalventures.com/',
     description:
       'Vital Ventures is a long-term oriented firm focused on studying, supporting, and building the foundational systems that will shape human civilization.',
@@ -325,7 +313,7 @@ const PORTFOLIO_RAW = [
     name: 'ASI House',
     tag: 'Think Tank',
     tags: ['civic', 'studio'],
-    logo: '/assets/asi-house.png',
+    logo: '/assets/portfolio-white/asi-house.png',
     hoverColor: '#79378C',
     url: 'https://asiahouse.org/',
     description:
@@ -349,8 +337,7 @@ const PORTFOLIO_RAW = [
     name: 'Socialverse',
     tag: 'Campus · Social',
     tags: ['social', 'consumer'],
-    logo: '/assets/socialverse.png',
-    logoClass: 'is-extra-large',
+    logo: '/assets/portfolio-white/socialverse.png',
     hoverColor: '#411241',
     url: 'https://socialverse.app/',
     description:
@@ -375,7 +362,7 @@ const PORTFOLIO_RAW = [
     name: 'Vible',
     tag: 'Social · Rewards',
     tags: ['social', 'consumer'],
-    logo: '/assets/vible.png',
+    logo: '/assets/portfolio-white/vible.png',
     hoverColor: '#CA9305',
     url: 'https://vible.app/',
     description:
@@ -395,7 +382,7 @@ const PORTFOLIO_RAW = [
     name: 'Startupathon',
     tag: 'Competitions',
     tags: ['studio', 'civic'],
-    logo: '/assets/startupthon.png',
+    logo: '/assets/portfolio-white/startupathon.png',
     hoverColor: '#805DD8',
     url: 'https://startupathon.com/',
     description:
@@ -415,9 +402,9 @@ const PORTFOLIO_RAW = [
     name: 'PumpGym',
     tag: 'AI · Fitness',
     tags: ['ai', 'consumer'],
-    logo: '/assets/pump-logo.png',
-    logoClass: 'is-extra-compact',
-    hoverColor: '#1BAF99',
+    logo: '/assets/portfolio-white/pumpgym.png',
+    logoClass: 'is-wordmark',
+        hoverColor: '#1BAF99',
     url: 'https://pumpgym.com/',
     description:
       'Pumpgym is an AI-powered fitness platform that delivers personalized workout and diet plans, real-time feedback, and smart scheduling — helping users stay consistent, motivated, and on track with their health goals.',
@@ -428,7 +415,7 @@ const PORTFOLIO_RAW = [
     name: 'PracAI',
     tag: 'AI · Education',
     tags: ['ai', 'consumer'],
-    logo: '/assets/prac-ai.png',
+    logo: '/assets/portfolio-white/pracai.png',
     hoverColor: '#6AD426',
     url: 'https://pracai.com/',
     description:
@@ -446,7 +433,8 @@ const PORTFOLIO_RAW = [
     name: 'Yumiko AI',
     tag: 'AI · Companion',
     tags: ['ai', 'consumer'],
-    logo: '/assets/yumiko.png',
+    logo: '/assets/portfolio-white/yumiko-ai.png',
+    logoClass: 'is-wordmark is-wordmark-wide',
     hoverColor: '#865CA3',
     url: 'https://yumiko.ai/',
     description:
@@ -458,8 +446,8 @@ const PORTFOLIO_RAW = [
     name: 'Creatorships',
     tag: 'Influencer Marketing',
     tags: ['media', 'ai'],
-    logo: '/assets/creatorship.png',
-    logoClass: 'is-slightly-large',
+    logo: '/assets/portfolio-white/creatorships.png',
+    logoClass: 'is-creatorships',
     hoverColor: '#EC5E3F',
     url: 'https://creatorships.com/',
     description:
@@ -471,7 +459,7 @@ const PORTFOLIO_RAW = [
     name: 'Shorts-lol',
     tag: 'AI · Video',
     tags: ['ai', 'media'],
-    logo: '/assets/shorts-lol.webp',
+    logo: '/assets/portfolio-white/shorts-lol.png',
     hoverColor: '#093F89',
     url: 'https://shorts.lol/',
     description:
@@ -491,9 +479,8 @@ const PORTFOLIO_RAW = [
     name: 'WestX',
     tag: 'AI · Social',
     tags: ['ai', 'social'],
-    logo: '/assets/westx.webp',
-    logoClass: 'is-shorter',
-    hoverColor: '#3D0F5A',
+    logo: '/assets/portfolio-white/westx.png',
+        hoverColor: '#3D0F5A',
     url: 'https://westx.com/',
     description:
       'WestX is an AI-powered social platform where users don\'t just create content — they create content creators, redefining how influence and creativity are built online.',
@@ -504,9 +491,8 @@ const PORTFOLIO_RAW = [
     name: 'VIBESxCODED',
     tag: 'No-Code · AI',
     tags: ['ai', 'studio'],
-    logo: '/assets/vibes-coded.png',
-    logoClass: 'is-extra-compact',
-    hoverColor: '#A3A342',
+    logo: '/assets/portfolio-white/vibescoded.png',
+        hoverColor: '#A3A342',
     url: 'https://vibescoded.com/',
     description:
       'VibesCoded is an AI-powered no-code platform that turns your ideas or sketches into fully deployed applications.',
@@ -517,9 +503,8 @@ const PORTFOLIO_RAW = [
     name: 'Collabio',
     tag: 'Workspace',
     tags: ['studio'],
-    logo: '/assets/collabio.png',
-    logoClass: 'is-slightly-compact',
-    hoverColor: '#FFBE0B',
+    logo: '/assets/portfolio-white/collabio.png',
+        hoverColor: '#FFBE0B',
     url: 'https://collabio.com/',
     description:
       'Collabio is an all-in-one workspace for streamlined project and team management — offering time tracking, task insights, activity reports, and real-time collaboration from one intuitive dashboard.',
@@ -530,7 +515,7 @@ const PORTFOLIO_RAW = [
     name: 'Hey Ova',
     tag: 'AI · Voice',
     tags: ['ai', 'consumer'],
-    logo: '/assets/hey-ova.png',
+    logo: '/assets/portfolio-white/hey-ova.png',
     url: 'https://heyova.com/',
     description:
       'HeyOva is your always-on "second brain" — a smart voice assistant that listens, understands, and responds instantly. It handles everything from image analysis and music creation to scheduling events and managing contacts — all through simple voice commands. With HeyOva, your ideas flow seamlessly into action, powered by the intelligence of next-generation AI computing.',
@@ -553,9 +538,8 @@ const PORTFOLIO_RAW = [
     name: 'Soulmegle',
     tag: 'Video Chat',
     tags: ['social', 'ai'],
-    logo: '/assets/soulmegle.png',
-    logoClass: 'is-slightly-large',
-    hoverColor: '#AA33FF',
+    logo: '/assets/portfolio-white/soulmegle.png',
+        hoverColor: '#AA33FF',
     url: 'https://soulmegle.com/',
     description:
       'Soulmegle is an AI-powered, interest-based video chat platform that connects like-minded people for meaningful conversations by matching users based on shared interests.',
@@ -573,9 +557,9 @@ const PORTFOLIO_RAW = [
     name: 'Game of Creators',
     tag: 'Creator Economy',
     tags: ['media', 'social'],
-    logo: '/assets/game-of-creators.png',
-    logoClass: 'is-slightly-large',
-    hoverColor: '#C27B16',
+    logo: '/assets/portfolio-white/game-of-creators.png',
+    logoClass: 'is-line-mark',
+        hoverColor: '#C27B16',
     url: 'https://gameofcreators.com/',
     description:
       'Game of Creators is democratizing brand deals by letting brands run creator contests for viral marketing — enabling content creators to earn based on performance, not followers, and helping brands reach audiences without the hassle.',
@@ -593,7 +577,7 @@ const PORTFOLIO_RAW = [
     name: 'LinkGrid',
     tag: 'People Search',
     tags: ['ai', 'talent'],
-    logo: '/assets/link-grid.png',
+    logo: '/assets/portfolio-white/linkgrid.png',
     hoverColor: '#4507E6',
     url: 'https://linkgrid.com/',
     description:
@@ -605,9 +589,8 @@ const PORTFOLIO_RAW = [
     name: 'Career Accelerator',
     tag: 'Developer Careers',
     tags: ['talent', 'ai'],
-    logo: '/assets/career-accelerator.png',
-    logoClass: 'is-slightly-large',
-    hoverColor: '#3E1379',
+    logo: '/assets/portfolio-white/career-accelerator.png',
+        hoverColor: '#3E1379',
     url: 'https://persistventures.com/',
     description:
       'Developer Career Accelerator by Persist Ventures helps developers land top jobs faster with AI-powered tools optimizing profiles, auto-applying to 100+ roles daily, streamlining hiring for recruiters, and offering targeted training to sharpen core skills.',
@@ -633,9 +616,8 @@ const PORTFOLIO_RAW = [
     name: 'Ascension Studios',
     tag: 'Film · Web3',
     tags: ['media', 'studio'],
-    logo: '/assets/aacension-studio.svg',
-    logoClass: 'is-slightly-large',
-    hoverColor: '#9EFF3E',
+    logo: '/assets/portfolio-white/ascension-studios.png',
+        hoverColor: '#9EFF3E',
     url: 'https://ascensionstudio.com/',
     description:
       'Ascension Studio is an end-to-end filmmaking platform streamlining everything from scenes to full web series — making production more accessible, affordable, and collaborative through Solana-powered decentralization.',
@@ -646,9 +628,8 @@ const PORTFOLIO_RAW = [
     name: 'Meme Mates',
     tag: 'Dating',
     tags: ['consumer', 'social'],
-    logo: '/assets/meme-mates.png',
-    logoClass: 'is-slightly-compact',
-    hoverColor: '#653872',
+    logo: '/assets/portfolio-white/meme-mates.png',
+        hoverColor: '#653872',
     url: 'https://mememates.com/',
     description:
       'MemeMates is a dating app that sparks real connections through humor — using memes, mood boards, and music anthems to match users based on shared vibes and mutual interests.',
@@ -672,9 +653,8 @@ const PORTFOLIO_RAW = [
     name: 'Communion',
     tag: 'Community',
     tags: ['social', 'civic'],
-    logo: '/assets/communion.png',
-    logoClass: 'is-slightly-compact',
-    hoverColor: '#00AEEF',
+    logo: '/assets/portfolio-white/communion.png',
+        hoverColor: '#00AEEF',
     url: 'https://communion.app/',
     description:
       'The Communion app brings diverse communities together on one platform to share resources, join discussions, organize events, and support one another in a welcoming, collaborative space.',
@@ -693,9 +673,8 @@ const PORTFOLIO_RAW = [
     name: 'Workplete',
     tag: 'Automation',
     tags: ['ai', 'studio'],
-    logo: '/assets/workplete.png',
-    logoClass: 'is-slightly-large',
-    hoverColor: '#D4822B',
+    logo: '/assets/portfolio-white/workplete.png',
+        hoverColor: '#D4822B',
     url: 'https://workplete.com/',
     description:
       'Workplete offers AI-powered workflow automation for startups, creators, and organizations — recently launching Quick List, a tool that auto-lists your product on 40+ AI directories to boost visibility effortlessly.',
@@ -714,7 +693,7 @@ const PORTFOLIO_RAW = [
     name: 'Cloutso',
     tag: 'Content Engine',
     tags: ['media', 'studio'],
-    logo: '/assets/cloutso.png',
+    logo: '/assets/portfolio-white/cloutso.png',
     hoverColor: '#FF8336',
     url: 'https://cloutso.com/',
     description:
@@ -732,9 +711,8 @@ const PORTFOLIO_RAW = [
     name: 'Election Agency',
     tag: 'Civic · Nonprofit',
     tags: ['civic'],
-    logo: '/assets/election.org.webp',
-    logoClass: 'is-large',
-    hoverColor: '#FC1723',
+    logo: '/assets/portfolio-white/election-agency.png',
+        hoverColor: '#FC1723',
     url: 'https://electionagency.org/',
     description:
       'Election Agency is a nonprofit civic engagement platform empowering young leaders to run for public office through training programs, mentorship, advocacy initiatives, and community-driven political education designed to strengthen democratic participation.',
@@ -751,9 +729,8 @@ const PORTFOLIO_RAW = [
     name: 'Createathon',
     tag: 'Creator Platform',
     tags: ['media', 'social'],
-    logo: '/assets/createathon.svg',
-    logoClass: 'is-slightly-large',
-    hoverColor: '#7149D2',
+    logo: '/assets/portfolio-white/createathon.png',
+        hoverColor: '#7149D2',
     url: 'https://createathon.com/',
     description:
       'Createathon is a community-driven platform built to empower digital creators — offering step-by-step guidance on content strategy, editing, growth, and monetization, all while rewarding creativity through collaboration and performance-based support.',
@@ -764,9 +741,8 @@ const PORTFOLIO_RAW = [
     name: 'AMERICA HOUSE',
     tag: 'Movement',
     tags: ['civic'],
-    logo: '/assets/america-house.png',
-    logoClass: 'is-slightly-compact',
-    hoverColor: '#082954',
+    logo: '/assets/portfolio-white/america-house.png',
+        hoverColor: '#082954',
     url: 'https://americahouse.com/',
     description:
       'More than a residence, America House is the physical anchor for a digital uprising. We are reclaiming the narrative from the pillars of this compound.',
@@ -786,7 +762,7 @@ const PORTFOLIO_RAW = [
     name: 'Gifmor',
     tag: 'GIF Tools',
     tags: ['media', 'ai'],
-    logo: '/assets/gifmor.png',
+    logo: '/assets/portfolio-white/gifmor.png',
     hoverColor: '#CEFF5E',
     url: 'https://gifmor.com/',
     description:
@@ -816,7 +792,7 @@ export const PORTFOLIO = PORTFOLIO_RAW.map((company) => {
     ...company,
     url: live.url || null,
     pitchDeck: live.pitchDeck || null,
-    logoLive: live.logo || null,
+    logoLive: null,
     description: live.description || company.description,
   }
 })
@@ -881,7 +857,7 @@ export function getCompanyWebsite(companyId) {
 }
 
 export function getPortfolioImage(company) {
-  return company.logoLive || company.logo || getPortfolioThumbnail(company.id) || null
+  return company.logo || company.logoLive || getPortfolioThumbnail(company.id) || null
 }
 
 export function getCompanyYear(company, index) {

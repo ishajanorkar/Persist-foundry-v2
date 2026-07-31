@@ -17,7 +17,8 @@ function getRevealDelay(order) {
 function CellVisual({ company }) {
   const [srcIndex, setSrcIndex] = useState(0)
   const thumbnail = getPortfolioThumbnail(company.id)
-  const sources = [...new Set([company.logo, company.logoLive, thumbnail].filter(Boolean))]
+  // Prefer local white brand marks; never fall back to remote colored logos.
+  const sources = [...new Set([company.logo, thumbnail].filter(Boolean))]
   const exhausted = srcIndex >= sources.length
   const src = exhausted ? null : sources[srcIndex]
   const usingBrandLogo = Boolean(src) && src !== thumbnail
