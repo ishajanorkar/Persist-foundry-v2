@@ -14,15 +14,17 @@ export default function Home() {
     /* ── CUSTOM CURSOR (global CustomCursor component) ─────── */
 
     /* ── MAGNETIC BUTTONS ────────────────────────────────────── */
-    document.querySelectorAll('[data-magnetic]').forEach(btn => {
-      btn.addEventListener('mousemove', (e) => {
-        const rect = btn.getBoundingClientRect()
-        const x = e.clientX - rect.left - rect.width / 2
-        const y = e.clientY - rect.top - rect.height / 2
-        btn.style.transform = `translate(${x * 0.18}px, ${y * 0.25}px)`
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      document.querySelectorAll('[data-magnetic]').forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect()
+          const x = e.clientX - rect.left - rect.width / 2
+          const y = e.clientY - rect.top - rect.height / 2
+          btn.style.transform = `translate(${x * 0.18}px, ${y * 0.25}px)`
+        })
+        btn.addEventListener('mouseleave', () => { btn.style.transform = '' })
       })
-      btn.addEventListener('mouseleave', () => { btn.style.transform = '' })
-    })
+    }
 
     /* ── LOADER + SCROLL-SCRUBBED VIDEO ──────────────────────── */
     const video = document.getElementById('scrubVideo')
@@ -36,11 +38,24 @@ export default function Home() {
     const loaderBar = document.getElementById('loaderBar')
     const loaderText = document.getElementById('loaderText')
 
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches
+    const isNarrow = () => window.matchMedia('(max-width: 900px)').matches
+    const isMobileScrub = () => isCoarsePointer || isNarrow()
+
+    // Mobile seeks are expensive — use coarser steps + never stack seeks.
+    const scrubThreshold = () => (isMobileScrub() ? 0.1 : 0.02)
+
     let videoDuration = 0
     let ticking = false
     let lastScrubTime = -1
     let videoReady = false
     let loadingFinished = false
+    let scrubInView = true
+    let seeking = false
+    let pendingScrubTime = null
+    let seekWatch = null
+    let activePanel = 1
 
     let loadProgress = 0
     const loaderInterval = setInterval(() => {
@@ -48,19 +63,71 @@ export default function Home() {
       if (loaderBar) loaderBar.style.width = loadProgress + '%'
     }, 110)
 
+    function applyScrubTime(targetTime) {
+      if (!video || !videoReady) return
+      const t = Math.max(0, Math.min(videoDuration || 0, targetTime))
+      if (Math.abs(t - lastScrubTime) < scrubThreshold()) return
+
+      // Queue while a seek is in flight — stacking currentTime kills mobile FPS.
+      if (seeking) {
+        pendingScrubTime = t
+        return
+      }
+
+      lastScrubTime = t
+      pendingScrubTime = null
+      seeking = true
+      try {
+        if (typeof video.fastSeek === 'function') video.fastSeek(t)
+        else video.currentTime = t
+      } catch {
+        seeking = false
+        return
+      }
+      // Safety: some mobile browsers miss `seeked` under load.
+      clearTimeout(seekWatch)
+      seekWatch = setTimeout(() => {
+        seeking = false
+        if (pendingScrubTime != null) {
+          const next = pendingScrubTime
+          pendingScrubTime = null
+          applyScrubTime(next)
+        }
+      }, 220)
+    }
+
+    function onVideoSeeked() {
+      clearTimeout(seekWatch)
+      seeking = false
+      if (pendingScrubTime == null) return
+      const next = pendingScrubTime
+      pendingScrubTime = null
+      applyScrubTime(next)
+    }
+
     function tryInit() {
       if (loadingFinished) return
       if (!video || !video.duration || isNaN(video.duration)) return
       videoDuration = video.duration
       videoReady = true
-      try {
-        const warmup = video.play()
-        if (warmup && warmup.then) warmup.then(() => { video.pause(); video.currentTime = 0 }).catch(() => {})
-      } catch (e) {}
+      // Avoid play/pause warmup on mobile — it janks the first paint.
+      if (!isMobileScrub()) {
+        try {
+          const warmup = video.play()
+          if (warmup && warmup.then) {
+            warmup.then(() => { video.pause(); video.currentTime = 0 }).catch(() => {})
+          }
+        } catch (e) {}
+      } else {
+        try { video.currentTime = 0 } catch (e) {}
+      }
       finishLoading()
     }
 
     if (video) {
+      // Mobile: metadata only — full preload competes with scroll.
+      if (isMobileScrub()) video.preload = 'metadata'
+      video.addEventListener('seeked', onVideoSeeked)
       video.addEventListener('loadedmetadata', tryInit)
       video.addEventListener('loadeddata', tryInit)
       video.addEventListener('canplay', tryInit)
@@ -76,7 +143,7 @@ export default function Home() {
         }
         finishLoading()
       }
-    }, 3000)
+    }, isMobileScrub() ? 1800 : 3000)
 
     function finishLoading() {
       if (loadingFinished) return
@@ -88,38 +155,49 @@ export default function Home() {
         if (loader) loader.classList.add('is-hidden')
         document.body.classList.add('is-loaded')
         onScroll()
-      }, 500)
+      }, isMobileScrub() ? 280 : 500)
+    }
+
+    if (scrubBlock && typeof IntersectionObserver !== 'undefined') {
+      const scrubObs = new IntersectionObserver(
+        ([entry]) => { scrubInView = entry.isIntersecting },
+        { rootMargin: '20% 0px', threshold: 0 },
+      )
+      scrubObs.observe(scrubBlock)
     }
 
     function updateScrub() {
       if (!videoReady || !scrubBlock) return
+
+      const viewportHeight = window.innerHeight
+      const totalScroll = document.documentElement.scrollHeight - viewportHeight
+      const pageProgress = totalScroll > 0 ? (window.scrollY / totalScroll) * 100 : 0
+      if (progressBar) progressBar.style.width = pageProgress + '%'
+      updateSectionDots()
+
+      if (!scrubInView) return
+
       const rect = scrubBlock.getBoundingClientRect()
       const blockHeight = scrubBlock.offsetHeight
-      const viewportHeight = window.innerHeight
-      const scrollable = blockHeight - viewportHeight
+      const scrollable = Math.max(1, blockHeight - viewportHeight)
       let progress = -rect.top / scrollable
       progress = Math.max(0, Math.min(1, progress))
 
-      const targetTime = progress * videoDuration
-      if (Math.abs(targetTime - lastScrubTime) > 0.01) {
-        video.currentTime = targetTime
-        lastScrubTime = targetTime
+      if (!reduceMotion) {
+        applyScrubTime(progress * videoDuration)
       }
 
-      let active = 1
-      if (progress > 0.900) active = 3
-      else if (progress > 0.28) active = 2
-      if (panel1) panel1.classList.toggle('is-active', active === 1)
-      if (panel2) panel2.classList.toggle('is-active', active === 2)
-      if (panel3) panel3.classList.toggle('is-active', active === 3)
+      let next = 1
+      if (progress > 0.900) next = 3
+      else if (progress > 0.28) next = 2
+      if (next !== activePanel) {
+        activePanel = next
+        if (panel1) panel1.classList.toggle('is-active', activePanel === 1)
+        if (panel2) panel2.classList.toggle('is-active', activePanel === 2)
+        if (panel3) panel3.classList.toggle('is-active', activePanel === 3)
+      }
 
       if (scrollCue) scrollCue.style.opacity = progress > 0.04 ? '0' : '1'
-
-      const totalScroll = document.documentElement.scrollHeight - viewportHeight
-      const pageProgress = (window.scrollY / totalScroll) * 100
-      if (progressBar) progressBar.style.width = pageProgress + '%'
-
-      updateSectionDots()
     }
 
     function onScroll() {
@@ -130,11 +208,15 @@ export default function Home() {
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll, { passive: true })
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) pendingScrubTime = null
+    })
 
     /* ── SECTION DOTS ────────────────────────────────────────── */
     const sectionIds = ['scrubBlock', 'impact', 'offer', 'manifestoScroll', 'filter', 'portfolio', 'apply']
     const dots = document.querySelectorAll('.section-dot')
     function updateSectionDots() {
+      if (!dots.length || isNarrow()) return
       const center = window.innerHeight / 2
       let activeIdx = 0
       sectionIds.forEach((id, idx) => {
@@ -269,15 +351,50 @@ export default function Home() {
         }
       }
 
-      // single rAF loop: lerp + apply + logo
-      ;(function mLoop(t) {
+      // rAF only while the manifesto is on-screen (saves main-thread elsewhere)
+      let manifestoLive = false
+      let manifestoRaf = 0
+      let lastApplied = -1
+
+      function mLoop(t) {
+        if (!manifestoLive) {
+          manifestoRaf = 0
+          return
+        }
         readScroll()
-        mCurrent += (mTarget - mCurrent) * 0.07
-        if (Math.abs(mTarget - mCurrent) < 0.0003) mCurrent = mTarget
+        const lerp = isMobileScrub() ? 0.12 : 0.07
+        mCurrent += (mTarget - mCurrent) * lerp
+        if (Math.abs(mTarget - mCurrent) < 0.0004) mCurrent = mTarget
+        // Skip redundant paints when settled
+        if (Math.abs(mCurrent - lastApplied) < 0.00025 && mCurrent === mTarget) {
+          updateLogoTrace(mCurrent, t)
+          manifestoRaf = requestAnimationFrame(mLoop)
+          return
+        }
+        lastApplied = mCurrent
         applyManifesto(mCurrent)
         updateLogoTrace(mCurrent, t)
-        requestAnimationFrame(mLoop)
-      })(0)
+        manifestoRaf = requestAnimationFrame(mLoop)
+      }
+
+      if (typeof IntersectionObserver !== 'undefined') {
+        const mObs = new IntersectionObserver(
+          ([entry]) => {
+            manifestoLive = entry.isIntersecting
+            if (manifestoLive) {
+              if (!manifestoRaf) manifestoRaf = requestAnimationFrame(mLoop)
+            } else if (manifestoRaf) {
+              cancelAnimationFrame(manifestoRaf)
+              manifestoRaf = 0
+            }
+          },
+          { rootMargin: '12% 0px', threshold: 0 },
+        )
+        mObs.observe(mScroll)
+      } else {
+        manifestoLive = true
+        manifestoRaf = requestAnimationFrame(mLoop)
+      }
 
       window.addEventListener('resize', readScroll, { passive: true })
     })()
@@ -413,8 +530,14 @@ export default function Home() {
     /* ── FINAL CTA MOUSE PARALLAX ────────────────────────────── */
     const finalHeadline = document.getElementById('finalHeadline')
     const finalCta = document.getElementById('apply')
-    if (finalCta && finalHeadline) {
+    if (
+      finalCta &&
+      finalHeadline &&
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches
+    ) {
       let fX = 0, fY = 0, tX = 0, tY = 0
+      let ctaLive = false
+      let ctaRaf = 0
       finalCta.addEventListener('mousemove', (e) => {
         const r = finalCta.getBoundingClientRect()
         tX = (e.clientX - r.left - r.width / 2) / r.width
@@ -422,12 +545,37 @@ export default function Home() {
       })
       finalCta.addEventListener('mouseleave', () => { tX = 0; tY = 0 })
       function animateFinal() {
+        if (!ctaLive) {
+          ctaRaf = 0
+          return
+        }
         fX += (tX - fX) * 0.08
         fY += (tY - fY) * 0.08
+        if (Math.abs(tX - fX) < 0.001 && Math.abs(tY - fY) < 0.001) {
+          fX = tX
+          fY = tY
+        }
         finalHeadline.style.transform = `translate(${fX * 18}px, ${fY * 10}px)`
-        requestAnimationFrame(animateFinal)
+        ctaRaf = requestAnimationFrame(animateFinal)
       }
-      animateFinal()
+      if (typeof IntersectionObserver !== 'undefined') {
+        const ctaObs = new IntersectionObserver(
+          ([entry]) => {
+            ctaLive = entry.isIntersecting
+            if (ctaLive) {
+              if (!ctaRaf) ctaRaf = requestAnimationFrame(animateFinal)
+            } else if (ctaRaf) {
+              cancelAnimationFrame(ctaRaf)
+              ctaRaf = 0
+            }
+          },
+          { rootMargin: '8% 0px', threshold: 0 },
+        )
+        ctaObs.observe(finalCta)
+      } else {
+        ctaLive = true
+        ctaRaf = requestAnimationFrame(animateFinal)
+      }
     }
 
     /* ── VELOCITY MARQUEE ────────────────────────────────────── */
@@ -435,26 +583,55 @@ export default function Home() {
     const velSection = document.getElementById('velocityMarquee')
     if (velTrack && velSection) {
       let trackX = 0, lastY = window.scrollY, velocity = 0
-      const baseSpeed = 3.0
+      const baseSpeed = isMobileScrub() ? 1.6 : 3.0
       let halfWidth = 0
+      let marqueeLive = false
+      let marqueeRaf = 0
+      let wasFast = false
       function measureHalf() { halfWidth = velTrack.scrollWidth / 2 }
       requestAnimationFrame(() => requestAnimationFrame(measureHalf))
-      window.addEventListener('resize', measureHalf)
+      window.addEventListener('resize', measureHalf, { passive: true })
       const originals = Array.from(velTrack.children)
       originals.forEach(node => velTrack.appendChild(node.cloneNode(true)))
       requestAnimationFrame(() => requestAnimationFrame(measureHalf))
       function tickMarquee() {
+        if (!marqueeLive) {
+          marqueeRaf = 0
+          return
+        }
         const y = window.scrollY
         const dy = y - lastY
         lastY = y
         velocity = velocity * 0.88 + dy * 0.6
-        trackX -= baseSpeed + Math.abs(velocity) * 0.35
+        trackX -= baseSpeed + Math.abs(velocity) * (isMobileScrub() ? 0.22 : 0.35)
         if (halfWidth > 0 && trackX <= -halfWidth) trackX += halfWidth
-        velTrack.style.transform = `translate3d(${trackX}px, 0, 0)`
-        velSection.classList.toggle('is-fast', Math.abs(velocity) > 6)
-        requestAnimationFrame(tickMarquee)
+        velTrack.style.transform = `translate3d(${trackX.toFixed(2)}px, 0, 0)`
+        const fast = Math.abs(velocity) > 6
+        if (fast !== wasFast) {
+          wasFast = fast
+          velSection.classList.toggle('is-fast', fast)
+        }
+        marqueeRaf = requestAnimationFrame(tickMarquee)
       }
-      tickMarquee()
+      if (typeof IntersectionObserver !== 'undefined') {
+        const mObs = new IntersectionObserver(
+          ([entry]) => {
+            marqueeLive = entry.isIntersecting
+            if (marqueeLive) {
+              lastY = window.scrollY
+              if (!marqueeRaf) marqueeRaf = requestAnimationFrame(tickMarquee)
+            } else if (marqueeRaf) {
+              cancelAnimationFrame(marqueeRaf)
+              marqueeRaf = 0
+            }
+          },
+          { rootMargin: '15% 0px', threshold: 0 },
+        )
+        mObs.observe(velSection)
+      } else {
+        marqueeLive = true
+        marqueeRaf = requestAnimationFrame(tickMarquee)
+      }
     }
 
     /* ── FINAL CTA STATS COUNT-UP ────────────────────────────── */
@@ -555,8 +732,9 @@ export default function Home() {
             playsInline
             preload="auto"
             disablePictureInPicture
+            disableRemotePlayback
           >
-            <source src="/assets/scrub-video.mp4"  type="video/mp4"  />
+            <source src="/assets/scrub-video.mp4" type="video/mp4" />
           </video>
 
           <div className="scrub-vignette"></div>

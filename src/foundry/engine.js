@@ -9,6 +9,12 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+ScrollTrigger.config({
+  ignoreMobileResize: true,
+  limitCallbacks: true,
+});
+gsap.ticker.lagSmoothing(750, 33);
+
 /** Lazy-loaded — keeps Three.js (~160KB+) out of the initial mobile parse. */
 let THREE = null;
 
@@ -249,7 +255,15 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   }
 
   function initHeroParallax() {
-    if (reduceMotion || !canvas) return;
+    // Skip continuous canvas redraws on touch / lite devices
+    if (
+      reduceMotion ||
+      !canvas ||
+      isLitePerf ||
+      !window.matchMedia("(hover: hover) and (pointer: fine)").matches
+    ) {
+      return;
+    }
     on(window, "pointermove", onHeroPointerMove, { passive: true });
     parallaxRaf = requestAnimationFrame(tickHeroParallax);
     cleanups.push(() => {
@@ -322,7 +336,8 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       // Soft stage fade on hero / tether; light veil on backstory so baked
       // stars read ~half as dense without going fully black
       if (i === 0) stageO = Math.max(stageO, o * (isMobile ? 0.38 : 0.18));
-      if (i === 1) stageO = Math.max(stageO, o * 0.92);
+      // Mobile Funded-by: keep footage brighter (was 0.92 — too black)
+      if (i === 1) stageO = Math.max(stageO, o * (isMobile ? 0.55 : 0.92));
       if (i === 2) {
         thresholdO = o;
         stageO = Math.max(stageO, o * (isMobile ? 0.45 : 0.38));
@@ -519,7 +534,8 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       start: "top top",
       endTrigger: "#threshold",
       end: "bottom bottom",
-      scrub: 0.6,
+      // Slightly snappier scrub on lite devices — less “rubber band” lag
+      scrub: isLitePerf ? 0.35 : 0.6,
       onUpdate: (self) => onScrub(self.progress),
     });
     onScrub(0);
@@ -1599,7 +1615,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       trigger: "#portfolio",
       start: "top 95%",
       end: "top -40%",
-      scrub: 1.85,
+      scrub: isLitePerf ? 1.15 : 1.85,
       onLeaveBack: () => {
         // Back into Five Ways — footage + globe return with the wheel
         if (canvas) {

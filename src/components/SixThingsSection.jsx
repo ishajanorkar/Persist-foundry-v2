@@ -46,6 +46,7 @@ export default function SixThingsSection() {
 
   useEffect(() => {
     let raf = 0, alive = true
+    let sectionLive = false
     const isMobile = () => window.innerWidth <= 900
 
     function readScroll() {
@@ -100,21 +101,50 @@ export default function SixThingsSection() {
 
     function loop() {
       if (!alive) return
+      if (!sectionLive || isMobile()) {
+        raf = 0
+        return
+      }
       curP.current += (targetP.current - curP.current) * 0.1
       if (Math.abs(targetP.current - curP.current) < 0.0003) curP.current = targetP.current
       apply(curP.current)
       raf = requestAnimationFrame(loop)
     }
 
+    function ensureLoop() {
+      if (!alive || isMobile() || !sectionLive) return
+      if (!raf) raf = requestAnimationFrame(loop)
+    }
+
     readScroll()
     curP.current = targetP.current
     apply(curP.current)
     window.addEventListener('scroll', readScroll, { passive: true })
-    window.addEventListener('resize', readScroll)
-    raf = requestAnimationFrame(loop)
+    window.addEventListener('resize', readScroll, { passive: true })
+
+    let io
+    if (typeof IntersectionObserver !== 'undefined' && sectionRef.current) {
+      io = new IntersectionObserver(
+        ([entry]) => {
+          sectionLive = entry.isIntersecting
+          if (sectionLive) ensureLoop()
+          else if (raf) {
+            cancelAnimationFrame(raf)
+            raf = 0
+          }
+        },
+        { rootMargin: '12% 0px', threshold: 0 },
+      )
+      io.observe(sectionRef.current)
+    } else {
+      sectionLive = true
+      ensureLoop()
+    }
+
     return () => {
       alive = false
       cancelAnimationFrame(raf)
+      io?.disconnect()
       window.removeEventListener('scroll', readScroll)
       window.removeEventListener('resize', readScroll)
     }

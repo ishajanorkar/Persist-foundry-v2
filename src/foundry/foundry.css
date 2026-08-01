@@ -150,10 +150,14 @@ body.pf-landing ::selection {
 .stage {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  /* Prefer dynamic viewport on mobile browsers (avoids bottom chrome cut) */
+  height: 100dvh;
+  max-width: 100%;
   z-index: var(--z-canvas);
   background: var(--pf-bg);
+  overflow: hidden;
 }
 #hero-canvas {
   position: absolute;
@@ -498,6 +502,7 @@ body.pf-landing ::selection {
 .beat {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -505,6 +510,7 @@ body.pf-landing ::selection {
   text-align: center;
   padding: 0 var(--gutter) clamp(6vh, 12vh, 14vh);
   pointer-events: none;
+  overflow: clip;
 }
 .beat--center {
   justify-content: center;
@@ -552,6 +558,38 @@ body.pf-landing ::selection {
     rgba(6, 4, 13, 0.4) 48%,
     rgba(6, 4, 13, 0) 78%
   );
+}
+
+@media (max-width: 1024px) {
+  /* Funded-by / center beats: edge-to-edge wash (no 96vw box cut),
+     same soft depth as before — not a heavy black overlay */
+  .beat--center .beat__scrim,
+  #tether .beat__scrim {
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    transform: none;
+    filter: none;
+    z-index: 0;
+    background: radial-gradient(
+      135% 105% at 50% 48%,
+      rgba(6, 4, 13, 0.72) 0%,
+      rgba(6, 4, 13, 0.38) 42%,
+      rgba(6, 4, 13, 0.12) 68%,
+      rgba(6, 4, 13, 0) 86%
+    );
+  }
+  #tether.beat--center {
+    isolation: isolate;
+  }
+  #tether .beat__inner {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 /* Hero: light readability wash — keep footage visible */
@@ -673,20 +711,22 @@ body.pf-landing ::selection {
   /* No top dark wash on mobile — a fixed stage + scrolling beat
      gradient reads as a hard cut / “slide” edge while scrolling */
   #hero .beat__scrim {
-    left: 50%;
+    left: 0;
+    right: 0;
+    top: auto;
     bottom: 0;
-    transform: translateX(-50%);
-    height: min(78vh, 820px);
+    transform: none;
     width: 100%;
+    height: min(78dvh, 820px);
     z-index: 0;
+    filter: none;
     background: radial-gradient(
-      ellipse closest-side at 50% 58%,
+      120% 90% at 50% 58%,
       rgba(4, 3, 10, 0.42) 0%,
       rgba(4, 3, 10, 0.22) 45%,
       rgba(4, 3, 10, 0.08) 70%,
       rgba(4, 3, 10, 0) 100%
     );
-    filter: blur(20px);
   }
   #hero .beat__inner--hero {
     position: relative;

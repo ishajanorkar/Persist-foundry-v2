@@ -76,6 +76,8 @@ html {
   scroll-behavior: auto;
   color-scheme: only dark;
   background: var(--night);
+  /* Keep scroll on the compositor; avoid rubber-band fighting sticky heroes */
+  overscroll-behavior-y: none;
 }
 body {
   font-family: var(--sans);
@@ -89,6 +91,19 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   cursor: none;
+  /* Hint browsers to optimize vertical scrolling */
+  overscroll-behavior-y: none;
+}
+
+/* Below-fold Home sections — skip layout/paint until near viewport */
+#impact,
+#offer,
+.filter-section,
+#portfolio,
+#velocityMarquee,
+#apply {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 720px;
 }
 button,
 input,
@@ -1063,6 +1078,31 @@ body::before {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   filter: contrast(1.03) saturate(1.08);
+}
+
+/* Touch / narrow: drop 3-D + filters so scroll-scrub stays smooth */
+@media (max-width: 900px), (pointer: coarse) {
+  .scrub-video {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    will-change: auto;
+    filter: none;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .scrub-sticky {
+    transform: translateZ(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrub-video {
+    will-change: auto;
+    transform: none;
+    filter: none;
+  }
 }
 
 .scrub-vignette {
