@@ -95,13 +95,19 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* Below-fold Home sections — skip layout/paint until near viewport */
+/* Below-fold Home sections — skip layout/paint until near viewport.
+   Do NOT apply to Foundry: it reuses #portfolio / .filter-section and
+   content-visibility + wrong intrinsic size collapses layout into the
+   Unfair Start parallax (cards overlapping Portfolio while scrolling). */
 #impact,
 #offer,
-.filter-section,
-#portfolio,
 #velocityMarquee,
 #apply {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 720px;
+}
+body:not(.pf-landing) .filter-section,
+body:not(.pf-landing) #portfolio {
   content-visibility: auto;
   contain-intrinsic-size: 1px 720px;
 }
@@ -291,6 +297,7 @@ body::before {
   width: 36px;
   height: 36px;
   object-fit: contain;
+  object-position: center 43%;
   display: block;
   flex-shrink: 0;
 }
@@ -314,8 +321,10 @@ body::before {
   pointer-events: none;
 }
 .nav-logo-mark .nav-logo-p {
-  width: 36px;
-  height: 36px;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center 43%;
   transition: opacity 0.35s ease;
 }
 .nav-logo--foundry.is-mark-docked .nav-logo-mark .nav-logo-p {
@@ -4968,6 +4977,10 @@ body::before {
     width: 30px;
     height: 30px;
   }
+  .nav-logo-mark {
+    width: 30px;
+    height: 30px;
+  }
   .nav-logo-word {
     font-size: 18px;
   }
@@ -5739,6 +5752,10 @@ body::before {
   }
   .nav-logo img,
   .nav-logo-p {
+    width: 28px;
+    height: 28px;
+  }
+  .nav-logo-mark {
     width: 28px;
     height: 28px;
   }

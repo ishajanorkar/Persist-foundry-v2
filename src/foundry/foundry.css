@@ -149,11 +149,16 @@ body.pf-landing ::selection {
 /* ---------- Fixed visual stage (canvas + three) ---------- */
 .stage {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   width: 100%;
+  /* lvh = tallest viewport (URL bar hidden). Extra bleed covers toolbar
+     transition frames so scrolling-up never flashes a black gap. */
   height: 100%;
-  /* Prefer dynamic viewport on mobile browsers (avoids bottom chrome cut) */
-  height: 100dvh;
+  min-height: 100%;
+  height: calc(100lvh + 48px);
+  min-height: calc(100dvh + 48px);
   max-width: 100%;
   z-index: var(--z-canvas);
   background: var(--pf-bg);
@@ -165,6 +170,9 @@ body.pf-landing ::selection {
   width: 100%;
   height: 100%;
   display: block;
+  /* Never let engine inline sizes leave a letterbox under the stage */
+  max-width: none;
+  max-height: none;
 }
 #three-canvas {
   position: absolute;
@@ -190,7 +198,8 @@ body.pf-landing ::selection {
   /* Soft edge vignette — was 0.5, dialed down so hero footage stays bright */
   background: radial-gradient(
     135% 110% at 50% 48%,
-    transparent 62%,
+    transparent 58%,
+    rgba(7, 5, 16, 0.12) 82%,
     rgba(7, 5, 16, 0.22) 100%
   );
 }
@@ -201,11 +210,13 @@ body.pf-landing ::selection {
   pointer-events: none;
   z-index: 4;
   opacity: 0;
+  /* Softer stops — hard mid-stops read as a horizontal “gradient break” on mobile */
   background: radial-gradient(
-    58% 52% at 50% 46%,
-    rgba(5, 4, 11, 0.55) 0%,
-    rgba(5, 4, 11, 0.82) 52%,
-    rgba(4, 3, 9, 0.96) 100%
+    72% 64% at 50% 48%,
+    rgba(5, 4, 11, 0.28) 0%,
+    rgba(5, 4, 11, 0.48) 42%,
+    rgba(5, 4, 11, 0.68) 72%,
+    rgba(4, 3, 9, 0.82) 100%
   );
 }
 
@@ -473,6 +484,8 @@ body.pf-landing ::selection {
   top: 50%;
   left: 50%;
   width: clamp(140px, 17vw, 250px);
+  aspect-ratio: 1 / 1;
+  height: auto;
   transform: translate(-50%, -50%) scale(0.6);
   opacity: 0;
   pointer-events: none;
@@ -480,17 +493,28 @@ body.pf-landing ::selection {
   display: flex;
   align-items: center;
   justify-content: center;
+  transform-origin: center center;
 }
 .persist-logo svg,
 .persist-logo img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
   margin: 0;
-  /* optical center — P glyph mass sits slightly high-left in the artboard */
-  transform: translate(2%, -1%);
+  object-fit: contain;
+  /* Glyph mass sits slightly low in the 2000² artboard — bias up to true center */
+  object-position: center 43%;
+  transform: none;
   filter: drop-shadow(0 0 8px rgba(140, 120, 200, 0.45))
     drop-shadow(0 0 18px rgba(100, 75, 170, 0.28));
+}
+
+@media (max-width: 900px) {
+  .persist-logo svg,
+  .persist-logo img {
+    /* Stronger optical lift on small screens where the orbit orb reads higher */
+    object-position: center 40%;
+  }
 }
 
 /* ---------- Scroll track + beat overlays ---------- */
@@ -708,24 +732,24 @@ body.pf-landing ::selection {
   will-change: transform, opacity;
 }
 @media (max-width: 1024px) {
-  /* No top dark wash on mobile — a fixed stage + scrolling beat
-     gradient reads as a hard cut / “slide” edge while scrolling */
+  /* Full-bleed soft wash (not a 78dvh box). A shorter scrolling scrim
+     paints a hard horizontal cut across the fixed stage while scrolling. */
   #hero .beat__scrim {
     left: 0;
     right: 0;
-    top: auto;
+    top: 0;
     bottom: 0;
     transform: none;
     width: 100%;
-    height: min(78dvh, 820px);
+    height: 100%;
     z-index: 0;
     filter: none;
     background: radial-gradient(
-      120% 90% at 50% 58%,
-      rgba(4, 3, 10, 0.42) 0%,
-      rgba(4, 3, 10, 0.22) 45%,
-      rgba(4, 3, 10, 0.08) 70%,
-      rgba(4, 3, 10, 0) 100%
+      150% 120% at 50% 58%,
+      rgba(4, 3, 10, 0.32) 0%,
+      rgba(4, 3, 10, 0.16) 38%,
+      rgba(4, 3, 10, 0.06) 62%,
+      transparent 82%
     );
   }
   #hero .beat__inner--hero {
@@ -3059,6 +3083,9 @@ body.pf-landing .pf ~ .footer {
   background: rgba(5, 4, 9, 0.28);
   border-top: 1px solid var(--pf-line-soft);
   padding: clamp(5rem, 10vh, 7rem) 0 clamp(6rem, 13vh, 9.5rem);
+  /* Parallax cards must not paint into Portfolio above */
+  overflow: clip;
+  isolation: isolate;
 }
 
 .vprop__head {
@@ -3135,7 +3162,8 @@ body.pf-landing .pf ~ .footer {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     max-width: 1320px;
     gap: clamp(2rem, 4vw, 3.75rem);
-    margin: 280px auto 60px auto;
+    /* Was 280px — enough room for mild parallax without invading Portfolio */
+    margin: clamp(4.5rem, 10vh, 7rem) auto 60px auto;
   }
   /* middle column (2nd & 5th cell, i.e. expertise + connections) sits lower */
   .vprop__cell:nth-child(2),
@@ -3302,7 +3330,8 @@ body.pf-landing .pf ~ .footer {
 /* ---------- Portfolio — 50/50 full-viewport sticky stack ---------- */
 .pfolio {
   position: relative;
-  z-index: var(--z-overlay);
+  /* Above Unfair Start so parallax cards never paint over this section */
+  z-index: calc(var(--z-overlay) + 1);
   background: #000000;
   border-top: 1px solid var(--pf-line-soft);
 }
@@ -3819,8 +3848,9 @@ body.pf-landing .pf ~ .footer {
   .persist-logo {
     width: clamp(110px, 30vw, 160px);
   }
+  /* Keep wheel geometrically centered so the P locks to the orb */
   #orbitLayer .orbit-donut {
-    top: 48% !important;
+    top: 50% !important;
   }
   #orbitLayer .orbit-petal__icon {
     width: 18px;

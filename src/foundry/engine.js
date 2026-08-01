@@ -170,14 +170,39 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     return 1 - (p - 0.18) / 0.18;
   }
 
+  function stagePixelSize() {
+    const stage = canvas.parentElement;
+    if (stage) {
+      const r = stage.getBoundingClientRect();
+      return {
+        w: Math.max(1, Math.round(r.width)),
+        h: Math.max(1, Math.round(r.height)),
+      };
+    }
+    const vv = window.visualViewport;
+    return {
+      w: Math.max(1, Math.round(vv?.width || window.innerWidth)),
+      h: Math.max(1, Math.round(vv?.height || window.innerHeight)),
+    };
+  }
+
   function resizeCanvas() {
     dpr = Math.min(window.devicePixelRatio || 1, isLitePerf ? 1.25 : 2);
-    cw = window.innerWidth;
-    ch = window.innerHeight;
-    canvas.width = Math.round(cw * dpr);
-    canvas.height = Math.round(ch * dpr);
-    canvas.style.width = cw + "px";
-    canvas.style.height = ch + "px";
+    const { w, h } = stagePixelSize();
+    const nextW = Math.round(w * dpr);
+    const nextH = Math.round(h * dpr);
+    // Skip no-op resizes (mobile chrome toggles thrash otherwise)
+    if (w === cw && h === ch && canvas.width === nextW && canvas.height === nextH) {
+      return;
+    }
+    cw = w;
+    ch = h;
+    canvas.width = nextW;
+    canvas.height = nextH;
+    // Let CSS (inset:0 / 100%) fill the stage — inline px heights caused the
+    // bottom black bar when the URL/toolbar chrome changed innerHeight.
+    canvas.style.removeProperty("width");
+    canvas.style.removeProperty("height");
     drawFrame(currentFrame, true);
   }
   function drawCover(img) {
@@ -334,8 +359,9 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       const scrimMul = i === 2 ? 0 : i === 0 ? (isMobile ? 0.7 : 0.45) : 0.95;
       if (scrim) scrim.style.opacity = (o * scrimMul).toFixed(3);
       // Soft stage fade on hero / tether; light veil on backstory so baked
-      // stars read ~half as dense without going fully black
-      if (i === 0) stageO = Math.max(stageO, o * (isMobile ? 0.38 : 0.18));
+      // stars read ~half as dense without going fully black.
+      // Mobile hero kept lighter — heavy stage-fade + scrolling scrim = hard seam.
+      if (i === 0) stageO = Math.max(stageO, o * (isMobile ? 0.22 : 0.18));
       // Mobile Funded-by: keep footage brighter (was 0.92 — too black)
       if (i === 1) stageO = Math.max(stageO, o * (isMobile ? 0.55 : 0.92));
       if (i === 2) {
@@ -508,6 +534,11 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   function initScrubber() {
     resizeCanvas();
     on(window, "resize", resizeCanvas, { passive: true });
+    // Mobile URL/toolbar chrome often changes visualViewport without a reliable
+    // window.resize — keep the canvas matched to the stage so no black bar.
+    if (window.visualViewport) {
+      on(window.visualViewport, "resize", resizeCanvas, { passive: true });
+    }
     initHeroParallax();
 
     if (reduceMotion) {
@@ -642,13 +673,25 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     scene.add(starSprite);
 
     on(window, "resize", onResizeThree, { passive: true });
+    if (window.visualViewport) {
+      on(window.visualViewport, "resize", onResizeThree, { passive: true });
+    }
     if (!reduceMotion) on(window, "mousemove", onMouse, { passive: true });
   }
   function onResizeThree() {
-    if (!renderer) return;
-    camera.aspect = window.innerWidth / window.innerHeight;
+    if (!renderer || !threeCanvas) return;
+    const stage = threeCanvas.parentElement;
+    const w = Math.max(
+      1,
+      stage?.clientWidth || window.innerWidth,
+    );
+    const h = Math.max(
+      1,
+      stage?.clientHeight || window.innerHeight,
+    );
+    camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight, false);
+    renderer.setSize(w, h, false);
   }
   function onMouse(e) {
     parX = e.clientX / window.innerWidth - 0.5;
@@ -1407,10 +1450,14 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       if (t && t !== "none") navTy = new DOMMatrixReadOnly(t).m42;
     }
     navTarget.x = r.left + r.width / 2 - cx;
-    navTarget.y = r.top - navTy + r.height / 2 - cy;
+    // Slot geometric center; small upward bias matches object-position optical lift
+    // so the glyph sits flush with the "Persist" wordmark (esp. mobile).
+    const isNarrow = window.matchMedia("(max-width: 900px)").matches;
+    const opticalLift = isNarrow ? r.height * 0.06 : r.height * 0.03;
+    navTarget.y = r.top - navTy + r.height / 2 - cy - opticalLift;
     const lw = persistLogo.offsetWidth || 280;
     // land at the nav slot's rendered size so the mark sits flush with the wordmark
-    const targetPx = r.height || 30;
+    const targetPx = Math.min(r.width, r.height) || 30;
     navScale = targetPx / lw;
   }
   function setLogo(drop, glide) {
@@ -1424,12 +1471,14 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     const baseScale = orbitScale * (0.82 + 0.18 * drop);
     const scale = baseScale * (1 - glide) + navScale * glide;
 
-    // Keep the P locked to the glass orb center (donut may sit off 50%/50%
-    // on tablet), then blend toward the nav brand slot as glide progresses.
+    // Lock to the glass CORE center (not the full petal ring), then blend
+    // toward the nav brand slot as glide progresses.
     let orbitOffX = 0;
     let orbitOffY = 0;
     if (orbitDonut && glide < 1) {
-      const r = orbitDonut.getBoundingClientRect();
+      const coreEl = orbitDonut.querySelector(".orbit-core");
+      const anchor = coreEl || orbitDonut;
+      const r = anchor.getBoundingClientRect();
       if (r.width > 1 && r.height > 1) {
         const cx = document.documentElement.clientWidth / 2;
         const cy = document.documentElement.clientHeight / 2;

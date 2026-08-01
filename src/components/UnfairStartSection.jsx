@@ -99,9 +99,10 @@ const CARD_ORDER = [
 // collapse — that variance is what keeps the "different speed" feel alive
 // even in a single mobile column.
 const SPEEDS = {
-  desktop: [-700, -260, -370, -700, -260, -370],
-  tablet: [-190, -130, -190, -130, -190, -130],
-  mobile: [-70, -95, -60, -100, -75, -90],
+  // Keep travel modest so cards never climb into the section above.
+  desktop: [-140, -55, -85, -140, -55, -85],
+  tablet: [-90, -55, -90, -55, -90, -55],
+  mobile: [-36, -48, -30, -44, -40, -42],
 };
 
 function PropCard({ card, cardKey }) {
@@ -163,9 +164,11 @@ export default function UnfairStartSection() {
               force3D: true,
               scrollTrigger: {
                 trigger: root,
-                start: "top bottom",
+                // Wait until the section owns the viewport — avoids cards
+                // scrubbing upward into Portfolio while only partially entered.
+                start: "top 85%",
                 end: "bottom top",
-                scrub: 1.2,
+                scrub: 0.85,
                 invalidateOnRefresh: true,
               },
             }),
