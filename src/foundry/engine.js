@@ -1186,8 +1186,8 @@ export default function initFoundry({ base = "/foundry" } = {}) {
           max-width:none;width:100%;font-size:clamp(0.82rem,3.4vw,0.95rem);
           line-height:1.45;text-align:left;color:rgba(168,172,184,0.78);
         }
-        /* Mid stack between heading + detail */
-        .orbit-donut{top:48%;}
+        /* Keep wheel at true viewport center so the P locks to the glass orb */
+        .orbit-donut{top:50%;left:50%;transform:translate(-50%,-50%);}
         .orbit-petal__icon{width:20px;height:20px;}
         .orbit-petal__label{
           font-size:clamp(0.52rem,2.4vw,0.64rem);
@@ -1213,7 +1213,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       @media (max-width:900px) and (max-height:820px){
         .orbit-heading{top:clamp(4.35rem,8vh,5.35rem);gap:0.45rem;}
         .orbit-heading__body{display:block;-webkit-line-clamp:unset;overflow:visible;}
-        .orbit-donut{top:47%;}
+        .orbit-donut{top:50%;left:50%;transform:translate(-50%,-50%);}
       }
       @media (max-width:640px){
         .orbit-heading{
@@ -1225,7 +1225,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         .orbit-heading__title,.orbit-heading__body{text-align:left;}
         .orbit-heading__title{font-size:clamp(1.4rem,6.8vw,1.7rem);}
         .orbit-heading__body{max-width:none;font-size:clamp(0.84rem,3.6vw,0.95rem);line-height:1.45;}
-        .orbit-donut{top:48%;}
+        .orbit-donut{top:50%;left:50%;transform:translate(-50%,-50%);}
         .orbit-petal__icon{width:18px;height:18px;}
         .orbit-petal__label{font-size:clamp(0.5rem,2.3vw,0.6rem);max-width:10ch;}
       }`;
@@ -1433,33 +1433,53 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   /* ---- LOGO drop + nav glide ---- */
   let navTarget = { x: 0, y: 0 };
   let navScale = 0.12;
+  let orbitTarget = { x: 0, y: 0 };
+
+  /** Client-space center of an element (same coords as position:fixed + translate3d). */
+  function clientCenter(el) {
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return null;
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+
+  function viewportFallbackCenter() {
+    const vv = window.visualViewport;
+    if (vv) {
+      return { x: vv.offsetLeft + vv.width / 2, y: vv.offsetTop + vv.height / 2 };
+    }
+    return {
+      x: document.documentElement.clientWidth / 2,
+      y: document.documentElement.clientHeight / 2,
+    };
+  }
+
+  function computeOrbitTarget() {
+    const core =
+      orbitDonut && orbitDonut.querySelector(".orbit-core");
+    const c = clientCenter(core) || clientCenter(orbitDonut);
+    orbitTarget = c || viewportFallbackCenter();
+  }
+
   function computeNavTarget() {
     if (!navSlot || !persistLogo) return;
-    const r = navSlot.getBoundingClientRect();
-    // the logo's left:50% resolves against the layout viewport (excludes the
-    // scrollbar), so measure from clientWidth/Height — innerWidth would land
-    // the mark half a scrollbar off-center
-    const cx = document.documentElement.clientWidth / 2,
-      cy = document.documentElement.clientHeight / 2;
-    // subtract the nav's hide/show translateY so the target is always the
-    // SHOWN slot position — the mark's visibility is synced via .brand-hidden
+    // Prefer the slot's live rect — subtract nav hide translate so the
+    // target is always the SHOWN slot position.
     let navTy = 0;
     const navBar = navSlot.closest(".nav, .pf-nav");
     if (navBar) {
       const t = getComputedStyle(navBar).transform;
       if (t && t !== "none") navTy = new DOMMatrixReadOnly(t).m42;
     }
-    navTarget.x = r.left + r.width / 2 - cx;
-    // Slot geometric center; small upward bias matches object-position optical lift
-    // so the glyph sits flush with the "Persist" wordmark (esp. mobile).
-    const isNarrow = window.matchMedia("(max-width: 900px)").matches;
-    const opticalLift = isNarrow ? r.height * 0.06 : r.height * 0.03;
-    navTarget.y = r.top - navTy + r.height / 2 - cy - opticalLift;
+    const r = navSlot.getBoundingClientRect();
+    navTarget.x = r.left + r.width / 2;
+    navTarget.y = r.top - navTy + r.height / 2;
     const lw = persistLogo.offsetWidth || 280;
     // land at the nav slot's rendered size so the mark sits flush with the wordmark
     const targetPx = Math.min(r.width, r.height) || 30;
     navScale = targetPx / lw;
   }
+
   function setLogo(drop, glide) {
     if (!persistLogo) return;
     // while centered over the glass orb the mark must read much smaller
@@ -1471,26 +1491,18 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     const baseScale = orbitScale * (0.82 + 0.18 * drop);
     const scale = baseScale * (1 - glide) + navScale * glide;
 
-    // Lock to the glass CORE center (not the full petal ring), then blend
-    // toward the nav brand slot as glide progresses.
-    let orbitOffX = 0;
-    let orbitOffY = 0;
-    if (orbitDonut && glide < 1) {
-      const coreEl = orbitDonut.querySelector(".orbit-core");
-      const anchor = coreEl || orbitDonut;
-      const r = anchor.getBoundingClientRect();
-      if (r.width > 1 && r.height > 1) {
-        const cx = document.documentElement.clientWidth / 2;
-        const cy = document.documentElement.clientHeight / 2;
-        orbitOffX = r.left + r.width / 2 - cx;
-        orbitOffY = r.top + r.height / 2 - cy;
-      }
-    }
-    const x = orbitOffX * (1 - glide) + navTarget.x * glide;
-    const y = orbitOffY * (1 - glide) + navTarget.y * glide;
+    // Absolute client coords (not left/top 50% deltas) — mobile chrome
+    // changes layout vs visual viewport and used to leave the P low/left.
+    if (glide < 1) computeOrbitTarget();
+    if (glide > 0) computeNavTarget();
+
+    const x = orbitTarget.x * (1 - glide) + navTarget.x * glide;
+    const y = orbitTarget.y * (1 - glide) + navTarget.y * glide;
 
     persistLogo.style.opacity = String(Math.min(1, drop));
-    persistLogo.style.transform = `translate(calc(-50% + ${x.toFixed(2)}px), calc(-50% + ${y.toFixed(2)}px)) scale(${scale})`;
+    persistLogo.style.transform =
+      `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) ` +
+      `translate(-50%, -50%) scale(${scale})`;
   }
 
   /* Reveal the shared React navbar only once the P begins traveling
@@ -1529,7 +1541,27 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   let tickerFn = null;
   function wireScroll() {
     computeNavTarget();
-    on(window, "resize", computeNavTarget, { passive: true });
+    computeOrbitTarget();
+    on(window, "resize", () => {
+      computeNavTarget();
+      computeOrbitTarget();
+      const drop = window.PF?._logoDrop ?? 0;
+      const glide = window.PF?._glideG ?? 0;
+      if (drop > 0.01) setLogo(drop, glide);
+    }, { passive: true });
+    // Mobile URL/toolbar chrome moves the visual viewport without always
+    // firing window.resize — keep the P glued to orb / nav slot.
+    if (window.visualViewport) {
+      const syncLogoViewport = () => {
+        computeNavTarget();
+        computeOrbitTarget();
+        const drop = window.PF?._logoDrop ?? 0;
+        const glide = window.PF?._glideG ?? 0;
+        if (drop > 0.01) setLogo(drop, glide);
+      };
+      on(window.visualViewport, "resize", syncLogoViewport, { passive: true });
+      on(window.visualViewport, "scroll", syncLogoViewport, { passive: true });
+    }
 
     let spin = 0;
     let spinDrift = 0;
@@ -1605,7 +1637,6 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         const bright = Math.max(0.72, 1 - entryDim * 0.14 - drop * 0.12);
         canvas.style.filter = `brightness(${bright.toFixed(3)})`;
 
-        if (window.PF._gliding !== true) setLogo(drop, 0);
         orbitFade = 1;
         if (orbitLayer) {
           // Layer visible for stars/backdrop once zoom starts; wheel opacity is separate
@@ -1621,6 +1652,8 @@ export default function initFoundry({ base = "/foundry" } = {}) {
           if (diag) diag.style.opacity = String(uiReveal * 0.28);
         }
         layoutOrbit(ex, spin, op);
+        // Re-anchor AFTER layoutOrbit so the mark tracks the live orb center
+        if (window.PF._gliding !== true) setLogo(drop, 0);
         if (orbitHeading) {
           orbitHeading.style.opacity = String(
             Math.min(1, Math.max(0, (orbitProgress - 0.32) / 0.2)),

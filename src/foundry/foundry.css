@@ -481,12 +481,14 @@ body.pf-landing ::selection {
      into the brand slot stays visible — same stacking as the
      original pf-nav where --z-logo (12) > --z-nav (10). */
   z-index: 101;
-  top: 50%;
-  left: 50%;
+  /* Origin at viewport top-left — JS places via translate3d from
+     getBoundingClientRect so mobile chrome can't drift left/top: 50%. */
+  top: 0;
+  left: 0;
   width: clamp(140px, 17vw, 250px);
   aspect-ratio: 1 / 1;
   height: auto;
-  transform: translate(-50%, -50%) scale(0.6);
+  transform: translate3d(50vw, 50vh, 0) translate(-50%, -50%) scale(0.6);
   opacity: 0;
   pointer-events: none;
   will-change: transform, opacity;
@@ -502,19 +504,11 @@ body.pf-landing ::selection {
   height: 100%;
   margin: 0;
   object-fit: contain;
-  /* Glyph mass sits slightly low in the 2000² artboard — bias up to true center */
-  object-position: center 43%;
+  /* SVG ink is centered in the 2000² artboard — no object-position bias */
+  object-position: center center;
   transform: none;
   filter: drop-shadow(0 0 8px rgba(140, 120, 200, 0.45))
     drop-shadow(0 0 18px rgba(100, 75, 170, 0.28));
-}
-
-@media (max-width: 900px) {
-  .persist-logo svg,
-  .persist-logo img {
-    /* Stronger optical lift on small screens where the orbit orb reads higher */
-    object-position: center 40%;
-  }
 }
 
 /* ---------- Scroll track + beat overlays ---------- */
@@ -3792,8 +3786,11 @@ body.pf-landing .pf ~ .footer {
     line-height: 1.45 !important;
     color: rgba(168, 172, 184, 0.78) !important;
   }
+  /* True geometric center — 47/48% offsets left the P looking low/left on phones */
   #orbitLayer .orbit-donut {
-    top: 48% !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
   }
   #orbitLayer .orbit-petal__icon {
     width: 20px;
@@ -3816,7 +3813,9 @@ body.pf-landing .pf ~ .footer {
     overflow: visible !important;
   }
   #orbitLayer .orbit-donut {
-    top: 47% !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
   }
   .portfolio-detail--anchored {
     bottom: clamp(2.35rem, 5.5vh, 3.5rem) !important;
@@ -3851,6 +3850,8 @@ body.pf-landing .pf ~ .footer {
   /* Keep wheel geometrically centered so the P locks to the orb */
   #orbitLayer .orbit-donut {
     top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
   }
   #orbitLayer .orbit-petal__icon {
     width: 18px;
