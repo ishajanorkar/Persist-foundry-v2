@@ -790,34 +790,38 @@ body.pf-page .footer-ref { padding-top: 24px; }
   font-size: 36px;
 }
 
-/* Side-by-side CTAs — match navbar Fellowship glass pills */
+/* CTAs: stacked full-width by default (mobile); side-by-side from 969px */
 .pf-detail-ctas {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-direction: column;
+  flex-wrap: nowrap;
   align-items: stretch;
   gap: 10px;
   width: 100%;
 }
 
 .pf-detail-cta {
-  flex: 1 1 calc(50% - 5px);
+  flex: none;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   min-width: 0;
-  min-height: 46px;
-  padding: 12px 18px;
+  min-height: 48px;
+  padding: 13px 20px;
   border: none;
   border-radius: 100px;
   font-family: var(--sans);
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.01em;
-  line-height: 1;
+  line-height: 1.25;
+  text-align: center;
   text-decoration: none;
-  white-space: nowrap;
+  white-space: normal;
   color: var(--paper);
   position: relative;
   overflow: hidden;
@@ -834,6 +838,27 @@ body.pf-page .footer-ref { padding-top: 24px; }
     box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
     gap 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pf-detail-cta span {
+  text-align: center;
+}
+
+@media (min-width: 969px) {
+  .pf-detail-ctas {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .pf-detail-cta {
+    flex: 1 1 calc(50% - 5px);
+    width: auto;
+    min-height: 46px;
+    padding: 12px 18px;
+    line-height: 1;
+    white-space: nowrap;
+  }
 }
 
 .pf-detail-cta > * {
@@ -1040,32 +1065,6 @@ body.pf-page .footer-ref { padding-top: 24px; }
     gap: 14px 16px;
   }
 
-  /* Stack Visit + Pitch Deck full-width so long project names don't clip */
-  .pf-detail-ctas {
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    gap: 10px;
-    width: 100%;
-  }
-
-  .pf-detail-cta {
-    flex: none;
-    width: 100%;
-    max-width: none;
-    box-sizing: border-box;
-    justify-content: center;
-    text-align: center;
-    white-space: normal;
-    line-height: 1.25;
-    padding: 13px 20px;
-    min-height: 48px;
-  }
-
-  .pf-detail-cta span {
-    text-align: center;
-  }
-
   .pf-cell,
   .pf-filter-btn,
   .pf-empty-reset,
@@ -1095,9 +1094,7 @@ body.pf-page .footer-ref { padding-top: 24px; }
     gap: 8px;
   }
   .pf-detail-ctas {
-    flex-direction: column;
     gap: 10px;
-    width: 100%;
   }
   .pf-detail-founders { gap: 14px; }
   .pf-detail-founder-card { max-width: none; flex: 1 1 100%; }
