@@ -1,4 +1,21 @@
 {
+  "redirects": [
+    {
+      "source": "/startupathon",
+      "destination": "https://startupathon.persist.org/",
+      "permanent": true
+    },
+    {
+      "source": "/startupathon/",
+      "destination": "https://startupathon.persist.org/",
+      "permanent": true
+    },
+    {
+      "source": "/startupathon/:path*",
+      "destination": "https://startupathon.persist.org/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

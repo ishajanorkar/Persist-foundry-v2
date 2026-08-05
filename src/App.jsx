@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import CustomCursor from './components/CustomCursor'
+import ExternalRedirect from './components/ExternalRedirect'
 import Foundry from './pages/Foundry'
 import { TERMS_OF_SERVICE, PRIVACY_POLICY } from './data/legalPages'
 
@@ -19,6 +20,8 @@ const ApplicationForm = lazy(() => import('./pages/ApplicationForm'))
 const LegalPage = lazy(() => import('./pages/LegalPage'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 const FinalCtaSection = lazy(() => import('./components/FinalCtaSection'))
+
+const STARTUPATHON_URL = 'https://startupathon.persist.org/'
 
 const KNOWN_PATHS = new Set([
   '/',
@@ -59,13 +62,14 @@ function Layout() {
   const { pathname } = useLocation()
   const foundryHome = pathname === '/'
   const isLegal = pathname === '/terms-of-service' || pathname === '/privacy-policy'
+  const isExternalRedirect = pathname === '/startupathon' || pathname.startsWith('/startupathon/')
   const known = isKnownRoute(pathname)
   const showGlobalCta = known && !foundryHome && pathname !== '/legacy' && !isLegal
 
   return (
     <>
-      <CustomCursor />
-      <Navbar />
+      {!isExternalRedirect && <CustomCursor />}
+      {!isExternalRedirect && <Navbar />}
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/" element={<Foundry />} />
@@ -76,6 +80,14 @@ function Layout() {
           <Route path="/portfolio/:id" element={<PortfolioCompany />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/contact" element={<Contact />} />
+          <Route
+            path="/startupathon"
+            element={<ExternalRedirect to={STARTUPATHON_URL} />}
+          />
+          <Route
+            path="/startupathon/*"
+            element={<ExternalRedirect to={STARTUPATHON_URL} />}
+          />
           <Route
             path="/apply-for-a-full-time-position"
             element={<ApplicationForm formKey="fullTime" />}
@@ -104,7 +116,7 @@ function Layout() {
         </Routes>
         {showGlobalCta && <FinalCtaSection footer />}
       </Suspense>
-      {!foundryHome && !showGlobalCta && <Footer />}
+      {!foundryHome && !showGlobalCta && !isExternalRedirect && <Footer />}
     </>
   )
 }
