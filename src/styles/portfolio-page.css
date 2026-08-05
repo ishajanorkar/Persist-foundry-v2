@@ -1040,6 +1040,32 @@ body.pf-page .footer-ref { padding-top: 24px; }
     gap: 14px 16px;
   }
 
+  /* Stack Visit + Pitch Deck full-width so long project names don't clip */
+  .pf-detail-ctas {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .pf-detail-cta {
+    flex: none;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+    line-height: 1.25;
+    padding: 13px 20px;
+    min-height: 48px;
+  }
+
+  .pf-detail-cta span {
+    text-align: center;
+  }
+
   .pf-cell,
   .pf-filter-btn,
   .pf-empty-reset,
@@ -1062,12 +1088,16 @@ body.pf-page .footer-ref { padding-top: 24px; }
     max-width: none;
   }
   .pf-detail-cta {
-    font-size: 13px;
-    min-height: 42px;
-    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 48px;
+    padding: 14px 18px;
+    gap: 8px;
   }
   .pf-detail-ctas {
-    gap: 8px;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
   }
   .pf-detail-founders { gap: 14px; }
   .pf-detail-founder-card { max-width: none; flex: 1 1 100%; }
