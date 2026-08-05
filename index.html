@@ -93,6 +93,15 @@
     </noscript>
   </head>
   <body>
+    <!-- Immediate off-site redirect — runs before React (covers SPA rewrite) -->
+    <script>
+      (function () {
+        var path = location.pathname.replace(/\/+$/, "") || "/";
+        if (path === "/startupathon" || path.indexOf("/startupathon/") === 0) {
+          location.replace("https://startupathon.persist.org/");
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
