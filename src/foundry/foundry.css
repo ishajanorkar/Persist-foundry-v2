@@ -2380,7 +2380,8 @@ body.pf-landing ::selection {
   right: clamp(-4%, -1vw, 0%);
   width: min(42vw, 520px);
   opacity: 0.95;
-  filter: drop-shadow(0 0 60px rgba(120, 84, 213, 0.22));
+  /* Ash halo — matches grey face of the crystal behind the card */
+  filter: drop-shadow(0 0 60px rgba(130, 132, 140, 0.2));
 }
 .pf .filter-deco--bl {
   /* Pinned to section floor — no scroll drift (avoids a starfield gap) */
@@ -2390,7 +2391,7 @@ body.pf-landing ::selection {
   opacity: 0.9;
   transform: none;
   will-change: auto;
-  filter: drop-shadow(0 0 50px rgba(120, 84, 213, 0.16));
+  filter: drop-shadow(0 0 50px rgba(125, 127, 135, 0.16));
 }
 
 .pf .filter-inner {
@@ -2446,19 +2447,18 @@ body.pf-landing ::selection {
   color: rgba(190, 196, 210, 0.78);
 }
 
-/* Blueprint glass panel */
+/* Blueprint glass panel — clear frame; frost lives on columns so ash orbs show through */
 .pf .filter-panel {
   --filter-line: #fffaf180;
   --filter-cross: 20px;
   position: relative;
   width: 100%;
-  border: 1px solid #ffffff24;
-  background: rgba(12, 12, 16, 0.42);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.02) inset,
-    0 24px 80px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 250, 241, 0.14);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  overflow: visible;
   opacity: 0;
   transform: translateY(22px);
   transition:
@@ -2469,26 +2469,123 @@ body.pf-landing ::selection {
   opacity: 1;
   transform: none;
 }
+
+/* Soft ash orbs behind the frosted columns (grey face of deco crystals) */
+.pf .filter-panel__glows {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.pf .filter-glow {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.pf .filter-glow--bl {
+  left: -22%;
+  bottom: -48%;
+  width: min(68%, 520px);
+  height: min(110%, 560px);
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    rgba(150, 152, 160, 0.72) 0%,
+    rgba(110, 112, 120, 0.38) 34%,
+    rgba(70, 72, 78, 0.12) 58%,
+    transparent 74%
+  );
+  filter: blur(32px);
+}
+.pf .filter-glow--r {
+  right: -26%;
+  top: -12%;
+  width: min(70%, 540px);
+  height: min(120%, 580px);
+  background: radial-gradient(
+    ellipse at 40% 48%,
+    rgba(148, 150, 158, 0.58) 0%,
+    rgba(108, 110, 118, 0.3) 38%,
+    rgba(68, 70, 76, 0.1) 60%,
+    transparent 76%
+  );
+  filter: blur(40px);
+}
+
 .pf .filter-panel__grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
 .pf .filter-col {
+  position: relative;
+  isolation: isolate;
   margin: 0;
   padding: 0;
   border: 0;
   border-radius: 0;
-  background: #41414133;
-  /* border: 0.5px solid #fffbf11a; */
-  backdrop-filter: blur(60px);
+  overflow: hidden;
+  /* Frosted glass — low saturate so deco ash stays neutral, not violet */
+  background: rgba(95, 96, 105, 0.18);
+  backdrop-filter: blur(40px) saturate(108%);
+  -webkit-backdrop-filter: blur(40px) saturate(108%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
   transform: none;
   transition: none;
+}
+/* Ash bloom under the frost — matches grey crystal faces in the reference */
+.pf .filter-col::before {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 78% 72% at 0% 100%,
+    rgba(155, 157, 164, 0.88) 0%,
+    rgba(118, 120, 128, 0.48) 28%,
+    rgba(78, 80, 86, 0.16) 50%,
+    transparent 70%
+  );
+  filter: blur(34px);
+  mix-blend-mode: screen;
+  opacity: 0.85;
+}
+.pf .filter-col--no::before {
+  background: radial-gradient(
+    ellipse 70% 68% at 105% 22%,
+    rgba(152, 154, 162, 0.8) 0%,
+    rgba(115, 117, 125, 0.42) 30%,
+    rgba(75, 77, 84, 0.14) 52%,
+    transparent 72%
+  );
+}
+.pf .filter-col > * {
+  position: relative;
+  z-index: 1;
 }
 .pf .filter-col:hover {
   transform: none;
 }
 .pf .filter-col--yes {
-  border-right: 1px solid #fffbf11a;
+  border-right: 1px solid rgba(255, 251, 241, 0.1);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .pf .filter-col {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(28, 30, 42, 0.92);
+  }
+  .pf .filter-col::before {
+    opacity: 0.4;
+    filter: blur(16px);
+  }
+  .pf .filter-panel__glows {
+    opacity: 0.3;
+  }
 }
 .pf .filter-col-label {
   display: flex;
@@ -2652,7 +2749,7 @@ body.pf-landing ::selection {
     margin-left: auto;
     margin-right: auto;
   }
-  /* Drop shared outer frame — each column becomes its own card */
+  /* Drop shared outer frame — each column becomes its own glass card */
   .pf .filter-panel {
     border: 0;
     background: transparent;
@@ -2660,22 +2757,25 @@ body.pf-landing ::selection {
     -webkit-backdrop-filter: none;
     box-shadow: none;
   }
+  .pf .filter-panel__glows {
+    display: none;
+  }
   .pf .filter-panel__grid {
     grid-template-columns: 1fr;
     gap: 1.15rem;
   }
   .pf .filter-col {
-    border: 1px solid var(--filter-line);
-    background: rgba(12, 12, 16, 0.42);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 250, 241, 0.14);
+    background: rgba(95, 96, 105, 0.18);
+    backdrop-filter: blur(40px) saturate(108%);
+    -webkit-backdrop-filter: blur(40px) saturate(108%);
     box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.02) inset,
-      0 18px 60px rgba(0, 0, 0, 0.3);
+      inset 0 1px 0 rgba(255, 255, 255, 0.055),
+      0 18px 60px rgba(0, 0, 0, 0.28);
   }
   .pf .filter-col--yes {
-    border-right: 1px solid var(--filter-line);
-    border-bottom: 1px solid var(--filter-line);
+    border-right: 1px solid rgba(255, 250, 241, 0.14);
+    border-bottom: 1px solid rgba(255, 250, 241, 0.14);
   }
   .pf .filter-col-label {
     margin: 0;
@@ -2816,28 +2916,29 @@ body.pf-landing ::selection {
   width: 100%;
   max-width: min(1100px, 100%);
   margin: 0 auto;
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
   isolation: isolate;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  /* Frosted charcoal glass — matched to navbar pill + forge segments */
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  /*
+    Reference glass: darker/more solid at top for type,
+    clearer toward the bottom so the mesh frosts through (ref bot ~rgb 66,62,112).
+  */
   background: linear-gradient(
-    165deg,
-    rgba(52, 50, 60, 0.48) 0%,
-    rgba(26, 24, 34, 0.62) 48%,
-    rgba(14, 12, 20, 0.72) 100%
+    180deg,
+    rgba(18, 18, 24, 0.52) 0%,
+    rgba(14, 14, 20, 0.4) 40%,
+    rgba(12, 12, 20, 0.34) 100%
   );
-  backdrop-filter: blur(32px) saturate(140%);
-  -webkit-backdrop-filter: blur(32px) saturate(140%);
+  backdrop-filter: blur(32px) saturate(120%);
+  -webkit-backdrop-filter: blur(32px) saturate(120%);
   box-shadow:
-    inset 0.5px 1px 0 rgba(255, 255, 255, 0.28),
-    inset 1px 0.5px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
-    inset -1px 0 0 rgba(0, 0, 0, 0.18),
-    0 22px 64px rgba(0, 0, 0, 0.42);
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+    0 24px 80px rgba(0, 0, 0, 0.35);
 }
 
-/* Soft static glass rim — top-left light catch like nav / forge */
+/* Soft static glass rim — faint light catch on the edge */
 .pf-final-cta-container .pf-final-cta-panel::after {
   content: "";
   position: absolute;
@@ -2846,10 +2947,10 @@ body.pf-landing ::selection {
   padding: 1px;
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.28) 0%,
-    rgba(255, 255, 255, 0.1) 28%,
+    rgba(255, 255, 255, 0.32) 0%,
+    rgba(255, 255, 255, 0.1) 30%,
     rgba(255, 255, 255, 0.03) 55%,
-    rgba(255, 255, 255, 0.08) 100%
+    rgba(255, 255, 255, 0.1) 100%
   );
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
@@ -2868,33 +2969,36 @@ body.pf-landing ::selection {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  /* Top sheen — glass catching light */
   background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.02) 35%,
-    rgba(255, 255, 255, 0) 60%,
-    rgba(255, 255, 255, 0.03) 100%
+    180deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.02) 28%,
+    transparent 55%
   );
-  opacity: 0.7;
+  opacity: 1;
   mix-blend-mode: soft-light;
 }
 
+/* Let the real mesh be the bottom glow — only a soft top highlight here */
 .pf-final-cta-container .pf-final-cta-panel__glow {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background:
-    radial-gradient(
-      ellipse 42% 55% at 50% 110%,
-      rgba(167, 139, 251, 0.22) 0%,
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 70% 50% at 50% 0%,
-      rgba(255, 255, 255, 0.06) 0%,
-      transparent 55%
-    );
+  background: radial-gradient(
+    ellipse 75% 45% at 50% -5%,
+    rgba(255, 255, 255, 0.07) 0%,
+    transparent 60%
+  );
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .pf-final-cta-container .pf-final-cta-panel {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(18, 18, 24, 0.94);
+  }
 }
 
 .pf-final-cta-container .pf-final-cta-copy {
@@ -3163,10 +3267,12 @@ body.pf-landing .pf ~ .footer {
   padding: 0 var(--gutter);
   align-items: start;
   box-sizing: border-box;
+  overflow: visible;
 }
 
 .vprop__cell {
   will-change: transform;
+  overflow: visible;
 }
 
 /* Tablet — 2 columns */
@@ -3216,10 +3322,11 @@ body.pf-landing .pf ~ .footer {
   }
 }
 
-/* ---------- Card ---------- */
+/* ---------- Card — crop-mark frame + glass foot (matches reference) ---------- */
 .vprop-card {
-  --vprop-line: rgba(200, 205, 220, 0.55);
+  --vprop-line: rgba(200, 205, 220, 0.45);
   --vprop-cross: 14px;
+  --vprop-cross-half: 7px;
   position: relative;
   width: 100%;
   display: flex;
@@ -3228,15 +3335,44 @@ body.pf-landing .pf ~ .footer {
   gap: 0.8rem;
   margin: 0;
   padding: 1.4rem 0 0;
-  background: rgba(255, 255, 255, 0.07);
-  border-width: 1.5px;
+  /* Top pane stays clear so the starfield reads through the frame */
+  background: transparent;
+  border-width: 0.5px;
   border-style: solid;
-  border-color: #fffbf11f;
+  border-color: rgba(255, 251, 241, 0.28);
   overflow: visible;
-  backdrop-filter: blur(3px);
+  isolation: isolate;
 
   /* idle float — layered on top of the scroll-tween on .vprop__cell */
   animation: vprop-float 6.5s ease-in-out infinite;
+}
+/* Crop-mark pluses — same asset as Backstory / About */
+.vprop-card__cross {
+  position: absolute;
+  width: var(--vprop-cross);
+  height: var(--vprop-cross);
+  display: block;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.85;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.vprop-card__cross--tl {
+  top: calc(var(--vprop-cross-half) * -1);
+  left: calc(var(--vprop-cross-half) * -1);
+}
+.vprop-card__cross--tr {
+  top: calc(var(--vprop-cross-half) * -1);
+  right: calc(var(--vprop-cross-half) * -1);
+}
+.vprop-card__cross--bl {
+  bottom: calc(var(--vprop-cross-half) * -1);
+  left: calc(var(--vprop-cross-half) * -1);
+}
+.vprop-card__cross--br {
+  bottom: calc(var(--vprop-cross-half) * -1);
+  right: calc(var(--vprop-cross-half) * -1);
 }
 /* desync the bob per card so it doesn't look like one synced pulse */
 .vprop__cell:nth-child(2n) .vprop-card {
@@ -3302,7 +3438,10 @@ body.pf-landing .pf ~ .footer {
   border: 0;
   border-top: 1px solid var(--vprop-line);
   box-sizing: border-box;
-  background: #d9d9d91a;
+  /* Same frosted glass as Backstory .bcard__value */
+  background: rgba(217, 217, 217, 0.12);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 .vprop-card__foot p {
   margin: 0;
@@ -3312,6 +3451,14 @@ body.pf-landing .pf ~ .footer {
   line-height: 1.45;
   color: rgba(220, 224, 235, 0.78);
   text-align: center;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .vprop-card__foot {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(28, 30, 42, 0.88);
+  }
 }
 
 @media (min-width: 1025px) {
@@ -3342,6 +3489,10 @@ body.pf-landing .pf ~ .footer {
   }
   .vprop-card__icon--network img {
     width: clamp(6rem, 20vh, 8.5rem);
+  }
+  .vprop-card__foot {
+    backdrop-filter: blur(14px) saturate(130%);
+    -webkit-backdrop-filter: blur(14px) saturate(130%);
   }
   .vprop-card__foot p {
     font-size: clamp(0.66rem, 3vw, 0.74rem);
@@ -3768,6 +3919,43 @@ body.pf-landing .pf ~ .footer {
   }
   .pf .footer-nav-cols .footer-nav-col:last-child {
     grid-column: 1 / -1;
+  }
+}
+
+/* Five Ways segments — nav charcoal glass + static glass rim (no spin) */
+#orbitLayer .orbit-petal {
+  background: linear-gradient(
+    165deg,
+    rgba(58, 56, 66, 0.5) 0%,
+    rgba(30, 28, 38, 0.66) 48%,
+    rgba(16, 14, 22, 0.74) 100%
+  ) !important;
+  backdrop-filter: blur(28px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(150%) !important;
+  box-shadow:
+    inset 0.5px 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28) !important;
+}
+#orbitLayer .orbit-seg-rim {
+  stroke-width: 1.25 !important;
+}
+#orbitLayer .orbit-petal.is-featured {
+  box-shadow:
+    inset 0.5px 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 28px rgba(120, 84, 213, 0.42),
+    0 0 56px rgba(88, 66, 180, 0.24) !important;
+}
+@media (max-width: 640px) {
+  #orbitLayer .orbit-petal {
+    backdrop-filter: blur(18px) saturate(135%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(135%) !important;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  #orbitLayer .orbit-petal {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(28, 26, 38, 0.9) !important;
   }
 }
 

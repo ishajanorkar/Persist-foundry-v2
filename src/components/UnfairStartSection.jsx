@@ -108,6 +108,34 @@ const SPEEDS = {
 function PropCard({ card, cardKey }) {
   return (
     <article className="vprop-card">
+      <img
+        className="vprop-card__cross vprop-card__cross--tl"
+        src="/assets/plus-icon.svg"
+        alt=""
+        aria-hidden="true"
+        draggable="false"
+      />
+      <img
+        className="vprop-card__cross vprop-card__cross--tr"
+        src="/assets/plus-icon.svg"
+        alt=""
+        aria-hidden="true"
+        draggable="false"
+      />
+      <img
+        className="vprop-card__cross vprop-card__cross--bl"
+        src="/assets/plus-icon.svg"
+        alt=""
+        aria-hidden="true"
+        draggable="false"
+      />
+      <img
+        className="vprop-card__cross vprop-card__cross--br"
+        src="/assets/plus-icon.svg"
+        alt=""
+        aria-hidden="true"
+        draggable="false"
+      />
       <h3 className="vprop-card__title">{card.title}</h3>
       <div
         className={`vprop-card__icon${cardKey === "network" ? " vprop-card__icon--network" : ""}`}

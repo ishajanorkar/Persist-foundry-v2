@@ -121,6 +121,11 @@ export default function FilterSection() {
         </header>
 
         <div className="filter-panel">
+          <div className="filter-panel__glows" aria-hidden="true">
+            <span className="filter-glow filter-glow--bl" />
+            <span className="filter-glow filter-glow--r" />
+          </div>
+
           <span className="filter-cross filter-cross--tl" aria-hidden="true" />
           <span className="filter-cross filter-cross--tr" aria-hidden="true" />
           <span className="filter-cross filter-cross--bl" aria-hidden="true" />

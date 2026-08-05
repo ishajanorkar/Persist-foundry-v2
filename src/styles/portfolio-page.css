@@ -60,7 +60,8 @@ body.pf-page .footer-ref { padding-top: 24px; }
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--stone);
+  /* Match site eyebrows (About #ffffff8f) — readable on void */
+  color: rgba(240, 236, 247, 0.62);
 }
 
 .pf-filters {
@@ -71,10 +72,10 @@ body.pf-page .footer-ref { padding-top: 24px; }
 
 .pf-filter-btn {
   padding: 8px 14px;
-  border: 1px solid var(--hairline);
+  border: 1px solid rgba(184, 168, 230, 0.22);
   border-radius: 100px;
   background: transparent;
-  color: var(--stone-soft);
+  color: rgba(240, 236, 247, 0.72);
   font-family: var(--mono);
   font-size: 9px;
   letter-spacing: 0.1em;
@@ -85,13 +86,13 @@ body.pf-page .footer-ref { padding-top: 24px; }
 
 .pf-filter-btn:hover {
   color: var(--paper);
-  border-color: rgba(199, 184, 245, 0.24);
+  border-color: rgba(199, 184, 245, 0.36);
   background: rgba(120, 84, 213, 0.08);
 }
 
 .pf-filter-btn.is-active {
   color: var(--paper);
-  border-color: rgba(199, 184, 245, 0.32);
+  border-color: rgba(199, 184, 245, 0.42);
   background: rgba(120, 84, 213, 0.16);
 }
 
@@ -164,7 +165,7 @@ body.pf-page .footer-ref { padding-top: 24px; }
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.08em;
-  color: var(--stone);
+  color: rgba(240, 236, 247, 0.55);
   line-height: 1;
   margin-bottom: 14px;
   flex-shrink: 0;
@@ -360,7 +361,7 @@ body.pf-page .footer-ref { padding-top: 24px; }
   font-family: var(--sans);
   font-size: 12px;
   line-height: 1.45;
-  color: var(--stone-soft);
+  color: rgba(240, 236, 247, 0.62);
   max-width: 100%;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -370,7 +371,7 @@ body.pf-page .footer-ref { padding-top: 24px; }
 }
 
 .pf-cell:hover .pf-cell-tag {
-  color: rgba(244, 241, 250, 0.78);
+  color: rgba(244, 241, 250, 0.88);
 }
 
 .pf-cell-arrow {

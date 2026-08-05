@@ -367,6 +367,30 @@ const TEAM = [
     li: 'navalthanik',
     img: '/assets/team/naval-thanik.png',
   },
+  {
+    name: 'Bhavana Shetty',
+    role: 'UI/UX Designer',
+    bio: null,
+    x: null,
+    li: 'bhavana-shetty017',
+    img: '/assets/team/bhavana-shetty.png',
+  },
+  {
+    name: 'Sreeja Roy Chowdhury',
+    role: 'UI/UX Designer',
+    bio: null,
+    x: null,
+    li: 'sreeja-roy-c',
+    img: '/assets/team/sreeja-roy-chowdhury.png',
+  },
+  {
+    name: 'Swathy Stanley',
+    role: 'UI/UX Designer',
+    bio: null,
+    x: null,
+    li: 'swathystanley',
+    img: '/assets/team/swathy-stanley.png',
+  },
 ]
 /* ── icons ───────────────────────────────────────────────── */
 const LiIcon = () => (

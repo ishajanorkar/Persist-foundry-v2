@@ -884,13 +884,21 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       }
 
       // hairline rim on top of the clipped glass (Frame-accurate)
-      linesHTML += `<path class="orbit-seg-rim" d="${d}" />`;
+      linesHTML += `<path class="orbit-seg-rim" d="${d}" stroke="url(#orbitGlassRim)" />`;
     });
     if (orbitSegLines) {
       orbitSegLines.setAttribute("viewBox", `0 0 ${D} ${D}`);
       orbitSegLines.setAttribute("width", String(D));
       orbitSegLines.setAttribute("height", String(D));
-      orbitSegLines.innerHTML = linesHTML;
+      // Nav-style static glass rim (same stops as .nav-pill::after) — no spin
+      orbitSegLines.innerHTML =
+        `<defs><linearGradient id="orbitGlassRim" x1="0%" y1="0%" x2="100%" y2="100%">` +
+        `<stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>` +
+        `<stop offset="28%" stop-color="#ffffff" stop-opacity="0.28"/>` +
+        `<stop offset="55%" stop-color="#ffffff" stop-opacity="0.14"/>` +
+        `<stop offset="100%" stop-color="#ffffff" stop-opacity="0.32"/>` +
+        `</linearGradient></defs>` +
+        linesHTML;
     }
 
     const core = orbitDonut.querySelector(".orbit-core");
@@ -1116,18 +1124,17 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         /* off by default — JS enables only while the Five Ways wheel is live
            (children with pe:auto ignore a parent's pe:none, so this must start none) */
         pointer-events:none;isolation:isolate;
-        /* frosted charcoal glass — matched to navbar pill */
+        /* Charcoal frosted glass — matched to .nav-pill (static, no border spin) */
         background:linear-gradient(165deg,
-          rgba(58,56,66,0.52) 0%,
-          rgba(30,28,38,0.7) 48%,
-          rgba(16,14,22,0.8) 100%);
+          rgba(58,56,66,0.5) 0%,
+          rgba(30,28,38,0.66) 48%,
+          rgba(16,14,22,0.74) 100%);
         -webkit-backdrop-filter:blur(28px) saturate(1.5);
         backdrop-filter:blur(28px) saturate(1.5);
+        /* Soft top-left catch like nav — not a second outer stroke */
         box-shadow:
-          inset 0.5px 1px 0 rgba(255,255,255,0.32),
-          inset 1px 0.5px 0 rgba(255,255,255,0.12),
-          inset 0 -1px 0 rgba(0,0,0,0.4),
-          inset -1px 0 0 rgba(0,0,0,0.18);
+          inset 0.5px 1px 0 rgba(255,255,255,0.22),
+          inset 0 -1px 0 rgba(0,0,0,0.28);
         /* active purple — muted lilac rim, no pure-white hotspot (OLED-safe) */
         --orbit-active-fill:radial-gradient(circle at 50% 50%,
           rgb(20,16,34) 0%,
@@ -1142,24 +1149,24 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         background:var(--orbit-active-fill);opacity:0;
         transition:opacity .35s var(--ease-out);}
       .orbit-petal:hover::before,.orbit-petal.is-featured::before{opacity:0.92;}
-      /* soft static glass edge wash clipped with the petal */
+      /* Soft sheen only — perimeter border lives on SVG .orbit-seg-rim */
       .orbit-petal::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
         background:linear-gradient(145deg,
-          rgba(255,255,255,0.12) 0%,
-          rgba(255,255,255,0.03) 35%,
-          rgba(255,255,255,0) 60%,
-          rgba(255,255,255,0.04) 100%);
-        opacity:0.7;mix-blend-mode:soft-light;}
+          rgba(255,255,255,0.14) 0%,
+          rgba(255,255,255,0.04) 35%,
+          rgba(255,255,255,0) 65%);
+        opacity:0.85;mix-blend-mode:soft-light;}
       /* glow on the rim SVG only — never filter the petal (unclips a rectangle) */
       .orbit-seg-lines{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:visible;
         fill:none;}
       .orbit-seg-rim{fill:none;
-        stroke:rgba(255,255,255,0.28);
-        stroke-width:1.2;
+        /* stroke color from SVG url(#orbitGlassRim) — do not override in CSS */
+        stroke-width:1.25;
         stroke-linecap:round;stroke-linejoin:round;
+        vector-effect:non-scaling-stroke;
         transition:stroke .35s var(--ease-out),filter .35s var(--ease-out),stroke-width .35s var(--ease-out);}
-      .orbit-seg-rim.is-lit{stroke:rgba(220,210,240,0.75);stroke-width:1.3;
-        filter:drop-shadow(0 0 4px rgba(160,130,210,0.35)) drop-shadow(0 0 10px rgba(120,90,180,0.28));}
+      .orbit-seg-rim.is-lit{stroke:rgba(235,225,255,0.88);stroke-width:1.35;
+        filter:drop-shadow(0 0 4px rgba(160,130,210,0.4)) drop-shadow(0 0 10px rgba(120,90,180,0.3));}
       .orbit-petal__content{position:absolute;transform:translate(-50%,-50%);
         display:flex;flex-direction:column;align-items:center;gap:12px;
         pointer-events:none;text-align:center;will-change:transform;z-index:3;}
@@ -1215,10 +1222,10 @@ export default function initFoundry({ base = "/foundry" } = {}) {
             rgba(186,154,235,0.92) 90%);
         }
         .orbit-petal.is-featured{
+          /* Outer glow only — no inset strokes that double the SVG rim */
           box-shadow:
-            inset 0.5px 1px 0 rgba(255,255,255,0.28),
-            0 0 28px rgba(120,84,213,0.45),
-            0 0 56px rgba(88,66,180,0.28);
+            0 0 28px rgba(120,84,213,0.42),
+            0 0 56px rgba(88,66,180,0.24);
         }
       }
       @media (max-width:900px) and (max-height:820px){
@@ -1237,6 +1244,10 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         .orbit-heading__title{font-size:clamp(1.4rem,6.8vw,1.7rem);}
         .orbit-heading__body{max-width:none;font-size:clamp(0.84rem,3.6vw,0.95rem);line-height:1.45;}
         .orbit-donut{top:50%;left:50%;transform:translate(-50%,-50%);}
+        .orbit-petal{
+          -webkit-backdrop-filter:blur(18px) saturate(135%);
+          backdrop-filter:blur(18px) saturate(135%);
+        }
         .orbit-petal__icon{width:18px;height:18px;}
         .orbit-petal__label{font-size:clamp(0.5rem,2.3vw,0.6rem);max-width:10ch;}
       }`;
