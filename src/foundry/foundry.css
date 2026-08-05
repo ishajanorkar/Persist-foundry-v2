@@ -195,12 +195,12 @@ body.pf-landing ::selection {
   inset: 0;
   pointer-events: none;
   z-index: 3;
-  /* Soft edge vignette — was 0.5, dialed down so hero footage stays bright */
+  /* Soft edge vignette — wide feather so it never reads as a hard rim */
   background: radial-gradient(
-    135% 110% at 50% 48%,
-    transparent 58%,
-    rgba(7, 5, 16, 0.12) 82%,
-    rgba(7, 5, 16, 0.22) 100%
+    150% 125% at 50% 48%,
+    transparent 50%,
+    rgba(7, 5, 16, 0.08) 78%,
+    rgba(7, 5, 16, 0.18) 100%
   );
 }
 
@@ -210,14 +210,32 @@ body.pf-landing ::selection {
   pointer-events: none;
   z-index: 4;
   opacity: 0;
-  /* Softer stops — hard mid-stops read as a horizontal “gradient break” on mobile */
+  /* Soft depth — no hard mid-stops (those read as a ring / seam on mobile) */
   background: radial-gradient(
-    72% 64% at 50% 48%,
-    rgba(5, 4, 11, 0.28) 0%,
-    rgba(5, 4, 11, 0.48) 42%,
-    rgba(5, 4, 11, 0.68) 72%,
-    rgba(4, 3, 9, 0.82) 100%
+    90% 80% at 50% 52%,
+    rgba(5, 4, 11, 0.2) 0%,
+    rgba(5, 4, 11, 0.4) 50%,
+    rgba(5, 4, 11, 0.58) 78%,
+    rgba(4, 3, 9, 0.7) 100%
   );
+}
+
+/* Mobile: disable stage-fade entirely. Top linear washes + 16:9 footage
+   dark ceiling stacked into a sharp horizontal cut on tall phones. */
+@media (max-width: 1024px) {
+  .stage-fade {
+    opacity: 0 !important;
+    background: none !important;
+    visibility: hidden;
+  }
+  .stage::after {
+    background: radial-gradient(
+      160% 140% at 50% 55%,
+      rgba(7, 5, 16, 0) 42%,
+      rgba(7, 5, 16, 0.05) 78%,
+      rgba(7, 5, 16, 0.12) 100%
+    );
+  }
 }
 
 /* Soften the baked center flare — same gentle feel as stage-fade / Tether */
@@ -240,12 +258,12 @@ body.pf-landing ::selection {
 @media (max-width: 1024px) {
   .stage-flare-mask {
     background: radial-gradient(
-      ellipse 70% 58% at 50% 36%,
-      rgba(5, 4, 11, 1) 0%,
-      rgba(5, 4, 11, 0.92) 28%,
-      rgba(5, 4, 11, 0.55) 48%,
-      rgba(5, 4, 11, 0.18) 68%,
-      transparent 84%
+      ellipse 85% 72% at 50% 40%,
+      rgba(5, 4, 11, 0.88) 0%,
+      rgba(5, 4, 11, 0.62) 32%,
+      rgba(5, 4, 11, 0.28) 55%,
+      rgba(5, 4, 11, 0.08) 75%,
+      transparent 92%
     );
   }
 }
@@ -579,8 +597,7 @@ body.pf-landing ::selection {
 }
 
 @media (max-width: 1024px) {
-  /* Funded-by / center beats: edge-to-edge wash (no 96vw box cut),
-     same soft depth as before — not a heavy black overlay */
+  /* No top linear band — only a soft center wash (same-color zero alpha) */
   .beat--center .beat__scrim,
   #tether .beat__scrim {
     left: 0;
@@ -594,15 +611,15 @@ body.pf-landing ::selection {
     filter: none;
     z-index: 0;
     background: radial-gradient(
-      135% 105% at 50% 48%,
-      rgba(6, 4, 13, 0.72) 0%,
-      rgba(6, 4, 13, 0.38) 42%,
-      rgba(6, 4, 13, 0.12) 68%,
-      rgba(6, 4, 13, 0) 86%
+      170% 140% at 50% 55%,
+      rgba(6, 4, 13, 0.28) 0%,
+      rgba(6, 4, 13, 0.12) 48%,
+      rgba(6, 4, 13, 0.04) 72%,
+      rgba(6, 4, 13, 0) 100%
     );
   }
   #tether.beat--center {
-    isolation: isolate;
+    isolation: auto;
   }
   #tether .beat__inner {
     position: relative;
@@ -726,8 +743,7 @@ body.pf-landing ::selection {
   will-change: transform, opacity;
 }
 @media (max-width: 1024px) {
-  /* Full-bleed soft wash (not a 78dvh box). A shorter scrolling scrim
-     paints a hard horizontal cut across the fixed stage while scrolling. */
+  /* Soft center wash only — no top linear that cuts across the stage */
   #hero .beat__scrim {
     left: 0;
     right: 0;
@@ -739,11 +755,11 @@ body.pf-landing ::selection {
     z-index: 0;
     filter: none;
     background: radial-gradient(
-      150% 120% at 50% 58%,
-      rgba(4, 3, 10, 0.32) 0%,
-      rgba(4, 3, 10, 0.16) 38%,
-      rgba(4, 3, 10, 0.06) 62%,
-      transparent 82%
+      170% 140% at 50% 58%,
+      rgba(4, 3, 10, 0.18) 0%,
+      rgba(4, 3, 10, 0.08) 50%,
+      rgba(4, 3, 10, 0.02) 75%,
+      rgba(4, 3, 10, 0) 100%
     );
   }
   #hero .beat__inner--hero {
@@ -979,7 +995,7 @@ body.pf-landing ::selection {
   transform: translateY(clamp(2.25rem, 4.5vh, 3.5rem));
 }
 
-/* Landscape rectangles — fixed width × height so content can’t stretch them */
+/* Landscape rectangles — transparent frame; glass only on the value pane */
 .bcard {
   position: relative;
   display: block;
@@ -993,7 +1009,6 @@ body.pf-landing ::selection {
   border-width: 0.4px;
   border-style: solid;
   border-color: #fffbf138;
-
   overflow: visible;
 }
 .bcard__label,
@@ -1009,7 +1024,7 @@ body.pf-landing ::selection {
   z-index: 1;
   box-sizing: border-box;
 }
-/* Top half — transparent */
+/* Top half — fully clear (label only); ONE divider line at the split */
 .bcard__label {
   top: 0;
   height: 48%;
@@ -1024,15 +1039,18 @@ body.pf-landing ::selection {
   letter-spacing: -0.01em;
   color: rgba(255, 255, 255, 0.92);
 }
-/* Bottom half — solid fill flush to the divider */
+/* Bottom half — glass fill only; no top stroke/shadow (avoids a double divider) */
 .bcard__value {
   top: 48%;
   bottom: 0;
   height: 52%;
   margin: 0;
   overflow: hidden;
-  background: #d9d9d91a;
-  backdrop-filter: blur(35px);
+  border: 0;
+  box-shadow: none;
+  background: rgba(217, 217, 217, 0.1);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 .bcard__value .stat__num {
   font-family: "Montserrat", var(--pf-display), system-ui, sans-serif;
@@ -1043,7 +1061,22 @@ body.pf-landing ::selection {
   letter-spacing: -0.04em;
   text-align: center;
   color: #ffffff;
-  text-shadow: none;
+  text-shadow: 0 1px 10px rgba(4, 3, 10, 0.4);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .bcard__value {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(28, 30, 42, 0.88);
+  }
+}
+
+@media (max-width: 640px) {
+  .bcard__value {
+    backdrop-filter: blur(14px) saturate(130%);
+    -webkit-backdrop-filter: blur(14px) saturate(130%);
+  }
 }
 
 /* Crop-mark pluses — same asset as About, sized to sit on the frame */

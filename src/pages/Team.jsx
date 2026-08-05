@@ -104,6 +104,14 @@ const TEAM = [
     img: '/assets/team/claire-jing.png',
   },
   {
+    name: 'Swapnil Sharma',
+    role: 'Chief Science Officer',
+    bio: null,
+    x: null,
+    li: 'swapnil-sharma-a99ba3189',
+    img: '/assets/team/swapnil-sharma.jpg',
+  },
+  {
     name: 'Bhavya Bansal',
     role: 'Chief Technology Officer',
     bio: 'Bhavya, our CTO, seamlessly blends technical expertise with strategic vision, leading our tech-forward approach through innovative thinking.',
@@ -166,14 +174,6 @@ const TEAM = [
     x: null,
     li: 'mohitkhere',
     img: '/assets/team/mohit-kumar.png',
-  },
-  {
-    name: 'Nayan Patil',
-    role: 'CEO, Startupathon',
-    bio: null,
-    x: null,
-    li: 'nayan-patil-496b28201',
-    img: '/assets/team/nayan-patil.png',
   },
   {
     name: 'Jorge Martín Poza',

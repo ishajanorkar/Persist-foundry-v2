@@ -281,6 +281,27 @@ body::before {
   opacity: 0.9;
 }
 
+/* Foundry mobile: feather the scrolled nav — a solid bar bottom edge
+   stacks with the footage’s dark ceiling into a visible hard cut. */
+body.pf-landing .nav.is-scrolled {
+  background: linear-gradient(
+    180deg,
+    rgba(5, 4, 12, 0.78) 0%,
+    rgba(5, 4, 12, 0.45) 72%,
+    rgba(5, 4, 12, 0) 100%
+  );
+  border-bottom-color: transparent;
+  box-shadow: none;
+}
+body.pf-landing .nav::after {
+  height: 56px;
+  background: linear-gradient(
+    180deg,
+    rgba(5, 4, 12, 0.28) 0%,
+    rgba(5, 4, 12, 0) 100%
+  );
+}
+
 /* LOGO */
 .nav-logo {
   display: inline-flex;

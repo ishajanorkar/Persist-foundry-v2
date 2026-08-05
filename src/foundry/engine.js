@@ -209,11 +209,24 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     if (!img) return;
     const iw = img.naturalWidth,
       ih = img.naturalHeight;
+    if (!iw || !ih) return;
     const cWpx = canvas.width,
       cHpx = canvas.height;
     const cover = Math.max(cWpx / iw, cHpx / ih);
     // Overscan so radial zoom + mouse shift never flash edges
-    const overscan = 1 / (1 - RADIAL_ZOOM * 0.707);
+    let overscan = 1 / (1 - RADIAL_ZOOM * 0.707);
+    // Tall phones show the full 16:9 frame height — the baked dark ceiling
+    // reads as a hard band. Extra zoom + upward shift crops that top strip.
+    const tallMobile =
+      window.matchMedia("(max-width: 1024px) and (orientation: portrait)")
+        .matches ||
+      (window.matchMedia("(max-width: 1024px)").matches &&
+        cHpx / Math.max(1, cWpx) > 1.35);
+    let yBias = 0;
+    if (tallMobile) {
+      overscan *= 1.14;
+      yBias = -cHpx * 0.08;
+    }
     const scale = cover * overscan;
     const w = iw * scale,
       h = ih * scale;
@@ -223,7 +236,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     const my = mouseSmooth.y * amt;
     // Same as shader: warpedUv -= uMouse * 0.03  (screen UV → canvas px)
     const ox = -mx * MOUSE_UV_SHIFT * cWpx;
-    const oy = -my * MOUSE_UV_SHIFT * cHpx;
+    const oy = -my * MOUSE_UV_SHIFT * cHpx + yBias;
 
     const x = (cWpx - w) / 2 + ox,
       y = (cHpx - h) / 2 + oy;
@@ -355,18 +368,16 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         inner.style.opacity = o.toFixed(3);
         inner.style.transform = `translateY(${(1 - o) * 26}px)`;
       }
-      // Soft hero wash on mobile (match Funded-by depth); light on desktop
-      const scrimMul = i === 2 ? 0 : i === 0 ? (isMobile ? 0.7 : 0.45) : 0.95;
+      // Soft hero wash on mobile; light on desktop
+      const scrimMul =
+        i === 2 ? 0 : i === 0 ? (isMobile ? 0.4 : 0.45) : isMobile ? 0.55 : 0.95;
       if (scrim) scrim.style.opacity = (o * scrimMul).toFixed(3);
-      // Soft stage fade on hero / tether; light veil on backstory so baked
-      // stars read ~half as dense without going fully black.
-      // Mobile hero kept lighter — heavy stage-fade + scrolling scrim = hard seam.
-      if (i === 0) stageO = Math.max(stageO, o * (isMobile ? 0.22 : 0.18));
-      // Mobile Funded-by: keep footage brighter (was 0.92 — too black)
-      if (i === 1) stageO = Math.max(stageO, o * (isMobile ? 0.55 : 0.92));
+      // Mobile: stage-fade is CSS-disabled (was causing sharp top cut) — keep 0.
+      if (i === 0) stageO = Math.max(stageO, o * (isMobile ? 0 : 0.18));
+      if (i === 1) stageO = Math.max(stageO, o * (isMobile ? 0 : 0.92));
       if (i === 2) {
         thresholdO = o;
-        stageO = Math.max(stageO, o * (isMobile ? 0.45 : 0.38));
+        stageO = Math.max(stageO, o * (isMobile ? 0 : 0.38));
       }
     }
     if (stageFade) stageFade.style.opacity = stageO.toFixed(3);
