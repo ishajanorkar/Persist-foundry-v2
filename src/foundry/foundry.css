@@ -3077,8 +3077,9 @@ body.pf-landing ::selection {
 
 @media (max-width: 720px) {
   .pf-final-cta-container .pf-final-cta {
-    padding: clamp(3.25rem, 7vh, 4.5rem) var(--gutter)
-      clamp(3rem, 6vh, 4rem);
+    /* More space under the glass card before the footer join */
+    padding: clamp(3.5rem, 8vh, 5rem) var(--gutter)
+      clamp(4.5rem, 10vh, 6.5rem);
   }
   .pf-final-cta-container .pf-final-cta-panel {
     border-radius: 0;
@@ -4093,55 +4094,45 @@ body.pf-landing .pf ~ .footer {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  /* Keep mid-band open so the glass panel can frost the mesh (like About hands) */
+  /* Long soft fade — no hard mid-band seams */
   background: linear-gradient(
     180deg,
-    rgba(5, 6, 9, 0.35) 0%,
-    transparent 20%,
-    transparent 62%,
-    rgba(5, 6, 9, 0.45) 82%,
-    rgba(5, 6, 9, 0.92) 100%
+    rgba(5, 6, 9, 0.42) 0%,
+    rgba(5, 6, 9, 0.18) 18%,
+    rgba(5, 6, 9, 0.1) 40%,
+    rgba(5, 6, 9, 0.22) 62%,
+    rgba(5, 6, 9, 0.55) 78%,
+    rgba(5, 6, 9, 0.88) 100%
   );
 }
 
-/* Mobile: readable footer, but leave a clear window behind the CTA glass */
+/* Mobile: continuous veil + soft footer join (no hard horizontal cuts) */
 @media (max-width: 900px) {
   .pf-final-cta-container::after {
     background: linear-gradient(
       180deg,
-      rgba(5, 6, 9, 0.4) 0%,
-      rgba(5, 6, 9, 0.12) 16%,
-      transparent 32%,
-      transparent 54%,
-      rgba(5, 6, 9, 0.45) 70%,
-      rgba(5, 6, 9, 0.88) 86%,
-      rgba(5, 6, 9, 0.97) 100%
+      rgba(5, 6, 9, 0.55) 0%,
+      rgba(5, 6, 9, 0.28) 16%,
+      rgba(5, 6, 9, 0.18) 36%,
+      rgba(5, 6, 9, 0.28) 54%,
+      rgba(5, 6, 9, 0.52) 72%,
+      rgba(5, 6, 9, 0.88) 100%
     );
   }
-  .pf-final-cta-media__scrim {
-    background:
-      linear-gradient(
-        180deg,
-        rgba(5, 6, 9, 0.45) 0%,
-        rgba(5, 6, 9, 0.12) 26%,
-        rgba(5, 6, 9, 0.06) 46%,
-        rgba(5, 6, 9, 0.28) 68%,
-        rgba(5, 6, 9, 0.88) 100%
-      ),
-      radial-gradient(
-        ellipse 90% 70% at 50% 42%,
-        transparent 30%,
-        rgba(5, 6, 9, 0.35) 100%
-      );
-  }
+  .pf-final-cta-container .footer,
   .pf-final-cta-container .footer.footer--ref {
     background: linear-gradient(
       180deg,
       rgba(5, 6, 9, 0) 0%,
-      rgba(5, 6, 9, 0.55) 18%,
-      rgba(5, 6, 9, 0.92) 55%,
-      rgba(5, 6, 9, 1) 100%
+      rgba(5, 6, 9, 0.28) 18%,
+      rgba(5, 6, 9, 0.62) 42%,
+      rgba(5, 6, 9, 0.9) 72%,
+      #050609 100%
     );
+    border-top: none;
+    /* Extra runway so the join never reads as a hard cut under the card */
+    margin-top: 0;
+    padding-top: clamp(1.25rem, 3.5vh, 2rem);
   }
   .footer.footer--ref .footer-ref__tagline,
   .footer.footer--ref .footer-nav-link {
@@ -4186,12 +4177,11 @@ body.pf-landing .pf ~ .footer {
 }
 
 /*
- * Mobile: soft full-bleed ambient (blurred cover) + sharp mid plate.
- * Plate sized to ~viewport width / comfortable height — not a thin strip,
- * not phone-height cover-zoom (that is what looked soft/blurry).
+ * Mobile: one sharp full-bleed video + dark gradient scrim.
+ * (Blurred fill layer was making the mesh look soft.)
  */
 .pf-final-cta-background--fill {
-  display: none;
+  display: none !important;
 }
 
 @media (max-width: 900px) {
@@ -4199,39 +4189,26 @@ body.pf-landing .pf ~ .footer {
     background: #050609;
   }
 
-  .pf-final-cta-background--fill {
-    display: block;
-    position: absolute;
+  .pf-final-cta-background {
     inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
     height: 100%;
+    aspect-ratio: auto;
+    max-width: none;
+    max-height: none;
     object-fit: cover;
     object-position: center 42%;
-    z-index: 0;
-    opacity: 0.92;
-    filter: blur(28px) saturate(1.15);
-    transform: scale(1.18);
-    transform-origin: center center;
-    pointer-events: none;
-  }
-
-  .pf-final-cta-background {
-    inset: auto;
-    top: 46%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
-    /* Height-led plate ≈ half viewport — presence without cover-zoom blur */
-    width: auto;
-    height: min(50vh, 22.5rem);
-    aspect-ratio: 16 / 9;
-    max-width: none;
-    object-fit: cover;
-    object-position: center center;
-    transform: translate(-50%, -50%);
+    /* Keep native clarity — no blur, no upscale zoom */
+    transform: none;
     transform-origin: center center;
     filter: none;
     z-index: 1;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
   .pf-final-cta-background.is-front {
@@ -4243,18 +4220,28 @@ body.pf-landing .pf ~ .footer {
 
   .pf-final-cta-media__scrim {
     z-index: 3;
+    /* Dark gradient over sharp mesh — depth + readable type */
+    background:
+      linear-gradient(
+        180deg,
+        rgba(5, 6, 9, 0.72) 0%,
+        rgba(5, 6, 9, 0.42) 18%,
+        rgba(5, 6, 9, 0.28) 38%,
+        rgba(5, 6, 9, 0.38) 58%,
+        rgba(5, 6, 9, 0.72) 78%,
+        rgba(5, 6, 9, 0.94) 100%
+      ),
+      radial-gradient(
+        ellipse 100% 70% at 50% 40%,
+        rgba(5, 6, 9, 0.05) 0%,
+        rgba(5, 6, 9, 0.45) 100%
+      );
   }
 }
 
 @media (max-width: 600px) {
   .pf-final-cta-background {
-    top: 44%;
-    height: min(46vh, 21rem);
-  }
-
-  .pf-final-cta-background--fill {
-    filter: blur(22px) saturate(1.12);
-    transform: scale(1.14);
+    object-position: center 40%;
   }
 }
 
@@ -4268,20 +4255,20 @@ body.pf-landing .pf ~ .footer {
   position: absolute;
   inset: 0;
   z-index: 1;
-  /* Soft vignette — mid-band stays open so .pf-final-cta-panel can frost the mesh */
+  /* Even soft wash — avoid sudden opacity steps that read as cuts */
   background:
     linear-gradient(
       180deg,
-      rgba(5, 6, 9, 0.5) 0%,
-      rgba(5, 6, 9, 0.14) 26%,
-      rgba(5, 6, 9, 0.06) 48%,
-      rgba(5, 6, 9, 0.28) 72%,
-      rgba(5, 6, 9, 0.86) 100%
+      rgba(5, 6, 9, 0.48) 0%,
+      rgba(5, 6, 9, 0.2) 24%,
+      rgba(5, 6, 9, 0.14) 48%,
+      rgba(5, 6, 9, 0.32) 70%,
+      rgba(5, 6, 9, 0.82) 100%
     ),
     radial-gradient(
-      ellipse 90% 70% at 50% 42%,
-      transparent 28%,
-      rgba(5, 6, 9, 0.32) 100%
+      ellipse 100% 75% at 50% 42%,
+      transparent 30%,
+      rgba(5, 6, 9, 0.3) 100%
     );
 }
 

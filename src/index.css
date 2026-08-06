@@ -4377,8 +4377,8 @@ body.pf-landing .nav::after {
   background: linear-gradient(
     180deg,
     rgba(5, 6, 9, 0) 0%,
-    rgba(5, 6, 9, 0.72) 28%,
-    rgba(5, 6, 9, 0.96) 60%,
+    rgba(5, 6, 9, 0.45) 32%,
+    rgba(5, 6, 9, 0.88) 68%,
     #050609 100%
   );
   backdrop-filter: none;
@@ -4391,11 +4391,13 @@ body.pf-landing .nav::after {
     border-top: none;
     background: linear-gradient(
       180deg,
-      rgba(5, 6, 9, 0.15) 0%,
-      rgba(5, 6, 9, 0.85) 22%,
-      #050609 55%,
+      rgba(5, 6, 9, 0) 0%,
+      rgba(5, 6, 9, 0.25) 20%,
+      rgba(5, 6, 9, 0.55) 45%,
+      rgba(5, 6, 9, 0.88) 75%,
       #050609 100%
     );
+    padding-top: clamp(1.5rem, 4vh, 2.25rem);
   }
 }
 
@@ -5748,15 +5750,35 @@ body.pf-landing .nav::after {
     transform: scaleX(1);
   }
 
-  /* ?? 7. Footer subscribe button ? prevent text clipping ?? */
+  /* ?? 7. Footer subscribe — stronger field on mobile over dark/mesh bg ?? */
+  .footer-newsletter {
+    background: rgba(199, 184, 245, 0.14);
+    border: 1px solid rgba(199, 184, 245, 0.42);
+    border-radius: 8px;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.1) inset,
+      0 8px 22px rgba(0, 0, 0, 0.35);
+  }
+  .footer-newsletter:focus-within {
+    background: rgba(199, 184, 245, 0.18);
+    border-color: rgba(120, 84, 213, 0.75);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.12) inset,
+      0 0 0 1px rgba(120, 84, 213, 0.28),
+      0 10px 26px rgba(0, 0, 0, 0.4);
+  }
   .footer-newsletter-btn {
     padding: 12px 12px;
     font-size: 9px;
     letter-spacing: 0.14em;
   }
   .footer-newsletter-input {
-    padding: 12px 10px;
-    font-size: 10px;
+    padding: 12px 12px;
+    font-size: 11px;
+    color: rgba(250, 248, 255, 0.96);
+  }
+  .footer-newsletter-input::placeholder {
+    color: rgba(199, 184, 245, 0.72);
   }
 }
 
