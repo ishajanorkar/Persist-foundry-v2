@@ -3455,18 +3455,75 @@ body.pf-landing .pf ~ .footer {
   }
 }
 
-/* ---------- Portfolio — 50/50 full-viewport sticky stack ---------- */
+/* ---------- Portfolio — sticky left + stack over live project atmosphere ---------- */
 .pfolio {
   position: relative;
   /* Above Unfair Start so parallax cards never paint over this section */
   z-index: calc(var(--z-overlay) + 1);
-  background: #000000;
+  background: #07050f;
   border-top: 1px solid var(--pf-line-soft);
 }
+
+/* Viewport-locked blurred project thumb + glass veil */
+.pfolio__atmosphere {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  width: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.pfolio__bg {
+  position: absolute;
+  inset: 0;
+}
+.pfolio__bg-slide {
+  position: absolute;
+  inset: -14%;
+  background-color: #1a0f2e;
+  background-image: var(--pfolio-thumb);
+  background-size: cover;
+  background-position: center;
+  filter: blur(48px) saturate(1.2) brightness(0.62);
+  transform: scale(1.14);
+  opacity: 0;
+  transition:
+    opacity 1.05s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.25s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1.05s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform, filter;
+}
+.pfolio__bg-slide.is-active {
+  opacity: 1;
+  filter: blur(40px) saturate(1.45) brightness(0.78);
+  transform: scale(1.2);
+}
+.pfolio__glass {
+  position: absolute;
+  inset: 0;
+  /* One shared frosted pane across left + right (exact reference treatment) */
+  background:
+    linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.04) 36%,
+      rgba(40, 24, 72, 0.18) 100%
+    ),
+    rgba(48, 32, 78, 0.22);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
 .pfolio__inner {
+  position: relative;
+  z-index: 1;
   max-width: none;
   width: 100%;
-  margin: 0;
+  margin: -100vh 0 0;
+  margin-top: -100svh;
   padding: 0;
 }
 .pfolio__layout {
@@ -3477,7 +3534,7 @@ body.pf-landing .pf ~ .footer {
   width: 100%;
 }
 
-/* Left rail — full viewport sticky, copy vertically centered */
+/* Left rail — transparent over the shared atmosphere (no seam / no second glass) */
 .pfolio__aside {
   position: sticky;
   top: 0;
@@ -3486,20 +3543,21 @@ body.pf-landing .pf ~ .footer {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center; /* vertical center */
-  /* left edge matches Beats / Threshold / nav (--gutter) */
+  justify-content: center;
   padding: 0 clamp(1.25rem, 3vw, 2.5rem) 0 var(--gutter);
   box-sizing: border-box;
-  background: #000000;
-  /* full-viewport divider */
-  border-right: 1px solid rgba(255, 255, 255, 0.16);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   z-index: 4;
 }
 .pfolio__aside-inner {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.15rem;
+  gap: 1.35rem;
   width: 100%;
   max-width: 22rem;
   margin: 0;
@@ -3511,28 +3569,21 @@ body.pf-landing .pf ~ .footer {
   font-size: 50px;
   line-height: 1.1;
   letter-spacing: -0.04em;
-  text-transform: capitalize;
+  text-transform: none;
   color: #ffffff;
   margin: 0;
   max-width: 11ch;
   text-wrap: balance;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.35);
 }
 .pfolio__sub {
-  font-family: "Montserrat", var(--pf-display), system-ui, sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 14.21px;
-  line-height: 1.35;
-  letter-spacing: 0;
-  color: rgba(210, 212, 220, 0.88);
-  margin: 0;
-  max-width: 34ch;
+  display: none;
 }
 .pfolio__cta {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  margin-top: 0.35rem;
+  margin-top: 0.15rem;
   padding-bottom: 0.25rem;
   font-family: "Montserrat", var(--pf-display), system-ui, sans-serif;
   font-weight: 500;
@@ -3554,8 +3605,7 @@ body.pf-landing .pf ~ .footer {
   line-height: 1;
 }
 
-/* Right column — each card owns one full viewport so the next
-   never peeks until the user scrolls into it */
+/* Right column — each card owns one full viewport */
 .pfolio-stack {
   position: relative;
   display: flex;
@@ -3577,17 +3627,56 @@ body.pf-landing .pf ~ .footer {
   justify-content: center;
   gap: 1.1rem;
   margin: 0;
-  /* Extra top/bottom padding so the card content breathes and
-     stays clear of the fixed nav while filling the viewport */
   padding: clamp(5.5rem, 11vh, 7.5rem) var(--gutter)
     clamp(2.75rem, 7vh, 4.5rem) clamp(1.25rem, 3vw, 2.5rem);
   box-sizing: border-box;
-  background: #000000;
+  background: transparent;
   border: 0;
   border-radius: 0;
   box-shadow: none;
   overflow: hidden;
-  isolation: isolate;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  /* Micro fade — short enough to avoid readable text stack */
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0s;
+}
+.pfolio-card.is-passed {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0s linear 0.38s;
+}
+.pfolio-card__media,
+.pfolio-card__body {
+  transition:
+    opacity 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.pfolio-card.is-active .pfolio-card__media,
+.pfolio-card.is-active .pfolio-card__body {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+/* Soft settle-in when a card becomes the focus */
+.pfolio-card:not(.is-active):not(.is-passed) .pfolio-card__media,
+.pfolio-card:not(.is-active):not(.is-passed) .pfolio-card__body {
+  opacity: 0.92;
+  transform: translate3d(0, 10px, 0);
+}
+.pfolio-card.is-passed .pfolio-card__media,
+.pfolio-card.is-passed .pfolio-card__body {
+  opacity: 0;
+  transform: translate3d(0, -8px, 0);
+  transition:
+    opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.36s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .pfolio-card:nth-child(1) {
   z-index: 1;
@@ -3599,7 +3688,6 @@ body.pf-landing .pf ~ .footer {
   z-index: 3;
 }
 
-/* sharp rectangular thumbnails — shorter so meta fits cleanly */
 .pfolio-card__media {
   position: relative;
   display: block;
@@ -3608,8 +3696,11 @@ body.pf-landing .pf ~ .footer {
   aspect-ratio: 16 / 9;
   max-height: min(42vh, 380px);
   overflow: hidden;
-  border-radius: 0;
-  background: #111;
+  border-radius: 10px;
+  background: rgba(8, 6, 16, 0.45);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 18px 48px rgba(0, 0, 0, 0.35);
 }
 .pfolio-card__thumb {
   position: absolute;
@@ -3619,7 +3710,8 @@ body.pf-landing .pf ~ .footer {
   object-fit: cover;
   transition: transform 0.7s var(--ease-out);
 }
-.pfolio-card:hover .pfolio-card__thumb {
+.pfolio-card:hover .pfolio-card__thumb,
+.pfolio-card.is-active .pfolio-card__thumb {
   transform: scale(1.025);
 }
 
@@ -3629,7 +3721,7 @@ body.pf-landing .pf ~ .footer {
   gap: 0.7rem;
   flex: 0 0 auto;
   padding: 0;
-  background: #000000;
+  background: transparent;
 }
 .pfolio-card__name {
   font-family: "Montserrat", var(--pf-display), system-ui, sans-serif;
@@ -3641,6 +3733,7 @@ body.pf-landing .pf ~ .footer {
   text-transform: uppercase;
   color: #ffffff;
   margin: 0;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
 }
 .pfolio-card__meta {
   display: flex;
@@ -3658,7 +3751,8 @@ body.pf-landing .pf ~ .footer {
   font-size: 14.21px;
   line-height: 1.35;
   letter-spacing: 0;
-  color: rgba(210, 212, 220, 0.88);
+  color: rgba(236, 234, 245, 0.9);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
 }
 .pfolio-card__explore {
   flex: 0 0 auto;
@@ -3693,6 +3787,16 @@ body.pf-landing .pf ~ .footer {
 }
 
 @media (max-width: 1024px) {
+  /* No scroll-synced atmosphere — each card carries its own static bg */
+  .pfolio__atmosphere {
+    display: none;
+  }
+  .pfolio__inner {
+    margin-top: 0;
+  }
+  .pfolio {
+    background: #07050f;
+  }
   .pfolio__layout {
     grid-template-columns: 1fr;
   }
@@ -3702,22 +3806,26 @@ body.pf-landing .pf ~ .footer {
     height: auto;
     min-height: 0;
     padding: clamp(3.25rem, 8vh, 4.5rem) var(--gutter) 1.25rem;
-    border-right: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    border: 0;
     justify-content: flex-start;
     align-items: flex-start;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
   }
   .pfolio__aside-inner {
     max-width: 32rem;
+    gap: 1rem;
   }
   .pfolio__title {
     font-size: clamp(1.75rem, 5vw, 2.35rem);
-  }
-  .pfolio__sub {
-    font-size: clamp(0.85rem, 2.2vw, 0.95rem);
+    text-shadow: none;
   }
   .pfolio-stack {
-    gap: clamp(1.35rem, 3.5vh, 2rem);
+    gap: clamp(1.25rem, 3vh, 1.75rem);
+    padding: 0 var(--gutter) clamp(2rem, 5vh, 3rem);
+    box-sizing: border-box;
   }
   .pfolio-card,
   .pfolio-card:nth-child(1),
@@ -3728,33 +3836,103 @@ body.pf-landing .pf ~ .footer {
     height: auto;
     min-height: 0;
     justify-content: flex-start;
-    padding: 1.1rem var(--gutter) 1.5rem;
-    gap: 0.75rem;
+    padding: 1.15rem 1.15rem 1.35rem;
+    gap: 0.85rem;
+    border-radius: 14px;
+    overflow: hidden;
+    isolation: isolate;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transition: none;
+    /* Static frosted card over its own project thumb */
+    background:
+      linear-gradient(
+        165deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(12, 10, 24, 0.55) 48%,
+        rgba(8, 6, 16, 0.72) 100%
+      ),
+      rgba(16, 12, 28, 0.55);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 16px 40px rgba(0, 0, 0, 0.35);
   }
-  /* Keep a true 16:9 frame — width capped so height stays compact */
+  .pfolio-card::before {
+    content: "";
+    position: absolute;
+    inset: -8%;
+    z-index: 0;
+    background-image: var(--pfolio-thumb);
+    background-size: cover;
+    background-position: center;
+    filter: blur(28px) saturate(1.35) brightness(0.7);
+    transform: scale(1.12);
+    pointer-events: none;
+  }
+  .pfolio-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      linear-gradient(
+        160deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(20, 14, 40, 0.35) 45%,
+        rgba(8, 6, 16, 0.55) 100%
+      );
+    backdrop-filter: blur(14px) saturate(130%);
+    -webkit-backdrop-filter: blur(14px) saturate(130%);
+    pointer-events: none;
+  }
+  .pfolio-card > * {
+    position: relative;
+    z-index: 1;
+  }
+  .pfolio-card.is-passed {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+  .pfolio-card__media,
+  .pfolio-card__body,
+  .pfolio-card.is-active .pfolio-card__media,
+  .pfolio-card.is-active .pfolio-card__body,
+  .pfolio-card:not(.is-active):not(.is-passed) .pfolio-card__media,
+  .pfolio-card:not(.is-active):not(.is-passed) .pfolio-card__body,
+  .pfolio-card.is-passed .pfolio-card__media,
+  .pfolio-card.is-passed .pfolio-card__body {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
   .pfolio-card__media {
     position: relative;
     width: 100%;
-    max-width: min(100%, 34rem);
+    max-width: none;
     aspect-ratio: 16 / 9;
     height: auto;
     max-height: none;
     flex: 0 0 auto;
-    border-radius: 4px;
+    border-radius: 10px;
   }
   .pfolio-card__body {
     display: flex;
     flex-direction: column;
     gap: 0.55rem;
     width: 100%;
-    max-width: min(100%, 34rem);
+    max-width: none;
+    background: transparent;
   }
   .pfolio-card__name {
     font-size: clamp(1.05rem, 3.2vw, 1.3rem);
     line-height: 1.1;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
   }
   .pfolio-card__desc {
     font-size: clamp(0.78rem, 2vw, 0.88rem);
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
   }
   .pfolio-card__meta {
     flex-direction: column;
@@ -3769,10 +3947,22 @@ body.pf-landing .pf ~ .footer {
     max-width: none;
   }
   .pfolio-stack {
-    gap: clamp(1.5rem, 4vh, 2.25rem);
+    gap: 1.15rem;
+    padding-bottom: 2.25rem;
+  }
+  .pfolio-card,
+  .pfolio-card:nth-child(1),
+  .pfolio-card:nth-child(2),
+  .pfolio-card:nth-child(3) {
+    padding: 1rem 1rem 1.2rem;
+    gap: 0.7rem;
+    border-radius: 12px;
+  }
+  .pfolio-card::before {
+    filter: blur(22px) saturate(1.3) brightness(0.68);
   }
   .pfolio-card__media {
-    border-radius: 0;
+    border-radius: 8px;
     max-width: 100%;
     aspect-ratio: 16 / 9;
     height: auto;
@@ -3782,12 +3972,20 @@ body.pf-landing .pf ~ .footer {
   .pfolio-card__body {
     max-width: 100%;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pfolio__bg-slide {
+    transition: opacity 0.2s ease;
+    filter: blur(36px) saturate(1.25) brightness(0.7);
+    transform: scale(1.16);
+  }
   .pfolio-card,
-  .pfolio-card:nth-child(1),
-  .pfolio-card:nth-child(2),
-  .pfolio-card:nth-child(3) {
-    padding: 1.15rem var(--gutter) 1.6rem;
-    gap: 0.7rem;
+  .pfolio-card.is-passed,
+  .pfolio-card__media,
+  .pfolio-card__body {
+    transition: none !important;
+    transform: none !important;
   }
 }
 

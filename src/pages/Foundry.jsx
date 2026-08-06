@@ -39,7 +39,83 @@ export default function Foundry() {
       card.style.filter = "";
     });
 
+    // Sync section background thumb + hide passed sticky cards (no text stack)
+    const section = document.getElementById("portfolio");
+    const slides = section
+      ? Array.from(section.querySelectorAll(".pfolio__bg-slide"))
+      : [];
+    let activeIdx = -1;
+    let raf = 0;
+
+    const setActive = (idx) => {
+      if (idx === activeIdx || idx < 0 || idx >= stackCards.length) return;
+      activeIdx = idx;
+      stackCards.forEach((card, i) => {
+        const isActive = i === idx;
+        const isPassed = i < idx;
+        card.classList.toggle("is-active", isActive);
+        card.classList.toggle("is-passed", isPassed);
+        card.setAttribute("aria-hidden", isPassed ? "true" : "false");
+        card.inert = isPassed;
+      });
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("is-active", i === idx);
+      });
+    };
+
+    const syncActiveFromScroll = () => {
+      raf = 0;
+      if (!stackCards.length) return;
+
+      // Mobile / tablet: static cards — no sticky handoff or bg-swap animation
+      const stickyDesktop = window.matchMedia("(min-width: 1025px)").matches;
+      if (!stickyDesktop) {
+        if (activeIdx !== -1) {
+          activeIdx = -1;
+          stackCards.forEach((card) => {
+            card.classList.remove("is-passed");
+            card.classList.remove("is-active");
+            card.inert = false;
+            card.removeAttribute("aria-hidden");
+          });
+          // Keep first slide lit so desktop resize back in is predictable
+          slides.forEach((slide, i) => {
+            slide.classList.toggle("is-active", i === 0);
+          });
+        }
+        return;
+      }
+
+      // Slightly earlier than mid-stick so the fade starts before bodies collide
+      const switchLine = Math.round(window.innerHeight * 0.58);
+      let next = 0;
+      stackCards.forEach((card, i) => {
+        if (card.getBoundingClientRect().top <= switchLine) next = i;
+      });
+      setActive(next);
+    };
+
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(syncActiveFromScroll);
+    };
+
+    syncActiveFromScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    // Foundry also drives scroll via ScrollTrigger — keep in sync on those ticks
+    const onStUpdate = () => onScroll();
+    gsap.ticker.add(onStUpdate);
+
     return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      gsap.ticker.remove(onStUpdate);
+      stackCards.forEach((card) => {
+        card.inert = false;
+        card.removeAttribute("aria-hidden");
+      });
       cleanup();
       document.body.classList.remove("pf-landing");
     };
@@ -497,18 +573,40 @@ export default function Foundry() {
         {/* Dock settle runway — keeps the mark parked in the nav a beat longer */}
         <div className="dock-settle" aria-hidden="true" />
 
-        {/* PORTFOLIO — sticky left copy + stacking project cards */}
+        {/* PORTFOLIO — sticky left copy + stacking cards over live project bg */}
         <section className="pfolio" id="portfolio">
+          <div className="pfolio__atmosphere" aria-hidden="true">
+            <div className="pfolio__bg">
+              <div
+                className="pfolio__bg-slide is-active"
+                data-bg="0"
+                style={{
+                  "--pfolio-thumb": "url(/assets/opendroid-thumbnail.webp)",
+                }}
+              />
+              <div
+                className="pfolio__bg-slide"
+                data-bg="1"
+                style={{
+                  "--pfolio-thumb": "url(/assets/facesearch-ai-thumbnail.webp)",
+                }}
+              />
+              <div
+                className="pfolio__bg-slide"
+                data-bg="2"
+                style={{
+                  "--pfolio-thumb": "url(/assets/swissmote-thimbnaail.webp)",
+                }}
+              />
+            </div>
+            <div className="pfolio__glass" />
+          </div>
+
           <div className="pfolio__inner">
             <div className="pfolio__layout">
               <aside className="pfolio__aside">
                 <div className="pfolio__aside-inner">
-                  <h2 className="pfolio__title">Turning ideas into impact.</h2>
-                  <p className="pfolio__sub">
-                    30 companies launched — and more on the way. A look at
-                    the ventures we&apos;ve built with founders, from first
-                    sketch to something that ships.
-                  </p>
+                  <h2 className="pfolio__title">Turning Ideas Into Impact.</h2>
                   <Link className="pfolio__cta" to="/portfolio">
                     View Portfolio <span aria-hidden="true">↗</span>
                   </Link>
@@ -516,7 +614,13 @@ export default function Foundry() {
               </aside>
 
               <div className="pfolio-stack" id="pfolioStack">
-                <article className="pfolio-card" data-row="0">
+                <article
+                  className="pfolio-card is-active"
+                  data-row="0"
+                  style={{
+                    "--pfolio-thumb": "url(/assets/opendroid-thumbnail.webp)",
+                  }}
+                >
                   <a
                     className="pfolio-card__media"
                     href="https://opendroids.com/"
@@ -550,7 +654,14 @@ export default function Foundry() {
                   </div>
                 </article>
 
-                <article className="pfolio-card" data-row="1">
+                <article
+                  className="pfolio-card"
+                  data-row="1"
+                  style={{
+                    "--pfolio-thumb":
+                      "url(/assets/facesearch-ai-thumbnail.webp)",
+                  }}
+                >
                   <a
                     className="pfolio-card__media"
                     href="https://facesearchai.com/"
@@ -585,7 +696,13 @@ export default function Foundry() {
                   </div>
                 </article>
 
-                <article className="pfolio-card" data-row="2">
+                <article
+                  className="pfolio-card"
+                  data-row="2"
+                  style={{
+                    "--pfolio-thumb": "url(/assets/swissmote-thimbnaail.webp)",
+                  }}
+                >
                   <a
                     className="pfolio-card__media"
                     href="https://swissmote.com/"
