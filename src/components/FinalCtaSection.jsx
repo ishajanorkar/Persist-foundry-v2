@@ -16,6 +16,8 @@ export default function FinalCtaSection({ footer = false }) {
   const mediaRef = useRef(null);
   const videoARef = useRef(null);
   const videoBRef = useRef(null);
+  /** Soft full-bleed layer on mobile only (desync OK — it's blurred) */
+  const fillRef = useRef(null);
 
   useEffect(() => {
     const finalCta = document.getElementById("apply");
@@ -47,6 +49,7 @@ export default function FinalCtaSection({ footer = false }) {
   useEffect(() => {
     const a = videoARef.current;
     const b = videoBRef.current;
+    const fill = fillRef.current;
     const media = mediaRef.current;
     if (!a || !b || !media) return;
 
@@ -56,8 +59,12 @@ export default function FinalCtaSection({ footer = false }) {
     if (reduceMotion) {
       a.pause();
       b.pause();
+      fill?.pause();
       return;
     }
+
+    const mobileMq = window.matchMedia("(max-width: 900px)");
+    let useFill = mobileMq.matches;
 
     let active = a;
     let idle = b;
@@ -68,6 +75,7 @@ export default function FinalCtaSection({ footer = false }) {
     let fadeStart = 0;
 
     const playSafe = (el) => {
+      if (!el) return;
       const p = el.play();
       if (p && typeof p.catch === "function") p.catch(() => {});
     };
@@ -187,6 +195,7 @@ export default function FinalCtaSection({ footer = false }) {
     const syncPlayback = () => {
       if (inView && !document.hidden) {
         playSafe(active);
+        if (useFill) playSafe(fill);
         if (!swapping) idle.pause();
         startWatch();
       } else {
@@ -195,9 +204,17 @@ export default function FinalCtaSection({ footer = false }) {
         swapping = false;
         active.pause();
         idle.pause();
+        fill?.pause();
         setLayer(active, idle);
       }
     };
+
+    const onMq = () => {
+      useFill = mobileMq.matches;
+      if (!useFill) fill?.pause();
+      syncPlayback();
+    };
+    mobileMq.addEventListener?.("change", onMq);
 
     const onEnded = (e) => {
       if (e.target !== active) return;
@@ -226,6 +243,7 @@ export default function FinalCtaSection({ footer = false }) {
 
     a.preload = "none";
     b.preload = "none";
+    if (fill) fill.preload = "none";
     let warmed = false;
     const warm = () => {
       if (warmed) return;
@@ -234,6 +252,10 @@ export default function FinalCtaSection({ footer = false }) {
       b.preload = "auto";
       a.load();
       b.load();
+      if (fill && useFill) {
+        fill.preload = "auto";
+        fill.load();
+      }
     };
 
     const once = new IntersectionObserver(
@@ -251,6 +273,7 @@ export default function FinalCtaSection({ footer = false }) {
       stopFade();
       io.disconnect();
       once.disconnect();
+      mobileMq.removeEventListener?.("change", onMq);
       document.removeEventListener("visibilitychange", syncPlayback);
       a.removeEventListener("ended", onEnded);
       b.removeEventListener("ended", onEnded);
@@ -258,12 +281,25 @@ export default function FinalCtaSection({ footer = false }) {
       b.removeEventListener("timeupdate", onTimeUpdate);
       a.pause();
       b.pause();
+      fill?.pause();
     };
   }, []);
 
   return (
     <div className="pf-final-cta-container">
       <div className="pf-final-cta-media" aria-hidden="true" ref={mediaRef}>
+        {/* Mobile ambient fill — full-bleed + blur; loop desync is fine */}
+        <video
+          ref={fillRef}
+          className="pf-final-cta-background--fill"
+          src={CTA_VIDEO_SRC}
+          muted
+          loop
+          playsInline
+          preload="none"
+          disablePictureInPicture
+          disableRemotePlayback
+        />
         <video
           ref={videoARef}
           className="pf-final-cta-background is-front"

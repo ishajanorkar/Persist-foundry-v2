@@ -805,14 +805,18 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     // the ring clears the centered heading above + detail panel below.
     let D;
     if (vw <= 900) {
-      // Mobile stack: left heading above, left detail below, wheel in the middle
-      const headingBudget = vw <= 640 ? 150 : 140;
-      const detailBudget = vw <= 640 ? 200 : 185;
-      const availH = Math.max(200, vh - headingBudget - detailBudget - 16);
-      const availW = vw * (vw <= 640 ? 0.92 : 0.72);
-      const scale = vw <= 640 ? 0.58 : 0.44;
+      // Mobile stack: heading above, detail below, wheel centered — size up so
+      // segment labels fit inside the petals while the ring rolls.
+      const headingBudget = vw <= 640 ? 128 : 132;
+      const detailBudget = vw <= 640 ? 172 : 168;
+      const availH = Math.max(240, vh - headingBudget - detailBudget - 12);
+      const availW = vw * (vw <= 640 ? 0.94 : 0.84);
+      const scale = vw <= 640 ? 0.82 : 0.62;
       D = Math.round(Math.min(vmin * scale, availH, availW));
-      D = Math.max(vw <= 640 ? 220 : 200, Math.min(D, vw <= 640 ? 300 : 280));
+      D = Math.max(
+        vw <= 640 ? 280 : 240,
+        Math.min(D, vw <= 640 ? 400 : 360),
+      );
     } else if (vw < 1100) {
       D = Math.round(vmin * 0.42);
     } else if (vw < 1280) {
@@ -826,7 +830,10 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     const Ri = Ro * 0.52;
     const cx = Ro,
       cy = Ro;
-    const rc = Ri + (Ro - Ri) * 0.52;
+    // Mobile: seat icon+label a touch more inward so copy stays inside the
+    // annular clip while the wheel rolls (outer edge was clipping long titles).
+    const rcFactor = vw <= 900 ? 0.46 : 0.52;
+    const rc = Ri + (Ro - Ri) * rcFactor;
     orbitDonut.style.width = orbitDonut.style.height = D + "px";
     if (orbitRing) {
       orbitRing.style.width = orbitRing.style.height = D + "px";
@@ -1206,12 +1213,12 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         }
         /* Keep wheel at true viewport center so the P locks to the glass orb */
         .orbit-donut{top:50%;left:50%;transform:translate(-50%,-50%);}
-        .orbit-petal__icon{width:20px;height:20px;}
+        .orbit-petal__icon{width:22px;height:22px;}
         .orbit-petal__label{
-          font-size:clamp(0.52rem,2.4vw,0.64rem);
-          line-height:1.15;max-width:10ch;letter-spacing:-0.03em;
+          font-size:clamp(0.58rem,2.7vw,0.72rem);
+          line-height:1.12;max-width:11ch;letter-spacing:-0.03em;
         }
-        .orbit-petal__content{gap:7px;}
+        .orbit-petal__content{gap:6px;}
         .orbit-petal{
           --orbit-active-fill:radial-gradient(circle at 50% 50%,
             rgb(28,18,58) 0%,
@@ -1248,8 +1255,9 @@ export default function initFoundry({ base = "/foundry" } = {}) {
           -webkit-backdrop-filter:blur(18px) saturate(135%);
           backdrop-filter:blur(18px) saturate(135%);
         }
-        .orbit-petal__icon{width:18px;height:18px;}
-        .orbit-petal__label{font-size:clamp(0.5rem,2.3vw,0.6rem);max-width:10ch;}
+        .orbit-petal__icon{width:20px;height:20px;}
+        .orbit-petal__label{font-size:clamp(0.56rem,2.6vw,0.7rem);max-width:11ch;line-height:1.12;}
+        .orbit-petal__content{gap:5px;}
       }`;
     document.head.appendChild(st);
     injectedStyle = st;

@@ -377,7 +377,7 @@ const TEAM = [
   },
   {
     name: 'Sreeja Roy Chowdhury',
-    role: 'UI/UX Designer',
+    role: 'Executive Graphic Designer',
     bio: null,
     x: null,
     li: 'sreeja-roy-c',
@@ -385,7 +385,7 @@ const TEAM = [
   },
   {
     name: 'Swathy Stanley',
-    role: 'UI/UX Designer',
+    role: 'Executive Graphic Designer',
     bio: null,
     x: null,
     li: 'swathystanley',
