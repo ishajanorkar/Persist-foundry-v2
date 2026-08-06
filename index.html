@@ -97,7 +97,12 @@
     <script>
       (function () {
         var path = location.pathname.replace(/\/+$/, "") || "/";
-        if (path === "/startupathon" || path.indexOf("/startupathon/") === 0) {
+        if (
+          path === "/startupathon" ||
+          path.indexOf("/startupathon/") === 0 ||
+          path === "/persist-portfolio/startupathon" ||
+          path.indexOf("/persist-portfolio/startupathon/") === 0
+        ) {
           location.replace("https://startupathon.persist.org/");
         }
       })();

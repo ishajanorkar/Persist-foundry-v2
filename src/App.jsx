@@ -62,7 +62,11 @@ function Layout() {
   const { pathname } = useLocation()
   const foundryHome = pathname === '/'
   const isLegal = pathname === '/terms-of-service' || pathname === '/privacy-policy'
-  const isExternalRedirect = pathname === '/startupathon' || pathname.startsWith('/startupathon/')
+  const isExternalRedirect =
+    pathname === '/startupathon' ||
+    pathname.startsWith('/startupathon/') ||
+    pathname === '/persist-portfolio/startupathon' ||
+    pathname.startsWith('/persist-portfolio/startupathon/')
   const known = isKnownRoute(pathname)
   const showGlobalCta = known && !foundryHome && pathname !== '/legacy' && !isLegal
 
@@ -86,6 +90,14 @@ function Layout() {
           />
           <Route
             path="/startupathon/*"
+            element={<ExternalRedirect to={STARTUPATHON_URL} />}
+          />
+          <Route
+            path="/persist-portfolio/startupathon"
+            element={<ExternalRedirect to={STARTUPATHON_URL} />}
+          />
+          <Route
+            path="/persist-portfolio/startupathon/*"
             element={<ExternalRedirect to={STARTUPATHON_URL} />}
           />
           <Route

@@ -14,6 +14,21 @@
       "source": "/startupathon/:path*",
       "destination": "https://startupathon.persist.org/:path*",
       "permanent": true
+    },
+    {
+      "source": "/persist-portfolio/startupathon",
+      "destination": "https://startupathon.persist.org/",
+      "permanent": true
+    },
+    {
+      "source": "/persist-portfolio/startupathon/",
+      "destination": "https://startupathon.persist.org/",
+      "permanent": true
+    },
+    {
+      "source": "/persist-portfolio/startupathon/:path*",
+      "destination": "https://startupathon.persist.org/:path*",
+      "permanent": true
     }
   ],
   "rewrites": [
