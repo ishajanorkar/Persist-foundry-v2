@@ -808,7 +808,11 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   function layoutDonut() {
     if (!orbitDonut) return;
     const vw = window.innerWidth;
-    const vh = window.innerHeight;
+    // Prefer the visual viewport height — on mobile the URL/toolbar chrome
+    // can shrink the visible area without firing a window "resize" event,
+    // leaving the wheel sized for more room than is actually on screen and
+    // pushing the detail panel into an overlap with the ring.
+    const vh = window.visualViewport?.height || window.innerHeight;
     const vmin = Math.min(vw, vh);
     // Desktop: scale from vmin. Tablet/phone: also respect height budget so
     // the ring clears the centered heading above + detail panel below.
@@ -816,9 +820,12 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     if (vw <= 900) {
       // Mobile stack: heading above, detail below, wheel centered — size up so
       // segment labels fit inside the petals while the ring rolls.
+      // Detail budget is generous: every arm's card renders a title row +
+      // 4 bullet points that regularly wrap to 2 lines on narrow screens
+      // (~230–260px tall in practice), plus the panel's own bottom offset.
       const headingBudget = vw <= 640 ? 128 : 132;
-      const detailBudget = vw <= 640 ? 172 : 168;
-      const availH = Math.max(240, vh - headingBudget - detailBudget - 12);
+      const detailBudget = vw <= 640 ? 272 : 250;
+      const availH = Math.max(220, vh - headingBudget - detailBudget - 12);
       const availW = vw * (vw <= 640 ? 0.94 : 0.84);
       const scale = vw <= 640 ? 0.82 : 0.62;
       D = Math.round(Math.min(vmin * scale, availH, availW));
@@ -1591,6 +1598,7 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     computeNavTarget();
     computeOrbitTarget();
     on(window, "resize", () => {
+      layoutDonut();
       computeNavTarget();
       computeOrbitTarget();
       const drop = window.PF?._logoDrop ?? 0;
@@ -1598,17 +1606,22 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       if (drop > 0.01) setLogo(drop, glide);
     }, { passive: true });
     // Mobile URL/toolbar chrome moves the visual viewport without always
-    // firing window.resize — keep the P glued to orb / nav slot.
+    // firing window.resize — keep the wheel sized to fit + the P glued to
+    // the orb / nav slot.
     if (window.visualViewport) {
-      const syncLogoViewport = () => {
+      const syncLogoViewport = (relayout) => {
+        if (relayout) layoutDonut();
         computeNavTarget();
         computeOrbitTarget();
         const drop = window.PF?._logoDrop ?? 0;
         const glide = window.PF?._glideG ?? 0;
         if (drop > 0.01) setLogo(drop, glide);
       };
-      on(window.visualViewport, "resize", syncLogoViewport, { passive: true });
-      on(window.visualViewport, "scroll", syncLogoViewport, { passive: true });
+      // "resize" fires when the toolbar/chrome actually changes the visible
+      // area — recompute the wheel geometry too. "scroll" fires far more
+      // often (every scroll tick) so it only re-anchors the logo/orb target.
+      on(window.visualViewport, "resize", () => syncLogoViewport(true), { passive: true });
+      on(window.visualViewport, "scroll", () => syncLogoViewport(false), { passive: true });
     }
 
     let spin = 0;
