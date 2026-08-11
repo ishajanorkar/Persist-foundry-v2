@@ -2929,20 +2929,57 @@ body.pf-landing ::selection {
   width: min(1100px, 100%);
   max-width: min(1100px, 100%);
   margin: 0 auto;
-  /* Exact recipe from About “Inside the Studio” (.ab-inside__panel) */
-  background: #2c2c2c47;
-  backdrop-filter: blur(18.6px);
-  -webkit-backdrop-filter: blur(18.6px);
-  border: 1px solid rgba(255, 250, 241, 0.05);
+  /* Same layered-glass shape as the nav pill (.nav-pill in index.css), but
+     much lower fill opacity — real glass, not a painted dark panel. The
+     CTA video should stay clearly visible/tinted through it, just diffused
+     and given a frosted edge so it doesn't look like it's "colliding"
+     with a flat gray rectangle. */
+  background: linear-gradient(
+    165deg,
+    rgba(52, 50, 60, 0.26) 0%,
+    rgba(32, 30, 40, 0.36) 48%,
+    rgba(16, 15, 22, 0.46) 100%
+  );
+  backdrop-filter: blur(22px) saturate(128%);
+  -webkit-backdrop-filter: blur(22px) saturate(128%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0;
-  box-shadow: none;
+  box-shadow:
+    inset 0.5px 1px 0 rgba(255, 255, 255, 0.14),
+    inset 1px 0.5px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 24px 64px rgba(0, 0, 0, 0.3);
   overflow: visible;
-  isolation: auto;
+  isolation: isolate;
 }
 
-/* No extra rim/veil — About panel is a flat frosted pane */
-.pf-final-cta-container .pf-final-cta-panel::before,
+/* Soft static rim — same mask technique as .nav-pill::after, no spin
+   animation (this panel is a full-width rectangle, not a pill). */
 .pf-final-cta-container .pf-final-cta-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.07) 30%,
+    rgba(255, 255, 255, 0.02) 55%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
+}
+.pf-final-cta-container .pf-final-cta-panel::before {
   display: none !important;
   content: none !important;
 }
@@ -2956,7 +2993,7 @@ body.pf-landing ::selection {
   .pf-final-cta-container .pf-final-cta-panel {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: rgba(44, 44, 44, 0.92);
+    background: rgba(20, 19, 25, 0.94);
   }
 }
 

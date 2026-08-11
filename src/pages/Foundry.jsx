@@ -306,7 +306,7 @@ export default function Foundry() {
                 </a>
                 <a
                   className="lockup__link"
-                  href="https://percival.vc/"
+                  href="https://www.percival.vc/"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Percival"
