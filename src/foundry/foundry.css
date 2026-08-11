@@ -1258,14 +1258,16 @@ body.pf-landing ::selection {
     margin-right: 0;
   }
   .threshold-stats {
-    width: max-content;
+    /* Fill the same width as the copy column above it (no leftover gap on
+       either side) instead of a small fixed-width block — this is what
+       keeps the grid reading as "centered" between the shared gutters. */
+    width: 100%;
     max-width: 100%;
-    margin: 0.35rem auto 0;
-    justify-self: center;
-    --bcard-w: clamp(8.25rem, 38vw, 10.25rem);
+    margin: 0.35rem 0 0;
+    justify-self: stretch;
     --bcard-h: clamp(5.75rem, 22vw, 7rem);
     --bcard-gap: clamp(0.95rem, 2.8vw, 1.35rem);
-    grid-template-columns: repeat(2, var(--bcard-w));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--bcard-gap);
     padding-bottom: clamp(2.25rem, 5vh, 3rem);
   }
@@ -1276,7 +1278,7 @@ body.pf-landing ::selection {
     transform: translateY(clamp(1.85rem, 5vw, 2.85rem));
   }
   #threshold .bcard {
-    width: var(--bcard-w);
+    width: 100%;
     height: var(--bcard-h);
   }
   .display--backstory {
@@ -1300,7 +1302,6 @@ body.pf-landing ::selection {
     text-align: left;
   }
   .threshold-stats {
-    --bcard-w: clamp(8rem, 40vw, 9.5rem);
     --bcard-h: clamp(5.5rem, 24vw, 6.5rem);
     --bcard-gap: 1.05rem;
     gap: var(--bcard-gap);
@@ -4314,11 +4315,13 @@ body.pf-landing .pf ~ .footer {
     color: rgba(168, 172, 184, 0.78) !important;
   }
   /* True geometric center — 47/48% offsets left the P looking low/left on phones.
-     +52px matches the baked lens-flare convergence point in the footage
-     (#hero-canvas), measured empirically — see .orbit-donut base rule in
-     engine.js for the full explanation. */
+     -22px matches the baked lens-flare convergence point in the mobile-cropped
+     footage (#hero-canvas), measured empirically by locating the brightest
+     pixel cluster in a device-viewport screenshot. This differs from the
+     desktop offset because the video crop/aspect changes where the flare
+     lands on narrow phone viewports. */
   #orbitLayer .orbit-donut {
-    top: calc(50% + 52px) !important;
+    top: calc(50% - 22px) !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
   }
@@ -4343,7 +4346,7 @@ body.pf-landing .pf ~ .footer {
     overflow: visible !important;
   }
   #orbitLayer .orbit-donut {
-    top: calc(50% + 52px) !important;
+    top: calc(50% - 22px) !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
   }
@@ -4379,7 +4382,7 @@ body.pf-landing .pf ~ .footer {
   }
   /* Keep wheel geometrically centered so the P locks to the orb */
   #orbitLayer .orbit-donut {
-    top: calc(50% + 52px) !important;
+    top: calc(50% - 22px) !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
   }
@@ -4540,6 +4543,49 @@ body.pf-landing .pf ~ .footer {
   z-index: 0;
 }
 
+.pf-final-cta-media__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  /* Clarity/saturation boost for the video grades what's behind this layer
+     without ever touching the <video>'s own `filter` (see note above the
+     .pf-final-cta-background rule for why that breaks playback). */
+  backdrop-filter: saturate(132%) contrast(109%) brightness(1.05);
+  -webkit-backdrop-filter: saturate(132%) contrast(109%) brightness(1.05);
+  /* Even soft wash — avoid sudden opacity steps that read as cuts */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 6, 9, 0.48) 0%,
+      rgba(5, 6, 9, 0.2) 24%,
+      rgba(5, 6, 9, 0.14) 48%,
+      rgba(5, 6, 9, 0.32) 70%,
+      rgba(5, 6, 9, 0.82) 100%
+    ),
+    radial-gradient(
+      ellipse 100% 75% at 50% 42%,
+      transparent 30%,
+      rgba(5, 6, 9, 0.3) 100%
+    );
+}
+
+/* Extra veil over video corner watermark */
+.pf-final-cta-media__scrim::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: min(320px, 48%);
+  height: min(260px, 46%);
+  background: radial-gradient(
+    ellipse 100% 100% at 100% 100%,
+    rgba(5, 6, 9, 0.95) 0%,
+    rgba(5, 6, 9, 0.6) 42%,
+    transparent 72%
+  );
+  pointer-events: none;
+}
+
 /*
  * Mobile: one sharp full-bleed video + dark gradient scrim.
  * (Blurred fill layer was making the mesh look soft.)
@@ -4585,21 +4631,27 @@ body.pf-landing .pf ~ .footer {
 
   .pf-final-cta-media__scrim {
     z-index: 3;
-    /* Dark gradient over sharp mesh — depth + readable type */
+    /* Stronger grade than desktop — mobile's single sharp layer (no blurred
+       fill duplicate behind it) reads flatter/lower-contrast by comparison,
+       so push saturation/contrast/brightness harder through the scrim. */
+    backdrop-filter: saturate(158%) contrast(118%) brightness(1.1);
+    -webkit-backdrop-filter: saturate(158%) contrast(118%) brightness(1.1);
+    /* Lighter wash than before so the graded mesh actually shows through —
+       depth + readable type without smothering the color underneath */
     background:
       linear-gradient(
         180deg,
-        rgba(5, 6, 9, 0.72) 0%,
-        rgba(5, 6, 9, 0.42) 18%,
-        rgba(5, 6, 9, 0.28) 38%,
-        rgba(5, 6, 9, 0.38) 58%,
-        rgba(5, 6, 9, 0.72) 78%,
-        rgba(5, 6, 9, 0.94) 100%
+        rgba(5, 6, 9, 0.52) 0%,
+        rgba(5, 6, 9, 0.24) 18%,
+        rgba(5, 6, 9, 0.16) 38%,
+        rgba(5, 6, 9, 0.26) 58%,
+        rgba(5, 6, 9, 0.58) 78%,
+        rgba(5, 6, 9, 0.88) 100%
       ),
       radial-gradient(
         ellipse 100% 70% at 50% 40%,
-        rgba(5, 6, 9, 0.05) 0%,
-        rgba(5, 6, 9, 0.45) 100%
+        rgba(5, 6, 9, 0.03) 0%,
+        rgba(5, 6, 9, 0.32) 100%
       );
   }
 }
@@ -4614,49 +4666,6 @@ body.pf-landing .pf ~ .footer {
   .pf-final-cta-background--fill {
     display: none;
   }
-}
-
-.pf-final-cta-media__scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  /* Clarity/saturation boost for the video grades what's behind this layer
-     without ever touching the <video>'s own `filter` (see note above the
-     .pf-final-cta-background rule for why that breaks playback). */
-  backdrop-filter: saturate(132%) contrast(109%) brightness(1.05);
-  -webkit-backdrop-filter: saturate(132%) contrast(109%) brightness(1.05);
-  /* Even soft wash — avoid sudden opacity steps that read as cuts */
-  background:
-    linear-gradient(
-      180deg,
-      rgba(5, 6, 9, 0.48) 0%,
-      rgba(5, 6, 9, 0.2) 24%,
-      rgba(5, 6, 9, 0.14) 48%,
-      rgba(5, 6, 9, 0.32) 70%,
-      rgba(5, 6, 9, 0.82) 100%
-    ),
-    radial-gradient(
-      ellipse 100% 75% at 50% 42%,
-      transparent 30%,
-      rgba(5, 6, 9, 0.3) 100%
-    );
-}
-
-/* Extra veil over video corner watermark */
-.pf-final-cta-media__scrim::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: min(320px, 48%);
-  height: min(260px, 46%);
-  background: radial-gradient(
-    ellipse 100% 100% at 100% 100%,
-    rgba(5, 6, 9, 0.95) 0%,
-    rgba(5, 6, 9, 0.6) 42%,
-    transparent 72%
-  );
-  pointer-events: none;
 }
 
 .pf-final-cta-container > .pf-final-cta {
