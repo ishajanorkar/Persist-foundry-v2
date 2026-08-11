@@ -991,26 +991,26 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="portfolio-row" data-row="2" data-url="https://swissmote.com/">
+            <div className="portfolio-row" data-row="2" data-url="https://www.persistdesigns.com/">
               <div className="portfolio-row-left">
-                <div className="portfolio-row-tag">Talent</div>
-                <h3 className="portfolio-row-name"><em>Swissmote</em></h3>
+                <div className="portfolio-row-tag">Design Studio</div>
+                <h3 className="portfolio-row-name"><em>Persist Designs</em></h3>
                 <p className="portfolio-row-desc">
-                  Hiring the world's most overlooked builders. Built by someone who heard "no" so many times he rewrote the rules.
+                  Designing brands that refuse to be overlooked. From logos to websites, packaging to UI/UX, we turn ideas into identities that look great, work harder, and leave a mark.
                 </p>
                 <div className="portfolio-row-stats">
                   <div>
-                    <div className="portfolio-row-stat-num">Profitable</div>
-                    <div className="portfolio-row-stat-label">No outside capital</div>
+                    <div className="portfolio-row-stat-num">In-house</div>
+                    <div className="portfolio-row-stat-label">Design partner</div>
                   </div>
                   <div>
-                    <div className="portfolio-row-stat-num">Global</div>
-                    <div className="portfolio-row-stat-label">Day one</div>
+                    <div className="portfolio-row-stat-num">Every launch</div>
+                    <div className="portfolio-row-stat-label">Brand to product</div>
                   </div>
                 </div>
               </div>
               <div className="portfolio-row-right">
-                <img src="/assets/swissmote-thimbnaail.webp" alt="Swissmote" className="portfolio-row-thumb" />
+                <img src="/assets/persist-designs-thumbnail.png" alt="Persist Designs" className="portfolio-row-thumb" />
                 <div className="portfolio-row-thumb-overlay"></div>
                 <div className="portfolio-row-meta">Case 03 / 03</div>
                 <div className="portfolio-row-visual-corner tl"></div>

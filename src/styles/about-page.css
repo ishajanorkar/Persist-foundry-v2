@@ -306,10 +306,80 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   color: rgba(255, 250, 241, 0.55);
 }
 
-/* BELIEF */
-.ab-belief {
-  background: #050609;
-  padding: clamp(5rem, 12vh, 8rem) 0;
+/* BELIEF → INSIDE runway (sticky scrub) */
+.ab-belief-runway {
+  position: relative;
+  height: 360vh;
+  background: #000;
+  padding: 0;
+}
+.ab-belief-runway__pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: #000;
+  box-sizing: border-box;
+}
+.ab-belief-runway__hands {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  isolation: isolate;
+}
+.ab-belief-runway__hand {
+  position: absolute;
+  width: min(52vw, 760px);
+  height: auto;
+  object-fit: contain;
+  will-change: transform, opacity, filter;
+  mix-blend-mode: screen;
+  user-select: none;
+  -webkit-user-drag: none;
+  transform-origin: center center;
+}
+/* Belief start: recessed in corners — not collapsed to center */
+.ab-belief-runway__hand--tr {
+  top: -14%;
+  right: -10%;
+  left: auto;
+  width: min(54vw, 800px);
+}
+.ab-belief-runway__hand--bl {
+  bottom: -16%;
+  left: -10%;
+  right: auto;
+  width: min(54vw, 800px);
+}
+/* Meet / exit: top-left + bottom-right */
+.ab-belief-runway__hand--h1 {
+  top: -8%;
+  left: -10%;
+  opacity: 0;
+}
+.ab-belief-runway__hand--h2 {
+  bottom: -10%;
+  right: -10%;
+  opacity: 0;
+}
+
+.ab-belief-runway__belief {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  padding: clamp(4.5rem, 10vh, 6.5rem) 0;
+  box-sizing: border-box;
+  will-change: opacity;
+  /* Own stacking context so card backdrop-filter samples the hands behind */
+  isolation: isolate;
+}
+.ab-belief-runway__belief-inner {
+  width: 100%;
 }
 .ab-belief__headline {
   margin: 0 0 clamp(2.5rem, 6vh, 3.5rem);
@@ -324,15 +394,21 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
 .ab-belief__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 .ab-belief-card {
   position: relative;
   padding: clamp(1.75rem, 3vw, 2.25rem);
-  background: #41414122;
-  border: 1px solid #fffbf11f;
-  backdrop-filter: blur(40px);
+  /* Real frosted glass — must read through iridescent hands */
+  background: rgba(32, 32, 34, 0.55);
+  border: 1px solid rgba(255, 251, 241, 0.16);
+  backdrop-filter: blur(52px) saturate(160%);
+  -webkit-backdrop-filter: blur(52px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 8px 32px rgba(0, 0, 0, 0.25);
   min-height: 100%;
+  transform: translateZ(0);
 }
 .ab-belief-card__num {
   display: block;
@@ -373,75 +449,40 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   color: rgba(234, 228, 244, 0.72);
 }
 
-/* INSIDE — hands at corners, glass copy panel centered (matches Figma) */
-.ab-inside {
-  position: relative;
-  min-height: min(92vh, 900px);
+.ab-belief-runway__inside {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  background: #000;
-  padding: clamp(4rem, 10vh, 7rem) var(--gutter);
-}
-.ab-inside__hands {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+  padding: 0 var(--gutter);
+  box-sizing: border-box;
+  opacity: 0;
   pointer-events: none;
+  will-change: opacity;
 }
-.ab-inside__hand {
-  position: absolute;
-  width: min(48vw, 800px);
-  height: auto;
-  object-fit: contain;
-  will-change: transform, opacity;
-  filter: blur(0.5px) saturate(1.15) brightness(0.85);
-  transition: none;
-  transform: translate3d(0, 0, 0);
-  opacity: 0.6;
-}
-.ab-inside__hand--right {
-  top: -2%;
-  left: -4%;
-}
-.ab-inside__hand--left {
-  bottom: -4%;
-  right: -4%;
-}
-.ab-inside__glow {
+.ab-belief-runway__inside-glow {
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: 220px;
-  height: 220px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(243, 170, 98, 0.35) 0%,
-    rgba(120, 84, 213, 0.18) 40%,
-    transparent 70%
-  );
+  top: 48%;
+  width: min(72vw, 720px);
+  height: auto;
+  transform: translate(-50%, -50%) scale(0.88);
   opacity: 0;
-  transition: opacity 0.6s ease;
   pointer-events: none;
-  z-index: 1;
+  mix-blend-mode: screen;
+  filter: blur(2px) saturate(1.1);
+  will-change: opacity, transform;
+  user-select: none;
+  -webkit-user-drag: none;
 }
-.ab-inside__content {
+.ab-belief-runway__inside-copy {
   position: relative;
-  z-index: 2;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-.ab-inside__panel {
-  width: min(1280px, 100%);
-  padding: clamp(4rem, 14vh, 10rem) clamp(2rem, 10vw, 10rem);
+  z-index: 1;
+  width: min(720px, 100%);
   text-align: center;
-  background: #2c2c2c47;
-  backdrop-filter: blur(18.6px);
-  border: 1px solid rgba(255, 250, 241, 0.05);
+  will-change: opacity, transform;
 }
 .ab-inside__eyebrow {
   color: #ffffff8f;
@@ -458,11 +499,52 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
 }
 .ab-inside__body {
   margin: 0 auto;
+  max-width: 54ch;
   font-family: "Montserrat", var(--montserrat), sans-serif;
   font-weight: 400;
   font-size: clamp(0.95rem, 1.05vw, 1.05rem);
   line-height: 1.7;
   color: #a9a7a4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ab-belief-runway {
+    height: auto;
+  }
+  .ab-belief-runway__pin {
+    position: relative;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+  }
+  .ab-belief-runway__hands {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    min-height: 100vh;
+  }
+  .ab-belief-runway__belief {
+    position: relative;
+    inset: auto;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  .ab-belief-runway__inside {
+    position: relative;
+    inset: auto;
+    opacity: 1 !important;
+    min-height: min(88vh, 820px);
+    padding: clamp(4rem, 10vh, 7rem) var(--gutter);
+  }
+  .ab-belief-runway__inside-glow {
+    opacity: 0.9 !important;
+  }
+  .ab-belief-runway__inside-copy {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* PEOPLE */
@@ -702,11 +784,27 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
     font-size: clamp(0.95rem, 3.4vw, 1.15rem);
     text-shadow: 0 2px 24px rgba(5, 6, 9, 0.7);
   }
-  .ab-inside__panel {
-    padding: clamp(2.5rem, 7vh, 4rem) clamp(1.5rem, 4vw, 2.5rem);
+  .ab-belief-runway {
+    height: 300vh;
   }
-  .ab-inside__hand {
-    width: min(58vw, 380px);
+  .ab-belief-runway__hand {
+    width: min(70vw, 560px);
+  }
+  .ab-belief-runway__hand--tr {
+    top: -6%;
+    right: -16%;
+  }
+  .ab-belief-runway__hand--bl {
+    bottom: -8%;
+    left: -16%;
+  }
+  .ab-belief-runway__hand--h1 {
+    top: -4%;
+    left: -14%;
+  }
+  .ab-belief-runway__hand--h2 {
+    bottom: -6%;
+    right: -14%;
   }
 }
 
@@ -761,11 +859,13 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   .ab-people-col__body {
     margin: 1.25rem 0;
   }
-  .ab-inside__hand {
-    /* width: min(62vw, 340px); */
+  .ab-belief-runway__belief {
+    padding: clamp(3.5rem, 8vh, 5rem) 0;
+    align-items: flex-start;
+    overflow-y: auto;
   }
-  .ab-inside__panel {
-    padding: clamp(2rem, 6vh, 3.5rem) var(--gutter);
+  .ab-belief-runway__inside-copy {
+    padding: 0 0.25rem;
   }
 }
 
@@ -794,29 +894,36 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   .ab-quote-card {
     padding: 1.35rem 1.15rem;
   }
-  .ab-belief {
-    padding: clamp(3.5rem, 10vh, 5rem) 0;
+  .ab-belief-runway {
+    height: 280vh;
+  }
+  .ab-belief-runway__belief {
+    padding: clamp(3.25rem, 8vh, 4.5rem) 0;
   }
   .ab-belief-card {
     padding: 1.35rem 1.15rem;
   }
-  .ab-inside {
-    min-height: 70vh;
-    padding: clamp(3rem, 8vh, 4.5rem) 1.15rem;
+  .ab-belief-runway__hand {
+    width: min(88vw, 400px);
   }
-  .ab-inside__hand {
-    width: min(85vw, 880px);
+  .ab-belief-runway__hand--tr {
+    top: -4%;
+    right: -24%;
   }
-  .ab-inside__hand--right {
-    top: 15%;
-    left: -10%;
+  .ab-belief-runway__hand--bl {
+    bottom: -6%;
+    left: -24%;
   }
-  .ab-inside__hand--left {
-    bottom: 20%;
-    right: -20%;
+  .ab-belief-runway__hand--h1 {
+    top: -2%;
+    left: -22%;
   }
-  .ab-inside__panel {
-    padding: clamp(1.75rem, 5vh, 2.75rem) 1.15rem;
+  .ab-belief-runway__hand--h2 {
+    bottom: -4%;
+    right: -22%;
+  }
+  .ab-belief-runway__inside-glow {
+    width: min(92vw, 420px);
   }
   .ab-mission {
     min-height: 62vh;

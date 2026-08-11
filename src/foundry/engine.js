@@ -115,6 +115,11 @@ export default function initFoundry({ base = "/foundry" } = {}) {
   const CFG = PF_CONFIG.frames;
   const canvas = document.getElementById("hero-canvas");
   const ctx = canvas.getContext("2d", { alpha: false });
+  // Source frames are ~1080p and get scaled up to fill a hi-DPI canvas —
+  // browsers default to a cheap/blocky resampler, which is the real source
+  // of the "low quality/low res" softness. Force the best upscale filter.
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
 
   const frames = new Array(CFG.count);
   const loaded = new Array(CFG.count).fill(false);
@@ -199,6 +204,10 @@ export default function initFoundry({ base = "/foundry" } = {}) {
     ch = h;
     canvas.width = nextW;
     canvas.height = nextH;
+    // Resizing the backing buffer resets 2D context state, so the
+    // high-quality resampler needs to be reapplied every time.
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     // Let CSS (inset:0 / 100%) fill the stage — inline px heights caused the
     // bottom black bar when the URL/toolbar chrome changed innerHeight.
     canvas.style.removeProperty("width");
@@ -1099,8 +1108,17 @@ export default function initFoundry({ base = "/foundry" } = {}) {
         font-size:clamp(0.8rem,0.95vw,0.95rem);line-height:1.4;letter-spacing:-0.03em;
         color:rgba(168,172,184,0.72);max-width:34ch;
         text-shadow:0 1px 14px rgba(0,0,0,0.75);text-align:left;}
-      /* wheel dead-center — primary focal point of the section */
-      .orbit-donut{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      /* wheel dead-center — primary focal point of the section.
+         top is nudged +52px so the moon/P align with the baked lens-flare
+         convergence point in the frame-sequence footage (#hero-canvas),
+         which stays visible underneath the whole time this wheel is on
+         screen. Measured empirically (row-brightness scan of the canvas
+         pixels) and confirmed rock-stable across the whole zoom range —
+         the footage camera pushes straight toward that point, so it never
+         drifts. Do not "correct" this back down to +24px (the theoretical
+         .stage 48px-bleed half-offset) — that only accounts for the
+         starfield canvas's own centering, not the footage's framing. */
+      .orbit-donut{position:fixed;top:calc(50% + 52px);left:50%;transform:translate(-50%,-50%);
         transform-origin:center;will-change:transform,opacity;pointer-events:none;z-index:2;}
       .orbit-ring{position:absolute;inset:0;transform-origin:center;
         will-change:transform;pointer-events:none;}
@@ -1890,15 +1908,15 @@ export default function initFoundry({ base = "/foundry" } = {}) {
       }
 
       navEl.classList.toggle("scrolled", y > 40);
-      // conditional visibility: hide scrolling down, show scrolling up,
-      // always visible near the top
+        // conditional visibility: hide scrolling down, show scrolling up,
+        // always visible near the top
       const delta = y - lastNavY;
       if (y < 120) navEl.classList.remove("nav-hidden");
       else if (delta > 6) navEl.classList.add("nav-hidden");
       else if (delta < -6) navEl.classList.remove("nav-hidden");
       if (Math.abs(delta) > 6) lastNavY = y;
-      // the docked brand mark is a separate fixed element — fade it in
-      // sync with the nav (only once it has substantially glided in)
+        // the docked brand mark is a separate fixed element — fade it in
+        // sync with the nav (only once it has substantially glided in)
       const docked = window.PF._glideG > 0.5;
       persistLogo.classList.toggle(
         "brand-hidden",

@@ -173,6 +173,10 @@ body.pf-landing ::selection {
   /* Never let engine inline sizes leave a letterbox under the stage */
   max-width: none;
   max-height: none;
+  /* Frame sequence is ~1080p upscaled to fill a hi-DPI canvas, which reads
+     a bit soft/low-res — punch up clarity + saturation a touch. Safe on a
+     2D canvas (unlike a <video>, there's no decode pipeline to break). */
+  filter: saturate(114%) contrast(107%) brightness(1.02);
 }
 #three-canvas {
   position: absolute;
@@ -974,8 +978,10 @@ body.pf-landing ::selection {
 /* Staggered 2×2 — landscape rectangles, flush to nav right gutter */
 .threshold-stats {
   --bcard-line: rgba(210, 215, 230, 0.55);
-  --bcard-cross: 16px;
-  --bcard-cross-half: 8px;
+  /* Match the Filter section's crop-marks (--filter-cross) so the "+" reads
+     the same prominent size on every card sitewide. */
+  --bcard-cross: 20px;
+  --bcard-cross-half: 10px;
   --bcard-w: clamp(13.5rem, 16.5vw, 17.5rem);
   --bcard-h: clamp(8.25rem, 10.5vw, 10.5rem);
   --bcard-gap: clamp(1.75rem, 2.6vw, 2.5rem);
@@ -2701,35 +2707,41 @@ body.pf-landing ::selection {
     linear-gradient(var(--filter-line), var(--filter-line)) center / 1px 100%
       no-repeat;
 }
+/* Corner offset uses the standalone `translate` property (not `transform`)
+   so it composes AFTER the spin animation's `rotate` property (per the CSS
+   Transforms spec order: transform -> scale -> rotate -> translate). That
+   way each mark spins about its own center first and is shifted into its
+   corner slot last, instead of the mark orbiting around the un-translated
+   origin while it spins. */
 .pf .filter-cross--tl {
   top: 0;
   left: 0;
-  transform: translate(-50%, -50%);
+  translate: -50% -50%;
 }
 .pf .filter-cross--tr {
   top: 0;
   right: 0;
-  transform: translate(50%, -50%);
+  translate: 50% -50%;
 }
 .pf .filter-cross--bl {
   bottom: 0;
   left: 0;
-  transform: translate(-50%, 50%);
+  translate: -50% 50%;
 }
 .pf .filter-cross--br {
   bottom: 0;
   right: 0;
-  transform: translate(50%, 50%);
+  translate: 50% 50%;
 }
 .pf .filter-cross--tm {
   top: 0;
   left: 50%;
-  transform: translate(-50%, -50%);
+  translate: -50% -50%;
 }
 .pf .filter-cross--bm {
   bottom: 0;
   left: 50%;
-  transform: translate(-50%, 50%);
+  translate: -50% 50%;
 }
 
 @media (max-width: 1024px) {
@@ -3154,6 +3166,26 @@ body.pf-landing .pf ~ .footer {
 .dock-settle {
   height: 55vh;
   pointer-events: none;
+  position: relative;
+}
+/* Earliest hint of the coming portfolio glass — a soft, low-alpha breath of
+   the same violet-black tone that starts right as the P eases toward the
+   dock, well before the portfolio atmosphere itself is on screen. Both ends
+   sit at zero alpha so it never introduces its own hard seam. */
+.dock-settle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(18, 12, 30, 0) 0%,
+    rgba(18, 12, 30, 0.05) 42%,
+    rgba(22, 14, 36, 0.14) 76%,
+    rgba(20, 13, 33, 0.08) 92%,
+    rgba(18, 12, 30, 0) 100%
+  );
 }
 
 /* ---------- Value Props — vertical parallax (all breakpoints) ---------- */
@@ -3167,6 +3199,28 @@ body.pf-landing .pf ~ .footer {
   /* Parallax cards must not paint into Portfolio above */
   overflow: clip;
   isolation: isolate;
+}
+/* Softens the handoff from the blurred portfolio atmosphere above — the
+   crisp, unblurred starfield here would otherwise snap into focus the
+   instant the last card's glass fades out. Mirrors the same long, eased
+   breath used at the top of the portfolio section. */
+.vprop::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 38vh;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(7, 5, 15, 0.94) 0%,
+    rgba(7, 5, 15, 0.62) 30%,
+    rgba(7, 5, 15, 0.3) 58%,
+    rgba(7, 5, 15, 0.1) 80%,
+    rgba(7, 5, 15, 0) 100%
+  );
 }
 
 .vprop__head {
@@ -3275,8 +3329,10 @@ body.pf-landing .pf ~ .footer {
 /* ---------- Card — crop-mark frame + glass foot (matches reference) ---------- */
 .vprop-card {
   --vprop-line: rgba(200, 205, 220, 0.45);
-  --vprop-cross: 14px;
-  --vprop-cross-half: 7px;
+  /* Match the Filter section's crop-marks (--filter-cross) so the "+" reads
+     the same prominent size on every card sitewide. */
+  --vprop-cross: 20px;
+  --vprop-cross-half: 10px;
   position: relative;
   width: 100%;
   display: flex;
@@ -3284,7 +3340,7 @@ body.pf-landing .pf ~ .footer {
   align-items: center;
   gap: 0.8rem;
   margin: 0;
-  padding: 1.4rem 0 0;
+  padding: 0;
   /* Top pane stays clear so the starfield reads through the frame */
   background: transparent;
   border-width: 0.5px;
@@ -3347,9 +3403,36 @@ body.pf-landing .pf ~ .footer {
   }
 }
 
+/* Title + icon share ONE glass surface — a single element with its own
+   background/backdrop-filter, rather than two adjacent panes, so there is
+   no seam where two independent blur regions meet. Darker and noticeably
+   less saturated than .vprop-card__foot, which keeps its own brighter
+   glass untouched below. */
+.vprop-card__top {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* .vprop-card has a flex `gap` between this wrapper and .vprop-card__foot
+     — pull the glass pane down into that gap so it touches the footer
+     directly, with only the footer's own border-top as a divider. */
+  margin: 0 0 -0.8rem;
+  background:
+    linear-gradient(
+      165deg,
+      rgba(255, 255, 255, 0.045) 0%,
+      rgba(255, 255, 255, 0.01) 40%,
+      rgba(60, 58, 66, 0.04) 100%
+    ),
+    rgba(108, 108, 114, 0.045);
+  backdrop-filter: blur(16px) saturate(94%);
+  -webkit-backdrop-filter: blur(16px) saturate(94%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
 .vprop-card__title {
+  width: 100%;
+  box-sizing: border-box;
   margin: 0;
-  padding: 0 1.15rem;
+  padding: 1rem 1.15rem 0.85rem;
   font-family: "Montserrat", var(--pf-display), system-ui, sans-serif;
   font-weight: 500;
   font-size: clamp(1.1rem, 0.9vw, 1.3rem);
@@ -3358,6 +3441,7 @@ body.pf-landing .pf ~ .footer {
   text-transform: uppercase;
   color: #ffffff;
   text-align: center;
+  background: none;
 }
 .vprop-card__icon {
   display: flex;
@@ -3367,6 +3451,7 @@ body.pf-landing .pf ~ .footer {
   min-height: clamp(9rem, 24vh, 22rem);
   padding: 0.5rem 1.25rem 1rem;
   box-sizing: border-box;
+  background: none;
 }
 .vprop-card__icon img {
   width: clamp(6.5rem, 15vh, 22rem);
@@ -3474,6 +3559,41 @@ body.pf-landing .pf ~ .footer {
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  /* Dissolve the whole layer — thumb, blur and glass together — into true
+     transparency toward the top AND the bottom. A mask (rather than a
+     painted veil) avoids the hard sampling edge backdrop-filter blur
+     otherwise leaves right at the box boundary, so the starfield above
+     blends in with no visible seam, and the same soft breath repeats at
+     the bottom edge so the last portfolio card eases into Unfair Start
+     instead of cutting straight into it. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.08) 10%,
+    rgba(0, 0, 0, 0.3) 22%,
+    rgba(0, 0, 0, 0.62) 34%,
+    rgba(0, 0, 0, 0.88) 46%,
+    #000 58%,
+    #000 78%,
+    rgba(0, 0, 0, 0.88) 86%,
+    rgba(0, 0, 0, 0.62) 92%,
+    rgba(0, 0, 0, 0.3) 97%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.08) 10%,
+    rgba(0, 0, 0, 0.3) 22%,
+    rgba(0, 0, 0, 0.62) 34%,
+    rgba(0, 0, 0, 0.88) 46%,
+    #000 58%,
+    #000 78%,
+    rgba(0, 0, 0, 0.88) 86%,
+    rgba(0, 0, 0, 0.62) 92%,
+    rgba(0, 0, 0, 0.3) 97%,
+    transparent 100%
+  );
 }
 .pfolio__bg {
   position: absolute;
@@ -3516,6 +3636,7 @@ body.pf-landing .pf ~ .footer {
   -webkit-backdrop-filter: blur(20px) saturate(140%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
+
 
 .pfolio__inner {
   position: relative;
@@ -4155,9 +4276,12 @@ body.pf-landing .pf ~ .footer {
     line-height: 1.45 !important;
     color: rgba(168, 172, 184, 0.78) !important;
   }
-  /* True geometric center — 47/48% offsets left the P looking low/left on phones */
+  /* True geometric center — 47/48% offsets left the P looking low/left on phones.
+     +52px matches the baked lens-flare convergence point in the footage
+     (#hero-canvas), measured empirically — see .orbit-donut base rule in
+     engine.js for the full explanation. */
   #orbitLayer .orbit-donut {
-    top: 50% !important;
+    top: calc(50% + 52px) !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
   }
@@ -4182,7 +4306,7 @@ body.pf-landing .pf ~ .footer {
     overflow: visible !important;
   }
   #orbitLayer .orbit-donut {
-    top: 50% !important;
+    top: calc(50% + 52px) !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
   }
@@ -4218,7 +4342,7 @@ body.pf-landing .pf ~ .footer {
   }
   /* Keep wheel geometrically centered so the P locks to the orb */
   #orbitLayer .orbit-donut {
-    top: 50% !important;
+    top: calc(50% + 52px) !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
   }
@@ -4358,6 +4482,11 @@ body.pf-landing .pf ~ .footer {
   object-fit: cover;
   object-position: center center;
   z-index: 0;
+  /* NOTE: do not put a `filter` on this <video> — combined with the
+     transform + will-change below it silently breaks .play() in Chromium
+     (currentTime stalls at 0, so it looks like a static frame). The
+     saturation/contrast boost lives on .pf-final-cta-media__scrim instead,
+     via backdrop-filter, which grades the video without touching it. */
   filter: none;
   /* Opacity + stacking controlled by JS for seamless dual-buffer fade */
   opacity: 0;
@@ -4403,6 +4532,7 @@ body.pf-landing .pf ~ .footer {
     /* Keep native clarity — no blur, no upscale zoom */
     transform: none;
     transform-origin: center center;
+    /* See desktop rule above — no `filter` on the <video> itself. */
     filter: none;
     z-index: 1;
     -webkit-mask-image: none;
@@ -4453,6 +4583,11 @@ body.pf-landing .pf ~ .footer {
   position: absolute;
   inset: 0;
   z-index: 1;
+  /* Clarity/saturation boost for the video grades what's behind this layer
+     without ever touching the <video>'s own `filter` (see note above the
+     .pf-final-cta-background rule for why that breaks playback). */
+  backdrop-filter: saturate(132%) contrast(109%) brightness(1.05);
+  -webkit-backdrop-filter: saturate(132%) contrast(109%) brightness(1.05);
   /* Even soft wash — avoid sudden opacity steps that read as cuts */
   background:
     linear-gradient(

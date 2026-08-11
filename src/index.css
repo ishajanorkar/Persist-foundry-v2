@@ -281,25 +281,19 @@ body::before {
   opacity: 0.9;
 }
 
-/* Foundry mobile: feather the scrolled nav — a solid bar bottom edge
-   stacks with the footage’s dark ceiling into a visible hard cut. */
+/* Home page — the frosted bar reads as a hard dark rectangle cut into the
+   footage/content behind it. Drop it entirely in every nav state (top,
+   scrolled, docked) so only the logo, pill and CTA float over the page. */
+body.pf-landing .nav,
 body.pf-landing .nav.is-scrolled {
-  background: linear-gradient(
-    180deg,
-    rgba(5, 4, 12, 0.78) 0%,
-    rgba(5, 4, 12, 0.45) 72%,
-    rgba(5, 4, 12, 0) 100%
-  );
+  background: transparent;
   border-bottom-color: transparent;
   box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 body.pf-landing .nav::after {
-  height: 56px;
-  background: linear-gradient(
-    180deg,
-    rgba(5, 4, 12, 0.28) 0%,
-    rgba(5, 4, 12, 0) 100%
-  );
+  opacity: 0;
 }
 
 /* LOGO */
@@ -8669,3 +8663,34 @@ body.pf-landing .nav::after {
 
 /* Fixed theme: brand colors stay identical in light and dark device modes.
    Do not add prefers-color-scheme overrides — the site is always this palette. */
+
+/* ======================================================
+   SITEWIDE — crop-mark plus icons spin into view.
+   Applies to every corner-tick "+" mark (Backstory bcard,
+   Unfair-Start vprop-card, Still-Deciding filter-cross,
+   About/Contact/Apply/Careers ab-corner-ticks). Driven by
+   src/plusSpin.js, which toggles the .pf-plus-spin class via
+   IntersectionObserver so the icon spins two full turns each
+   time its card scrolls into view.
+   Animates the standalone `rotate` property (not `transform`)
+   so it composes cleanly with marks like .filter-cross that
+   already use `transform: translate(...)` for corner-centering —
+   rotate + transform apply independently and never clobber each other. */
+@keyframes pf-plus-spin {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    /* two full turns — 720deg reads identically to 0deg at rest */
+    rotate: 720deg;
+  }
+}
+.pf-plus-spin {
+  animation: pf-plus-spin 2.4s cubic-bezier(0.65, 0, 0.35, 1);
+  transform-origin: 50% 50%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pf-plus-spin {
+    animation: none;
+  }
+}

@@ -1,15 +1,17 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
-  INSIDE_HAND_TIMELINE,
-  getInsideHandPreset,
-} from "../about/insideHands.config";
+  BELIEF_HAND_TIMELINE,
+  BELIEF_HAND_POSES,
+  lerpPose,
+} from "../about/beliefHands.config";
 import "../styles/about-page.css";
 
 /* ─────────────────────────────────────────────────────────────
    ABOUT — redesigned secondary page.
    Cursor + progress + magnetic + IO reveals (secondary-page recipe).
-   Hero: single-image parallax. Inside: scroll-driven hand meet.
+   Hero: single-image parallax.
+   Belief→Inside: sticky scrub — hands behind cards → twist/meet → exit → Inside.
    Styles: src/styles/about-page.css (.ab-* namespace).
 ───────────────────────────────────────────────────────────── */
 
@@ -234,70 +236,208 @@ export default function About() {
       window.removeEventListener("scroll", updatePhotoParallax),
     );
 
-    /* ── INSIDE: scroll-driven hand meet (HeroWebGL motion) ─ */
-    const inside = document.getElementById("inside");
-    const handLeft = document.getElementById("abHandLeft");
-    const handRight = document.getElementById("abHandRight");
-    const contactGlow = document.getElementById("abHandGlow");
+    /* ── BELIEF→INSIDE: sticky scrub — TR/BL belief hands → meet pair → exit ─ */
+    const runway = document.getElementById("belief");
+    const handTR = document.getElementById("abHandBeliefTR");
+    const handBL = document.getElementById("abHandBeliefBL");
+    const handH1 = document.getElementById("abHandH1");
+    const handH2 = document.getElementById("abHandH2");
+    const beliefStage = document.getElementById("abBeliefStage");
+    const insideStage = document.getElementById("inside");
+    const insideGlow = document.getElementById("abInsideGlow");
+    const insideCopy = insideStage?.querySelector(".ab-belief-runway__inside-copy");
 
-    if (inside && handLeft && handRight) {
-      let handsAlive = true;
-      let handsRaf = 0;
+    if (runway && handTR && handBL && handH1 && handH2) {
+      let alive = true;
+      let raf = 0;
       let scrollP = 0;
-      let handsCur = 0;
+      let curP = 0;
 
-      handLeft.style.transition = "none";
-      handRight.style.transition = "none";
+      [handTR, handBL, handH1, handH2, beliefStage, insideStage, insideGlow, insideCopy]
+        .filter(Boolean)
+        .forEach((el) => {
+          el.style.transition = "none";
+        });
 
-      const readScroll = () => {
-        const rect = inside.getBoundingClientRect();
-        const vh = window.innerHeight || 1;
-        const travel = Math.max(rect.height - vh, vh * 0.5);
-        scrollP = clamp01((vh - rect.top) / (travel + vh));
-      };
+      const poseCss = (pose) =>
+        `translate3d(${pose.x.toFixed(2)}vw, ${pose.y.toFixed(2)}vh, 0) rotate(${pose.r.toFixed(2)}deg) scale(${pose.s.toFixed(4)})`;
 
-      const applyHands = (hands) => {
-        const preset = getInsideHandPreset(window.innerWidth);
-        const halfW = Math.min(window.innerWidth, inside.offsetWidth) * 0.5;
-        const startPx = preset.handStartX * halfW;
-        const travelPx = preset.handTravel * halfW;
-        const ox = startPx - travelPx * hands;
-
-        // #abHandLeft = bottom-right; #abHandRight = top-left
-        handLeft.style.transform = `translate3d(${ox.toFixed(2)}px, ${ox.toFixed(2)}px, 0)`;
-        handRight.style.transform = `translate3d(${(-ox).toFixed(2)}px, ${(-ox).toFixed(2)}px, 0)`;
-        const op = 0.6 + 0.4 * hands;
-        handLeft.style.opacity = String(op);
-        handRight.style.opacity = String(op);
-        if (contactGlow) {
-          contactGlow.style.opacity =
-            hands > 0.85 ? String(((hands - 0.85) / 0.15) * 0.7) : "0";
+      const applyHand = (el, pose, { sharp = false } = {}) => {
+        el.style.transform = poseCss(pose);
+        el.style.opacity = String(Math.max(0, pose.op));
+        el.style.visibility = pose.op < 0.02 ? "hidden" : "visible";
+        const blur = Math.max(0, pose.blur ?? 0);
+        if (sharp || blur < 0.2) {
+          el.style.filter = "saturate(1.2) brightness(1.05)";
+        } else {
+          el.style.filter = `blur(${blur.toFixed(2)}px) saturate(1.15) brightness(0.98)`;
         }
       };
 
-      if (reduceMotion) {
-        applyHands(1);
-      } else {
-        const tickHands = () => {
-          if (!handsAlive) return;
-          const target = smoothstep(
-            clamp01(scrollP / INSIDE_HAND_TIMELINE.handsEnd),
+      const sample = (p) => {
+        const T = BELIEF_HAND_TIMELINE;
+        const P = BELIEF_HAND_POSES;
+        let tr = P.belief.tr;
+        let bl = P.belief.bl;
+        let h1 = { ...P.meetMid.h1, op: 0 };
+        let h2 = { ...P.meetMid.h2, op: 0 };
+
+        if (p <= T.beliefHoldEnd) {
+          tr = P.belief.tr;
+          bl = P.belief.bl;
+          h1 = { ...P.meetMid.h1, op: 0 };
+          h2 = { ...P.meetMid.h2, op: 0 };
+        } else if (p <= T.switchEnd) {
+          // Same-side vertical switch (no flip):
+          // TR slides down the right → H2 (BR)
+          // BL slides up the left   → H1 (TL)
+          const t = smoothstep(
+            clamp01((p - T.beliefHoldEnd) / (T.switchEnd - T.beliefHoldEnd)),
           );
-          handsCur += (target - handsCur) * 0.12;
-          if (Math.abs(target - handsCur) < 0.0004) handsCur = target;
-          applyHands(handsCur);
-          handsRaf = requestAnimationFrame(tickHands);
+
+          if (t < 0.5) {
+            // First half: belief hands travel toward mid-height
+            const u = smoothstep(t * 2);
+            tr = lerpPose(P.belief.tr, P.slideMid.tr, u);
+            bl = lerpPose(P.belief.bl, P.slideMid.bl, u);
+            h1 = { ...P.meetMid.h1, op: 0 };
+            h2 = { ...P.meetMid.h2, op: 0 };
+          } else if (t < 0.62) {
+            // Short handoff at mid-height on each side
+            const u = smoothstep((t - 0.5) / 0.12);
+            tr = lerpPose(P.slideMid.tr, { ...P.slideMid.tr, op: 0 }, u);
+            bl = lerpPose(P.slideMid.bl, { ...P.slideMid.bl, op: 0 }, u);
+            h1 = lerpPose({ ...P.meetMid.h1, op: 0 }, P.meetMid.h1, u);
+            h2 = lerpPose({ ...P.meetMid.h2, op: 0 }, P.meetMid.h2, u);
+          } else {
+            // Second half: meet hands finish traveling into clean corners
+            const u = smoothstep((t - 0.62) / 0.38);
+            tr = { ...P.slideOut.tr, op: 0 };
+            bl = { ...P.slideOut.bl, op: 0 };
+            h1 = lerpPose(P.meetMid.h1, P.meet.h1, u);
+            h2 = lerpPose(P.meetMid.h2, P.meet.h2, u);
+          }
+        } else if (p <= T.meetHoldEnd) {
+          tr = { ...P.slideOut.tr, op: 0 };
+          bl = { ...P.slideOut.bl, op: 0 };
+          h1 = P.meet.h1;
+          h2 = P.meet.h2;
+        } else if (p <= T.exitEnd) {
+          const t = smoothstep(
+            clamp01((p - T.meetHoldEnd) / (T.exitEnd - T.meetHoldEnd)),
+          );
+          tr = { ...P.slideOut.tr, op: 0 };
+          bl = { ...P.slideOut.bl, op: 0 };
+          h1 = lerpPose(P.meet.h1, P.exit.h1, t);
+          h2 = lerpPose(P.meet.h2, P.exit.h2, t);
+        } else {
+          tr = { ...P.slideOut.tr, op: 0 };
+          bl = { ...P.slideOut.bl, op: 0 };
+          h1 = P.exit.h1;
+          h2 = P.exit.h2;
+        }
+
+        const beliefOp =
+          p <= T.beliefHoldEnd
+            ? 1
+            : 1 -
+              smoothstep(
+                clamp01(
+                  (p - T.beliefHoldEnd) / (T.switchEnd - T.beliefHoldEnd),
+                ),
+              );
+
+        const insideOp = smoothstep(
+          clamp01(
+            (p - T.insideStart) / Math.max(T.insideEnd - T.insideStart, 0.01),
+          ),
+        );
+
+        return { tr, bl, h1, h2, beliefOp, insideOp };
+      };
+
+      const apply = (p) => {
+        const { tr, bl, h1, h2, beliefOp, insideOp } = sample(p);
+        applyHand(handTR, tr);
+        applyHand(handBL, bl);
+        applyHand(handH1, h1, { sharp: (h1.blur ?? 0) < 0.35 });
+        applyHand(handH2, h2, { sharp: (h2.blur ?? 0) < 0.35 });
+
+        if (beliefStage) {
+          beliefStage.style.opacity = String(beliefOp);
+          beliefStage.style.pointerEvents = beliefOp < 0.08 ? "none" : "auto";
+          beliefStage.style.visibility = beliefOp < 0.02 ? "hidden" : "visible";
+        }
+        if (insideStage) {
+          insideStage.style.opacity = String(insideOp);
+          insideStage.style.pointerEvents = insideOp < 0.08 ? "none" : "auto";
+        }
+        if (insideGlow) {
+          insideGlow.style.opacity = String(insideOp * 0.95);
+          insideGlow.style.transform = `translate(-50%, -50%) scale(${(0.88 + insideOp * 0.18).toFixed(3)})`;
+        }
+        if (insideCopy) {
+          const py = (1 - insideOp) * 36;
+          insideCopy.style.opacity = String(insideOp);
+          insideCopy.style.transform = `translate3d(0, ${py.toFixed(2)}px, 0)`;
+        }
+
+        const T = BELIEF_HAND_TIMELINE;
+        runway.dataset.phase =
+          p < T.switchEnd
+            ? p < T.beliefHoldEnd
+              ? "belief"
+              : "switch"
+            : p < T.meetHoldEnd
+              ? "meet"
+              : p < T.exitEnd
+                ? "exit"
+                : "inside";
+      };
+
+      const readScroll = () => {
+        const rect = runway.getBoundingClientRect();
+        const vh = window.innerHeight || 1;
+        const travel = Math.max(rect.height - vh, 1);
+        scrollP = clamp01(-rect.top / travel);
+      };
+
+      if (reduceMotion) {
+        applyHand(handTR, BELIEF_HAND_POSES.belief.tr);
+        applyHand(handBL, BELIEF_HAND_POSES.belief.bl);
+        applyHand(handH1, { ...BELIEF_HAND_POSES.meet.h1, op: 0 });
+        applyHand(handH2, { ...BELIEF_HAND_POSES.meet.h2, op: 0 });
+        if (beliefStage) {
+          beliefStage.style.opacity = "1";
+          beliefStage.style.visibility = "visible";
+        }
+        if (insideStage) insideStage.style.opacity = "1";
+        if (insideGlow) {
+          insideGlow.style.opacity = "0.9";
+          insideGlow.style.transform = "translate(-50%, -50%) scale(1)";
+        }
+        if (insideCopy) {
+          insideCopy.style.opacity = "1";
+          insideCopy.style.transform = "none";
+        }
+      } else {
+        const tick = () => {
+          if (!alive) return;
+          curP += (scrollP - curP) * 0.12;
+          if (Math.abs(scrollP - curP) < 0.0004) curP = scrollP;
+          apply(curP);
+          raf = requestAnimationFrame(tick);
         };
 
         readScroll();
-        applyHands(0);
+        apply(0);
         window.addEventListener("scroll", readScroll, { passive: true });
         window.addEventListener("resize", readScroll, { passive: true });
-        handsRaf = requestAnimationFrame(tickHands);
+        raf = requestAnimationFrame(tick);
 
         cleanups.push(() => {
-          handsAlive = false;
-          if (handsRaf) cancelAnimationFrame(handsRaf);
+          alive = false;
+          if (raf) cancelAnimationFrame(raf);
           window.removeEventListener("scroll", readScroll);
           window.removeEventListener("resize", readScroll);
         });
@@ -457,67 +597,91 @@ export default function About() {
         </div>
       </section>
 
-      {/* ═══════════════ BELIEF ═══════════════ */}
-      <section className="ab-belief" id="belief">
-        <div className="ab-inner">
-          <p className="ab-eyebrow ab-reveal" data-delay="0">
-            WHAT WE BELIEVE
-          </p>
-          <h2 className="ab-belief__headline ab-reveal" data-delay="100">
-            Four things we hold to be true.
-          </h2>
-          <div className="ab-belief__grid">
-            {BELIEFS.map((card, i) => (
-              <article
-                className="ab-belief-card ab-reveal"
-                key={card.num}
-                data-delay={String(i * 150)}
-              >
-                <CornerTicks size={16} />
-                <span className="ab-belief-card__num">{card.num}</span>
-                <h3 className="ab-belief-card__title">{card.title}</h3>
-                <p className="ab-belief-card__body">{card.body}</p>
-              </article>
-            ))}
+      {/* ═══════════════ BELIEF → INSIDE (sticky hand scrub) ═══════════════ */}
+      <section className="ab-belief-runway" id="belief">
+        <div className="ab-belief-runway__pin">
+          <div className="ab-belief-runway__hands" aria-hidden="true">
+            {/* Belief diagonal: top-right + bottom-left (section start) */}
+            <img
+              id="abHandBeliefTR"
+              className="ab-belief-runway__hand ab-belief-runway__hand--tr"
+              src="/assets/about/hand-belief-tr.png"
+              alt=""
+              draggable="false"
+            />
+            <img
+              id="abHandBeliefBL"
+              className="ab-belief-runway__hand ab-belief-runway__hand--bl"
+              src="/assets/about/hand-belief-bl.png"
+              alt=""
+              draggable="false"
+            />
+            {/* Meet diagonal: top-left + bottom-right (twist → exit) */}
+            <img
+              id="abHandH1"
+              className="ab-belief-runway__hand ab-belief-runway__hand--h1"
+              src="/assets/about/hand-h1.png"
+              alt=""
+              draggable="false"
+            />
+            <img
+              id="abHandH2"
+              className="ab-belief-runway__hand ab-belief-runway__hand--h2"
+              src="/assets/about/hand-h2.png"
+              alt=""
+              draggable="false"
+            />
           </div>
-        </div>
-      </section>
 
-      {/* ═══════════════ INSIDE ═══════════════ */}
-      <section className="ab-inside" id="inside">
-        <div className="ab-inside__hands" aria-hidden="true">
-          <img
-            id="abHandRight"
-            className="ab-inside__hand ab-inside__hand--right"
-            src="/assets/h1.png"
-            alt=""
-          />
-          <img
-            id="abHandLeft"
-            className="ab-inside__hand ab-inside__hand--left"
-            src="/assets/h2.png"
-            alt=""
-          />
-        </div>
-        <div className="ab-inside__content">
-          <div className="ab-inside__panel">
-            <p
-              className="ab-eyebrow ab-eyebrow--center ab-inside__eyebrow ab-reveal"
-              data-delay="280"
-            >
-              INSIDE THE STUDIO
-            </p>
-            <h2 className="ab-inside__headline ab-reveal" data-delay="380">
-              What it is like to build here.
-            </h2>
-            <p className="ab-inside__body ab-reveal" data-delay="480">
-              From the first day you are surrounded by people doing the same
-              hard thing. Operators who have shipped, advisors who have scaled,
-              and founders one step ahead who remember exactly where you are
-              standing. The standard is high and the feedback is direct, because
-              we would rather tell you the truth early than watch you learn it
-              late.
-            </p>
+          <div className="ab-belief-runway__belief" id="abBeliefStage">
+            <div className="ab-inner ab-belief-runway__belief-inner">
+              <p className="ab-eyebrow ab-reveal" data-delay="0">
+                WHAT WE BELIEVE
+              </p>
+              <h2 className="ab-belief__headline ab-reveal" data-delay="100">
+                Four things we hold to be true.
+              </h2>
+              <div className="ab-belief__grid">
+                {BELIEFS.map((card, i) => (
+                  <article
+                    className="ab-belief-card ab-reveal"
+                    key={card.num}
+                    data-delay={String(i * 150)}
+                  >
+                    <CornerTicks size={16} />
+                    <span className="ab-belief-card__num">{card.num}</span>
+                    <h3 className="ab-belief-card__title">{card.title}</h3>
+                    <p className="ab-belief-card__body">{card.body}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="ab-belief-runway__inside" id="inside">
+            <img
+              id="abInsideGlow"
+              className="ab-belief-runway__inside-glow"
+              src="/assets/about/inside-glow.png"
+              alt=""
+              draggable="false"
+            />
+            <div className="ab-belief-runway__inside-copy">
+              <p className="ab-eyebrow ab-eyebrow--center ab-inside__eyebrow">
+                INSIDE THE STUDIO
+              </p>
+              <h2 className="ab-inside__headline">
+                What it is like to build here.
+              </h2>
+              <p className="ab-inside__body">
+                From the first day you are surrounded by people doing the same
+                hard thing. Operators who have shipped, advisors who have
+                scaled, and founders one step ahead who remember exactly where
+                you are standing. The standard is high and the feedback is
+                direct, because we would rather tell you the truth early than
+                watch you learn it late.
+              </p>
+            </div>
           </div>
         </div>
       </section>

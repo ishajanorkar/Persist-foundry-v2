@@ -595,7 +595,7 @@ export default function Foundry() {
                 className="pfolio__bg-slide"
                 data-bg="2"
                 style={{
-                  "--pfolio-thumb": "url(/assets/swissmote-thimbnaail.webp)",
+                  "--pfolio-thumb": "url(/assets/persist-designs-thumbnail.png)",
                 }}
               />
             </div>
@@ -700,34 +700,35 @@ export default function Foundry() {
                   className="pfolio-card"
                   data-row="2"
                   style={{
-                    "--pfolio-thumb": "url(/assets/swissmote-thimbnaail.webp)",
+                    "--pfolio-thumb": "url(/assets/persist-designs-thumbnail.png)",
                   }}
                 >
                   <a
                     className="pfolio-card__media"
-                    href="https://swissmote.com/"
+                    href="https://www.persistdesigns.com/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Explore Swissmote"
+                    aria-label="Explore Persist Designs"
                   >
                     <img
                       className="pfolio-card__thumb"
-                      src="/assets/swissmote-thimbnaail.webp"
-                      alt="Swissmote"
+                      src="/assets/persist-designs-thumbnail.png"
+                      alt="Persist Designs"
                       loading="lazy"
                     />
                   </a>
                   <div className="pfolio-card__body">
-                    <h3 className="pfolio-card__name">Swissmote</h3>
+                    <h3 className="pfolio-card__name">Persist Designs</h3>
                     <div className="pfolio-card__meta">
                       <p className="pfolio-card__desc">
-                        Hiring the world&apos;s most overlooked builders. Built
-                        by someone who heard &quot;no&quot; so many times he
-                        rewrote the rules.
+                        Designing brands that refuse to be overlooked. From
+                        logos to websites, packaging to UI/UX, we turn ideas
+                        into identities that look great, work harder, and
+                        leave a mark.
                       </p>
                       <a
                         className="pfolio-card__explore"
-                        href="https://swissmote.com/"
+                        href="https://www.persistdesigns.com/"
                         target="_blank"
                         rel="noopener noreferrer"
                       >

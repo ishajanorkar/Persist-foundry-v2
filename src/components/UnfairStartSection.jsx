@@ -136,11 +136,18 @@ function PropCard({ card, cardKey }) {
         aria-hidden="true"
         draggable="false"
       />
-      <h3 className="vprop-card__title">{card.title}</h3>
-      <div
-        className={`vprop-card__icon${cardKey === "network" ? " vprop-card__icon--network" : ""}`}
-      >
-        <img src={card.icon} alt={card.alt} loading="lazy" draggable="false" />
+      <div className="vprop-card__top">
+        <h3 className="vprop-card__title">{card.title}</h3>
+        <div
+          className={`vprop-card__icon${cardKey === "network" ? " vprop-card__icon--network" : ""}`}
+        >
+          <img
+            src={card.icon}
+            alt={card.alt}
+            loading="lazy"
+            draggable="false"
+          />
+        </div>
       </div>
       <div className="vprop-card__foot">
         <p>
