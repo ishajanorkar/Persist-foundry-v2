@@ -3454,18 +3454,23 @@ body.pf-landing .pf ~ .footer {
      — pull the glass pane down into that gap so it touches the footer
      directly, with only the footer's own border-top as a divider. */
   margin: 0 0 -0.8rem;
+  /* Three layers doing separate jobs: a dark base that stops the starfield
+     reading straight through, a grey veil for the frosted milkiness, and the
+     sheen on top. The base stays cool and dark so this pane still sits below
+     the lighter footer glass. */
   background:
     linear-gradient(
       165deg,
-      rgba(255, 255, 255, 0.07) 0%,
-      rgba(255, 255, 255, 0.022) 42%,
-      rgba(62, 60, 70, 0.05) 100%
+      rgba(255, 255, 255, 0.085) 0%,
+      rgba(255, 255, 255, 0.03) 42%,
+      rgba(62, 60, 70, 0.07) 100%
     ),
-    rgba(146, 148, 162, 0.075);
-  backdrop-filter: blur(22px) saturate(126%);
-  -webkit-backdrop-filter: blur(22px) saturate(126%);
+    linear-gradient(rgba(150, 152, 168, 0.095), rgba(150, 152, 168, 0.095)),
+    rgba(15, 16, 25, 0.4);
+  backdrop-filter: blur(30px) saturate(150%);
+  -webkit-backdrop-filter: blur(30px) saturate(150%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.075),
+    inset 0 1px 0 rgba(255, 255, 255, 0.085),
     inset 0 -14px 26px -18px rgba(0, 0, 0, 0.5);
 }
 .vprop-card__title {
@@ -3571,8 +3576,8 @@ body.pf-landing .pf ~ .footer {
     width: clamp(6rem, 20vh, 8.5rem);
   }
   .vprop-card__top {
-    backdrop-filter: blur(17px) saturate(122%);
-    -webkit-backdrop-filter: blur(17px) saturate(122%);
+    backdrop-filter: blur(24px) saturate(144%);
+    -webkit-backdrop-filter: blur(24px) saturate(144%);
   }
   .vprop-card__foot {
     backdrop-filter: blur(14px) saturate(130%);
