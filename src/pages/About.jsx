@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import {
   BELIEF_HAND_TIMELINE,
   BELIEF_HAND_POSES,
+  HAND_SWITCH,
+  HAND_TIP_ANCHORS,
+  MEET_TIP_GAP_VW,
   lerpPose,
 } from "../about/beliefHands.config";
 import "../styles/about-page.css";
@@ -80,6 +83,9 @@ function CornerTicks({ size = 22 }) {
 
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
 const smoothstep = (t) => t * t * (3 - 2 * t);
+/* Flat in both velocity and acceleration at either end, so a move can start
+   and finish without the eye catching the moment it does. */
+const smootherstep = (t) => t * t * t * (t * (t * 6 - 15) + 10);
 
 export default function About() {
   const heroRafRef = useRef(null);
@@ -259,99 +265,213 @@ export default function About() {
           el.style.transition = "none";
         });
 
-      const poseCss = (pose) =>
-        `translate3d(${pose.x.toFixed(2)}vw, ${pose.y.toFixed(2)}vh, 0) rotate(${pose.r.toFixed(2)}deg) scale(${pose.s.toFixed(4)})`;
+      const els = { tr: handTR, bl: handBL, h1: handH1, h2: handH2 };
 
-      const applyHand = (el, pose, { sharp = false } = {}) => {
-        el.style.transform = poseCss(pose);
-        el.style.opacity = String(Math.max(0, pose.op));
-        el.style.visibility = pose.op < 0.02 ? "hidden" : "visible";
-        const blur = Math.max(0, pose.blur ?? 0);
-        if (sharp || blur < 0.2) {
-          el.style.filter = "saturate(1.2) brightness(1.05)";
-        } else {
-          el.style.filter = `blur(${blur.toFixed(2)}px) saturate(1.15) brightness(0.98)`;
-        }
+      /* Natural position of each hand's visible fingertip, plus the element
+         centre the transform rotates about, in the hand layer's own pixels.
+         Re-measured on resize because both follow the laid-out box. */
+      const tips = {};
+      /* Where the two meeting fingertips actually come to rest. Left where the
+         artwork puts them the hands stop well short of each other, so both are
+         drawn along the line joining them until only MEET_TIP_GAP_VW is left
+         and the tips read as touching. */
+      const meetTips = {};
+      const measureTips = () => {
+        Object.entries(els).forEach(([key, el]) => {
+          const f = HAND_TIP_ANCHORS[key];
+          tips[key] = {
+            x: el.offsetLeft + f.fx * el.offsetWidth,
+            y: el.offsetTop + f.fy * el.offsetHeight,
+            cx: el.offsetLeft + el.offsetWidth / 2,
+            cy: el.offsetTop + el.offsetHeight / 2,
+          };
+        });
+
+        const a = tips.h1;
+        const b = tips.h2;
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        const gap = (MEET_TIP_GAP_VW / 100) * (window.innerWidth || 1);
+        const pull = Math.max(0, (dist - gap) / 2);
+        meetTips.h1 = { x: a.x + (dx / dist) * pull, y: a.y + (dy / dist) * pull };
+        meetTips.h2 = { x: b.x - (dx / dist) * pull, y: b.y - (dy / dist) * pull };
       };
+
+      /* Translation that lands `key`'s fingertip exactly on `target` once the
+         given rotation and scale have been applied about the element centre.
+         Pinning the tip is what lets two differently-drawn arms hand over
+         without the hand appearing to jump. */
+      const pinTip = (key, target, r, s) => {
+        const t = tips[key];
+        const rad = (r * Math.PI) / 180;
+        const dx = (t.x - t.cx) * s;
+        const dy = (t.y - t.cy) * s;
+        return {
+          tx: target.x - (t.cx + dx * Math.cos(rad) - dy * Math.sin(rad)),
+          ty: target.y - (t.cy + dx * Math.sin(rad) + dy * Math.cos(rad)),
+        };
+      };
+
+      /* vw/vh pose (belief, meet, exit) expressed in the same pixel form */
+      const fromPose = (pose) => ({
+        tx: (pose.x / 100) * (window.innerWidth || 1),
+        ty: (pose.y / 100) * (window.innerHeight || 1),
+        r: pose.r,
+        s: pose.s,
+        op: pose.op,
+        blur: pose.blur ?? 0,
+      });
+
+      /* One of the two meeting hands, held on its closed-up fingertip, with an
+         optional vw/vh drift stacked on top for the exit. */
+      const meetPose = (key, drift) => {
+        const pin = pinTip(key, meetTips[key], drift.r, drift.s);
+        return {
+          tx: pin.tx + (drift.x / 100) * (window.innerWidth || 1),
+          ty: pin.ty + (drift.y / 100) * (window.innerHeight || 1),
+          r: drift.r,
+          s: drift.s,
+          op: drift.op,
+          blur: drift.blur ?? 0,
+        };
+      };
+
+      const applyHand = (el, pose) => {
+        el.style.transform = `translate3d(${pose.tx.toFixed(2)}px, ${pose.ty.toFixed(2)}px, 0) rotate(${pose.r.toFixed(3)}deg) scale(${pose.s.toFixed(4)})`;
+        el.style.opacity = String(Math.max(0, pose.op));
+        el.style.visibility = pose.op < 0.004 ? "hidden" : "visible";
+        /* One filter shape for every state: saturation and brightness are
+           continuous functions of the blur, so softening or sharpening a hand
+           can never step the colour the way swapping filter strings did. */
+        const blur = Math.max(0, pose.blur);
+        const k = Math.min(blur, 4) / 4;
+        el.style.filter = `blur(${blur.toFixed(2)}px) saturate(${(1.2 - k * 0.05).toFixed(3)}) brightness(${(1.05 - k * 0.07).toFixed(3)})`;
+      };
+
+      const hidden = (key) => ({ ...fromPose(BELIEF_HAND_POSES.meet[key]), op: 0 });
 
       const sample = (p) => {
         const T = BELIEF_HAND_TIMELINE;
         const P = BELIEF_HAND_POSES;
-        let tr = P.belief.tr;
-        let bl = P.belief.bl;
-        let h1 = { ...P.meetMid.h1, op: 0 };
-        let h2 = { ...P.meetMid.h2, op: 0 };
+        const S = HAND_SWITCH;
+        let tr = fromPose(P.belief.tr);
+        let bl = fromPose(P.belief.bl);
+        let h1 = hidden("h1");
+        let h2 = hidden("h2");
 
         if (p <= T.beliefHoldEnd) {
-          tr = P.belief.tr;
-          bl = P.belief.bl;
-          h1 = { ...P.meetMid.h1, op: 0 };
-          h2 = { ...P.meetMid.h2, op: 0 };
+          // held at rest
         } else if (p <= T.switchEnd) {
-          // Same-side vertical switch (no flip):
-          // TR slides down the right → H2 (BR)
-          // BL slides up the left   → H1 (TL)
-          const t = smoothstep(
-            clamp01((p - T.beliefHoldEnd) / (T.switchEnd - T.beliefHoldEnd)),
+          /* The arms trade corners — top-right hands over to bottom-right and
+             bottom-left to top-left — but the fingertips barely move, so the
+             fingertip is treated as the anchor and the two arms behind it
+             dissolve into one another. A single easing spans the whole switch
+             so nothing decelerates to a stop part-way through. */
+          const u = clamp01(
+            (p - T.beliefHoldEnd) / (T.switchEnd - T.beliefHoldEnd),
           );
-
-          if (t < 0.5) {
-            // First half: belief hands travel toward mid-height
-            const u = smoothstep(t * 2);
-            tr = lerpPose(P.belief.tr, P.slideMid.tr, u);
-            bl = lerpPose(P.belief.bl, P.slideMid.bl, u);
-            h1 = { ...P.meetMid.h1, op: 0 };
-            h2 = { ...P.meetMid.h2, op: 0 };
-          } else if (t < 0.62) {
-            // Short handoff at mid-height on each side
-            const u = smoothstep((t - 0.5) / 0.12);
-            tr = lerpPose(P.slideMid.tr, { ...P.slideMid.tr, op: 0 }, u);
-            bl = lerpPose(P.slideMid.bl, { ...P.slideMid.bl, op: 0 }, u);
-            h1 = lerpPose({ ...P.meetMid.h1, op: 0 }, P.meetMid.h1, u);
-            h2 = lerpPose({ ...P.meetMid.h2, op: 0 }, P.meetMid.h2, u);
-          } else {
-            // Second half: meet hands finish traveling into clean corners
-            const u = smoothstep((t - 0.62) / 0.38);
-            tr = { ...P.slideOut.tr, op: 0 };
-            bl = { ...P.slideOut.bl, op: 0 };
-            h1 = lerpPose(P.meetMid.h1, P.meet.h1, u);
-            h2 = lerpPose(P.meetMid.h2, P.meet.h2, u);
-          }
+          const t = smootherstep(u);
+          /* The dissolve runs on raw progress, not the eased value: easing is
+             steepest exactly where the swap happens, so riding it would cram
+             the crossfade into a fraction of the scroll and make the arms
+             flick over instead of melting. */
+          const xf = smoothstep(
+            clamp01((u - S.fadeStart) / Math.max(S.fadeEnd - S.fadeStart, 0.01)),
+          );
+          const H = S.handoff;
+          // Both arms reach identical opacity, blur and scale at the midpoint,
+          // so at the instant they trade over there is nothing to see change.
+          const toHandoff = clamp01(t * 2);
+          const fromHandoff = clamp01(t * 2 - 1);
+          const out = {};
+          S.sides.forEach(({ out: o, in: i }) => {
+            const from = tips[o];
+            const to = meetTips[i];
+            const target = {
+              x: from.x + (to.x - from.x) * t,
+              y: from.y + (to.y - from.y) * t,
+            };
+            const rest = P.belief[o];
+            // Both arms lean the same way through the swap, so the dissolve
+            // reads as one continuous sweep instead of a straight swap.
+            const rOut = S.sweep * t;
+            const rIn = S.sweep * (t - 1);
+            const sOut = 1 + (H.scale - 1) * t * 2;
+            const sIn = 1 + (H.scale - 1) * (1 - t) * 2;
+            out[o] = {
+              ...pinTip(o, target, rOut, sOut),
+              r: rOut,
+              s: sOut,
+              op: (rest.op + (H.op - rest.op) * toHandoff) * (1 - xf),
+              blur: rest.blur + (H.blur - rest.blur) * toHandoff,
+            };
+            out[i] = {
+              ...pinTip(i, target, rIn, sIn),
+              r: rIn,
+              s: sIn,
+              op: (H.op + (1 - H.op) * fromHandoff) * xf,
+              blur: H.blur * (1 - fromHandoff),
+            };
+          });
+          tr = out.tr;
+          bl = out.bl;
+          h1 = out.h1;
+          h2 = out.h2;
         } else if (p <= T.meetHoldEnd) {
-          tr = { ...P.slideOut.tr, op: 0 };
-          bl = { ...P.slideOut.bl, op: 0 };
-          h1 = P.meet.h1;
-          h2 = P.meet.h2;
+          tr = { ...tr, op: 0 };
+          bl = { ...bl, op: 0 };
+          h1 = meetPose("h1", P.meet.h1);
+          h2 = meetPose("h2", P.meet.h2);
         } else if (p <= T.exitEnd) {
-          const t = smoothstep(
-            clamp01((p - T.meetHoldEnd) / (T.exitEnd - T.meetHoldEnd)),
+          const raw = clamp01(
+            (p - T.meetHoldEnd) / Math.max(T.exitEnd - T.meetHoldEnd, 0.01),
           );
-          tr = { ...P.slideOut.tr, op: 0 };
-          bl = { ...P.slideOut.bl, op: 0 };
-          h1 = lerpPose(P.meet.h1, P.exit.h1, t);
-          h2 = lerpPose(P.meet.h2, P.exit.h2, t);
+          const t = smoothstep(raw);
+          // Position and opacity are decoupled: the pair stays solid for most
+          // of the drift and only clears near the very end, as in the video
+          // where both arms are still full at ~19.5s and gone by ~20s.
+          const fade = smoothstep(clamp01((raw - 0.4) / 0.6));
+          tr = { ...tr, op: 0 };
+          bl = { ...bl, op: 0 };
+          h1 = { ...meetPose("h1", lerpPose(P.meet.h1, P.exit.h1, t)), op: 1 - fade };
+          h2 = { ...meetPose("h2", lerpPose(P.meet.h2, P.exit.h2, t)), op: 1 - fade };
         } else {
-          tr = { ...P.slideOut.tr, op: 0 };
-          bl = { ...P.slideOut.bl, op: 0 };
-          h1 = P.exit.h1;
-          h2 = P.exit.h2;
+          tr = { ...tr, op: 0 };
+          bl = { ...bl, op: 0 };
+          h1 = meetPose("h1", P.exit.h1);
+          h2 = meetPose("h2", P.exit.h2);
         }
 
+        // Belief cards clear early in the switch so the hands never travel
+        // across readable copy — in the reference they are gone by ~17.5s,
+        // well before the pair reaches the meet pose.
         const beliefOp =
           p <= T.beliefHoldEnd
             ? 1
             : 1 -
               smoothstep(
                 clamp01(
-                  (p - T.beliefHoldEnd) / (T.switchEnd - T.beliefHoldEnd),
+                  (p - T.beliefHoldEnd) /
+                    Math.max(T.beliefFadeEnd - T.beliefHoldEnd, 0.01),
                 ),
               );
 
-        const insideOp = smoothstep(
-          clamp01(
-            (p - T.insideStart) / Math.max(T.insideEnd - T.insideStart, 0.01),
-          ),
-        );
+        // Inside starts during late meet — text sits over the hands, then
+        // hands exit while copy settles (matches Loom ~19–20s).
+        // Ramp to full opacity by insideOpaque so copy is readable while
+        // meet hands are still visible; hold at 1 through the end.
+        const insideOp =
+          p <= T.insideStart
+            ? 0
+            : p >= T.insideOpaque
+              ? 1
+              : smoothstep(
+                  clamp01(
+                    (p - T.insideStart) /
+                      Math.max(T.insideOpaque - T.insideStart, 0.01),
+                  ),
+                );
 
         return { tr, bl, h1, h2, beliefOp, insideOp };
       };
@@ -360,11 +480,15 @@ export default function About() {
         const { tr, bl, h1, h2, beliefOp, insideOp } = sample(p);
         applyHand(handTR, tr);
         applyHand(handBL, bl);
-        applyHand(handH1, h1, { sharp: (h1.blur ?? 0) < 0.35 });
-        applyHand(handH2, h2, { sharp: (h2.blur ?? 0) < 0.35 });
+        applyHand(handH1, h1);
+        applyHand(handH2, h2);
 
         if (beliefStage) {
+          // Lift and settle back slightly as it clears, so the section reads
+          // as moving on rather than simply dimming in place.
+          const gone = 1 - beliefOp;
           beliefStage.style.opacity = String(beliefOp);
+          beliefStage.style.transform = `translate3d(0, ${(-gone * 9).toFixed(2)}vh, 0) scale(${(1 - gone * 0.03).toFixed(3)})`;
           beliefStage.style.pointerEvents = beliefOp < 0.08 ? "none" : "auto";
           beliefStage.style.visibility = beliefOp < 0.02 ? "hidden" : "visible";
         }
@@ -373,13 +497,14 @@ export default function About() {
           insideStage.style.pointerEvents = insideOp < 0.08 ? "none" : "auto";
         }
         if (insideGlow) {
-          insideGlow.style.opacity = String(insideOp * 0.95);
-          insideGlow.style.transform = `translate(-50%, -50%) scale(${(0.88 + insideOp * 0.18).toFixed(3)})`;
+          insideGlow.style.opacity = String(insideOp);
+          insideGlow.style.transform = `translate(-50%, -50%) scale(${(0.9 + insideOp * 0.1).toFixed(3)})`;
         }
         if (insideCopy) {
+          // Grows as it resolves, matching the panel scaling up in the video.
           const py = (1 - insideOp) * 36;
           insideCopy.style.opacity = String(insideOp);
-          insideCopy.style.transform = `translate3d(0, ${py.toFixed(2)}px, 0)`;
+          insideCopy.style.transform = `translate3d(0, ${py.toFixed(2)}px, 0) scale(${(0.945 + insideOp * 0.055).toFixed(3)})`;
         }
 
         const T = BELIEF_HAND_TIMELINE;
@@ -402,18 +527,21 @@ export default function About() {
         scrollP = clamp01(-rect.top / travel);
       };
 
+      measureTips();
+
       if (reduceMotion) {
-        applyHand(handTR, BELIEF_HAND_POSES.belief.tr);
-        applyHand(handBL, BELIEF_HAND_POSES.belief.bl);
-        applyHand(handH1, { ...BELIEF_HAND_POSES.meet.h1, op: 0 });
-        applyHand(handH2, { ...BELIEF_HAND_POSES.meet.h2, op: 0 });
+        applyHand(handTR, fromPose(BELIEF_HAND_POSES.belief.tr));
+        applyHand(handBL, fromPose(BELIEF_HAND_POSES.belief.bl));
+        applyHand(handH1, hidden("h1"));
+        applyHand(handH2, hidden("h2"));
         if (beliefStage) {
           beliefStage.style.opacity = "1";
           beliefStage.style.visibility = "visible";
+          beliefStage.style.transform = "none";
         }
         if (insideStage) insideStage.style.opacity = "1";
         if (insideGlow) {
-          insideGlow.style.opacity = "0.9";
+          insideGlow.style.opacity = "1";
           insideGlow.style.transform = "translate(-50%, -50%) scale(1)";
         }
         if (insideCopy) {
@@ -421,25 +549,42 @@ export default function About() {
           insideCopy.style.transform = "none";
         }
       } else {
-        const tick = () => {
+        /* Trailing follow on the scroll value. Time-based rather than
+           per-frame so the damping feels the same on a 60Hz and a 120Hz
+           display instead of snapping twice as fast on the latter. */
+        const FOLLOW = 0.14;
+        let last = 0;
+        let painted = -1;
+        const tick = (now) => {
           if (!alive) return;
-          curP += (scrollP - curP) * 0.12;
-          if (Math.abs(scrollP - curP) < 0.0004) curP = scrollP;
-          apply(curP);
+          const dt = last ? Math.min((now - last) / 1000, 0.05) : 1 / 60;
+          last = now;
+          curP += (scrollP - curP) * (1 - Math.exp(-dt / FOLLOW));
+          if (Math.abs(scrollP - curP) < 0.0002) curP = scrollP;
+          if (Math.abs(curP - painted) > 0.00004) {
+            apply(curP);
+            painted = curP;
+          }
           raf = requestAnimationFrame(tick);
+        };
+
+        const onResize = () => {
+          measureTips();
+          readScroll();
+          painted = -1;
         };
 
         readScroll();
         apply(0);
         window.addEventListener("scroll", readScroll, { passive: true });
-        window.addEventListener("resize", readScroll, { passive: true });
+        window.addEventListener("resize", onResize, { passive: true });
         raf = requestAnimationFrame(tick);
 
         cleanups.push(() => {
           alive = false;
           if (raf) cancelAnimationFrame(raf);
           window.removeEventListener("scroll", readScroll);
-          window.removeEventListener("resize", readScroll);
+          window.removeEventListener("resize", onResize);
         });
       }
     }
@@ -659,28 +804,30 @@ export default function About() {
           </div>
 
           <div className="ab-belief-runway__inside" id="inside">
-            <img
-              id="abInsideGlow"
-              className="ab-belief-runway__inside-glow"
-              src="/assets/about/inside-glow.png"
-              alt=""
-              draggable="false"
-            />
-            <div className="ab-belief-runway__inside-copy">
-              <p className="ab-eyebrow ab-eyebrow--center ab-inside__eyebrow">
-                INSIDE THE STUDIO
-              </p>
-              <h2 className="ab-inside__headline">
-                What it is like to build here.
-              </h2>
-              <p className="ab-inside__body">
-                From the first day you are surrounded by people doing the same
-                hard thing. Operators who have shipped, advisors who have
-                scaled, and founders one step ahead who remember exactly where
-                you are standing. The standard is high and the feedback is
-                direct, because we would rather tell you the truth early than
-                watch you learn it late.
-              </p>
+            <div className="ab-inside__card">
+              <img
+                id="abInsideGlow"
+                className="ab-belief-runway__inside-glow"
+                src="/assets/about/inside-glow.png"
+                alt=""
+                draggable="false"
+              />
+              <div className="ab-belief-runway__inside-copy">
+                <p className="ab-eyebrow ab-eyebrow--center ab-inside__eyebrow">
+                  INSIDE THE STUDIO
+                </p>
+                <h2 className="ab-inside__headline">
+                  What it is like to build here.
+                </h2>
+                <p className="ab-inside__body">
+                  From the first day you are surrounded by people doing the same
+                  hard thing. Operators who have shipped, advisors who have
+                  scaled, and founders one step ahead who remember exactly where
+                  you are standing. The standard is high and the feedback is
+                  direct, because we would rather tell you the truth early than
+                  watch you learn it late.
+                </p>
+              </div>
             </div>
           </div>
         </div>

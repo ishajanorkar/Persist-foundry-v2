@@ -332,7 +332,13 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
 }
 .ab-belief-runway__hand {
   position: absolute;
-  width: min(52vw, 760px);
+  /* Sized so the meet pose fills the frame like the reference: the arms run
+     off opposite corners and the fingertips close to within ~4% of centre.
+     This MUST stay proportional to the viewport width — a px cap would make
+     the hands a different fraction of the frame at different widths, and
+     anything above ~57vw makes the two hands interpenetrate at the meet.
+     The vh term only guards freak short-and-wide viewports. */
+  width: min(55vw, 130vh);
   height: auto;
   object-fit: contain;
   will-change: transform, opacity, filter;
@@ -346,23 +352,25 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   top: -14%;
   right: -10%;
   left: auto;
-  width: min(54vw, 800px);
+  width: min(57vw, 134vh);
 }
 .ab-belief-runway__hand--bl {
   bottom: -16%;
   left: -10%;
   right: auto;
-  width: min(54vw, 800px);
+  width: min(57vw, 134vh);
 }
-/* Meet / exit: top-left + bottom-right */
+/* Meet / exit: top-left + bottom-right. Anchored closer to centre than the
+   belief pair so the fingertips close to within ~4% of the frame width at the
+   meet, which is the tightest point of the whole sequence. */
 .ab-belief-runway__hand--h1 {
   top: -8%;
-  left: -10%;
+  left: -3.5%;
   opacity: 0;
 }
 .ab-belief-runway__hand--h2 {
   bottom: -10%;
-  right: -10%;
+  right: -3.5%;
   opacity: 0;
 }
 
@@ -456,23 +464,39 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 var(--gutter);
+  padding: 0;
   box-sizing: border-box;
   opacity: 0;
   pointer-events: none;
   will-change: opacity;
 }
+/* Panel geometry is taken from the 1440 design frame: 1280×520 card sitting on
+   80px gutters, so 88.9% keeps the same proportion below 1440 and the px cap
+   holds it steady above. Square corners, flat fill — no border. */
+.ab-inside__card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(1280px, 88.9%);
+  min-height: min(520px, 36.1vw, 84vh);
+  padding: 0;
+  border-radius: 0;
+  background: #0d0d0d;
+  overflow: hidden;
+  box-sizing: border-box;
+}
 .ab-belief-runway__inside-glow {
   position: absolute;
-  left: 50%;
-  top: 48%;
-  width: min(72vw, 720px);
+  left: 48.6%;
+  top: 56.5%;
+  width: 52%;
   height: auto;
-  transform: translate(-50%, -50%) scale(0.88);
+  transform: translate(-50%, -50%) scale(0.9);
   opacity: 0;
   pointer-events: none;
   mix-blend-mode: screen;
-  filter: blur(2px) saturate(1.1);
+  filter: blur(2px) saturate(1.5);
   will-change: opacity, transform;
   user-select: none;
   -webkit-user-drag: none;
@@ -480,30 +504,35 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
 .ab-belief-runway__inside-copy {
   position: relative;
   z-index: 1;
-  width: min(720px, 100%);
+  width: min(952px, 74.4%);
   text-align: center;
   will-change: opacity, transform;
 }
+/* Type scale is solved off the 1440 frame and capped there, because the card
+   itself stops growing at 1280px. */
 .ab-inside__eyebrow {
   color: #ffffff8f;
-  margin-bottom: 1.5rem;
+  margin: 0 0 clamp(0.6rem, 1.711vw, 1.54rem);
+  font-size: clamp(0.5rem, 0.881vw, 0.79rem);
+  font-weight: 500;
+  letter-spacing: 0.105em;
 }
 .ab-inside__headline {
-  margin: 0 auto 1.5rem;
+  margin: 0 auto clamp(0.7rem, 1.936vw, 1.744rem);
   font-family: "Montserrat", var(--montserrat), sans-serif;
-  font-size: clamp(1.5rem, 2.87vw, 3rem);
+  font-size: clamp(1.1rem, 3.02vw, 2.72rem);
   font-weight: 600;
   line-height: 1.12;
   letter-spacing: -0.03em;
-  color: #fffaf1;
+  color: #fffcf6;
 }
 .ab-inside__body {
   margin: 0 auto;
-  max-width: 54ch;
+  max-width: none;
   font-family: "Montserrat", var(--montserrat), sans-serif;
   font-weight: 400;
-  font-size: clamp(0.95rem, 1.05vw, 1.05rem);
-  line-height: 1.7;
+  font-size: clamp(0.62rem, 1.09vw, 0.98rem);
+  line-height: 1.63;
   color: #a9a7a4;
 }
 
@@ -539,7 +568,7 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
     padding: clamp(4rem, 10vh, 7rem) var(--gutter);
   }
   .ab-belief-runway__inside-glow {
-    opacity: 0.9 !important;
+    opacity: 1 !important;
   }
   .ab-belief-runway__inside-copy {
     opacity: 1 !important;
@@ -788,7 +817,7 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
     height: 300vh;
   }
   .ab-belief-runway__hand {
-    width: min(70vw, 560px);
+    width: min(83vw, 130vh);
   }
   .ab-belief-runway__hand--tr {
     top: -6%;
@@ -864,8 +893,30 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
     align-items: flex-start;
     overflow-y: auto;
   }
+  /* Below the desktop range the vw-driven scale would go unreadably small, so
+     the card keeps its proportions but the type falls back to its own ramp. */
+  .ab-inside__card {
+    min-height: min(520px, 58vw, 76vh);
+    padding: clamp(1.75rem, 5vw, 2.75rem) clamp(1.1rem, 4vw, 2rem);
+  }
   .ab-belief-runway__inside-copy {
+    width: min(600px, 96%);
     padding: 0 0.25rem;
+  }
+  .ab-inside__eyebrow {
+    margin-bottom: 1.15rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+  }
+  .ab-inside__headline {
+    margin-bottom: 1.05rem;
+    font-size: clamp(1.45rem, 4.5vw, 2.2rem);
+  }
+  .ab-inside__body {
+    font-size: clamp(0.84rem, 1.95vw, 1rem);
+  }
+  .ab-belief-runway__inside-glow {
+    width: 76%;
   }
 }
 
@@ -903,27 +954,36 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   .ab-belief-card {
     padding: 1.35rem 1.15rem;
   }
+  /* A tall, narrow viewport spreads the diagonal, so the phone breakpoint
+     needs a longer reach and tighter anchors to keep the fingertips meeting. */
   .ab-belief-runway__hand {
-    width: min(88vw, 400px);
+    width: min(124vw, 190vh);
   }
   .ab-belief-runway__hand--tr {
     top: -4%;
-    right: -24%;
+    right: -18%;
   }
   .ab-belief-runway__hand--bl {
     bottom: -6%;
-    left: -24%;
+    left: -18%;
   }
   .ab-belief-runway__hand--h1 {
-    top: -2%;
-    left: -22%;
+    top: 2%;
+    left: -12%;
   }
   .ab-belief-runway__hand--h2 {
-    bottom: -4%;
-    right: -22%;
+    bottom: 0%;
+    right: -12%;
   }
   .ab-belief-runway__inside-glow {
-    width: min(92vw, 420px);
+    width: 88%;
+  }
+  .ab-inside__card {
+    min-height: min(430px, 72vw, 74vh);
+    padding: 1.9rem 1.2rem;
+  }
+  .ab-belief-runway__inside-copy {
+    width: 100%;
   }
   .ab-mission {
     min-height: 62vh;
