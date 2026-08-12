@@ -527,9 +527,29 @@ export default function About() {
         scrollP = clamp01(-rect.top / travel);
       };
 
-      measureTips();
+      /* Phones drop the hand sequence altogether (see about-page.css) — the
+         runway becomes two stacked sections there, so the scrub has nothing
+         left to drive. Kept as a live query so a tablet rotating across the
+         breakpoint picks the right mode up rather than staying frozen. */
+      const mqNoHands = window.matchMedia("(max-width: 900px)");
+
+      /* Hand back to the stylesheet: the phone rules resolve every stage to
+         its finished state, so clearing the inline values is all that is
+         needed to leave a clean, fully visible section behind. */
+      const releaseToCss = () => {
+        [beliefStage, insideStage, insideGlow, insideCopy]
+          .filter(Boolean)
+          .forEach((el) => {
+            el.style.opacity = "";
+            el.style.visibility = "";
+            el.style.transform = "";
+            el.style.pointerEvents = "";
+          });
+        delete runway.dataset.phase;
+      };
 
       if (reduceMotion) {
+        measureTips();
         applyHand(handTR, fromPose(BELIEF_HAND_POSES.belief.tr));
         applyHand(handBL, fromPose(BELIEF_HAND_POSES.belief.bl));
         applyHand(handH1, hidden("h1"));
@@ -574,17 +594,38 @@ export default function About() {
           painted = -1;
         };
 
-        readScroll();
-        apply(0);
-        window.addEventListener("scroll", readScroll, { passive: true });
-        window.addEventListener("resize", onResize, { passive: true });
-        raf = requestAnimationFrame(tick);
+        let running = false;
+        const start = () => {
+          if (running || !alive) return;
+          running = true;
+          measureTips();
+          readScroll();
+          curP = scrollP;
+          painted = -1;
+          apply(curP);
+          last = 0;
+          window.addEventListener("scroll", readScroll, { passive: true });
+          window.addEventListener("resize", onResize, { passive: true });
+          raf = requestAnimationFrame(tick);
+        };
+        const stop = () => {
+          if (!running) return;
+          running = false;
+          if (raf) cancelAnimationFrame(raf);
+          raf = 0;
+          window.removeEventListener("scroll", readScroll);
+          window.removeEventListener("resize", onResize);
+          releaseToCss();
+        };
+        const syncMode = () => (mqNoHands.matches ? stop() : start());
+
+        syncMode();
+        mqNoHands.addEventListener("change", syncMode);
 
         cleanups.push(() => {
           alive = false;
-          if (raf) cancelAnimationFrame(raf);
-          window.removeEventListener("scroll", readScroll);
-          window.removeEventListener("resize", onResize);
+          stop();
+          mqNoHands.removeEventListener("change", syncMode);
         });
       }
     }

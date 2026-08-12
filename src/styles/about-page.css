@@ -1036,6 +1036,54 @@ a.ab-quote-card__name:hover .ab-quote-card__li {
   }
 }
 
+/* PHONES / SMALL TABLETS — the two-hand choreography is built around a wide
+   frame: the arms enter from opposite corners and only read once there is
+   room for both to travel. On a narrow screen they crop into unrecognisable
+   slabs, so the runway drops the hands entirely and collapses from a 280vh
+   scrub into two plainly stacked sections. Placed after the width blocks
+   above so it wins on the properties it re-declares. */
+@media (max-width: 900px) {
+  .ab-belief-runway {
+    height: auto;
+  }
+  .ab-belief-runway__pin {
+    position: relative;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+  }
+  .ab-belief-runway__hands {
+    display: none;
+  }
+  .ab-belief-runway__belief {
+    position: relative;
+    inset: auto;
+    align-items: center;
+    overflow-y: visible;
+    padding: clamp(3.5rem, 9vh, 5rem) 0 clamp(2.5rem, 6vh, 3.5rem);
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+  .ab-belief-runway__inside {
+    position: relative;
+    inset: auto;
+    padding: 0 0 clamp(3.5rem, 9vh, 5rem);
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  .ab-belief-runway__inside-glow {
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+  .ab-belief-runway__inside-copy {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ab-reveal {
     transition: opacity 0.35s ease;
