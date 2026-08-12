@@ -17,7 +17,7 @@ function getRevealDelay(order) {
 function CellVisual({ company }) {
   const [srcIndex, setSrcIndex] = useState(0)
   const thumbnail = getPortfolioThumbnail(company.id)
-  // Prefer local white brand marks; never fall back to remote colored logos.
+  // Prefer the local brand mark; never fall back to remote logos.
   const sources = [...new Set([company.logo, thumbnail].filter(Boolean))]
   const exhausted = srcIndex >= sources.length
   const src = exhausted ? null : sources[srcIndex]
@@ -32,6 +32,7 @@ function CellVisual({ company }) {
   return (
     <div
       className={`pf-cell-visual-mark${isScreenshot ? ' is-screenshot' : ''}${usingBrandLogo ? ' is-brand' : ''}${company.logoClass ? ` ${company.logoClass}` : ''}`}
+      style={company.logoWidth ? { '--logo-w': `${company.logoWidth}px` } : undefined}
     >
       <img
         key={src}

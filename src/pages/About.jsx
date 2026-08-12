@@ -276,7 +276,15 @@ export default function About() {
          drawn along the line joining them until only MEET_TIP_GAP_VW is left
          and the tips read as touching. */
       const meetTips = {};
+      /* False until every hand has a real laid-out box. Painting off a zero
+         height puts each hand half its own height out of place, which is what
+         a first visit used to show before the PNGs had decoded. */
+      let measured = false;
       const measureTips = () => {
+        if (Object.values(els).some((el) => !el.offsetWidth || !el.offsetHeight)) {
+          measured = false;
+          return false;
+        }
         Object.entries(els).forEach(([key, el]) => {
           const f = HAND_TIP_ANCHORS[key];
           tips[key] = {
@@ -296,6 +304,8 @@ export default function About() {
         const pull = Math.max(0, (dist - gap) / 2);
         meetTips.h1 = { x: a.x + (dx / dist) * pull, y: a.y + (dy / dist) * pull };
         meetTips.h2 = { x: b.x - (dx / dist) * pull, y: b.y - (dy / dist) * pull };
+        measured = true;
+        return true;
       };
 
       /* Translation that lands `key`'s fingertip exactly on `target` once the
@@ -577,6 +587,18 @@ export default function About() {
         let painted = -1;
         const tick = (now) => {
           if (!alive) return;
+          if (!measured) {
+            /* Hold the CSS resting state rather than show a frame built on a
+               half-laid-out hand; retry until the artwork reports a size. */
+            if (!measureTips()) {
+              raf = requestAnimationFrame(tick);
+              return;
+            }
+            readScroll();
+            curP = scrollP;
+            painted = -1;
+            last = 0;
+          }
           const dt = last ? Math.min((now - last) / 1000, 0.05) : 1 / 60;
           last = now;
           curP += (scrollP - curP) * (1 - Math.exp(-dt / FOLLOW));
@@ -588,11 +610,21 @@ export default function About() {
           raf = requestAnimationFrame(tick);
         };
 
-        const onResize = () => {
+        const onLayoutChange = () => {
           measureTips();
           readScroll();
           painted = -1;
         };
+
+        /* The tip maths is measured off the hands' laid-out boxes, so it has to
+           be redone whenever those boxes change size — the PNGs decoding after
+           first paint, a viewport resize, or the mobile breakpoint. Observing
+           the elements catches all three; a resize listener alone misses the
+           decode, which is why a first visit stayed broken until reload. */
+        const ro =
+          typeof ResizeObserver === "undefined"
+            ? null
+            : new ResizeObserver(onLayoutChange);
 
         let running = false;
         const start = () => {
@@ -602,10 +634,11 @@ export default function About() {
           readScroll();
           curP = scrollP;
           painted = -1;
-          apply(curP);
+          if (measured) apply(curP);
           last = 0;
           window.addEventListener("scroll", readScroll, { passive: true });
-          window.addEventListener("resize", onResize, { passive: true });
+          window.addEventListener("resize", onLayoutChange, { passive: true });
+          if (ro) Object.values(els).forEach((el) => ro.observe(el));
           raf = requestAnimationFrame(tick);
         };
         const stop = () => {
@@ -614,7 +647,8 @@ export default function About() {
           if (raf) cancelAnimationFrame(raf);
           raf = 0;
           window.removeEventListener("scroll", readScroll);
-          window.removeEventListener("resize", onResize);
+          window.removeEventListener("resize", onLayoutChange);
+          if (ro) ro.disconnect();
           releaseToCss();
         };
         const syncMode = () => (mqNoHands.matches ? stop() : start());
@@ -788,11 +822,16 @@ export default function About() {
         <div className="ab-belief-runway__pin">
           <div className="ab-belief-runway__hands" aria-hidden="true">
             {/* Belief diagonal: top-right + bottom-left (section start) */}
+            {/* Intrinsic width/height are required, not decorative: the scrub
+                measures each hand's laid-out box to pin the fingertips, and
+                without them a not-yet-decoded image lays out at zero height. */}
             <img
               id="abHandBeliefTR"
               className="ab-belief-runway__hand ab-belief-runway__hand--tr"
               src="/assets/about/hand-belief-tr.png"
               alt=""
+              width="700"
+              height="751"
               draggable="false"
             />
             <img
@@ -800,6 +839,8 @@ export default function About() {
               className="ab-belief-runway__hand ab-belief-runway__hand--bl"
               src="/assets/about/hand-belief-bl.png"
               alt=""
+              width="671"
+              height="737"
               draggable="false"
             />
             {/* Meet diagonal: top-left + bottom-right (twist → exit) */}
@@ -808,6 +849,8 @@ export default function About() {
               className="ab-belief-runway__hand ab-belief-runway__hand--h1"
               src="/assets/about/hand-h1.png"
               alt=""
+              width="746"
+              height="720"
               draggable="false"
             />
             <img
@@ -815,6 +858,8 @@ export default function About() {
               className="ab-belief-runway__hand ab-belief-runway__hand--h2"
               src="/assets/about/hand-h2.png"
               alt=""
+              width="748"
+              height="720"
               draggable="false"
             />
           </div>

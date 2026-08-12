@@ -223,13 +223,19 @@ body.pf-page .footer-ref { padding-top: 24px; }
   color: #fff;
 }
 
-/* Shared logo slot — fixed box so every mark reads at the same size */
+/*
+  Shared logo slot. A fixed box can't make these read evenly: each source file
+  crops its artwork differently, so an identical box renders a tight logo at
+  full height and a padded one at half that. Instead every company carries a
+  precomputed `--logo-w` that normalises the *visible* artwork to a common
+  optical size, independent of file dimensions or internal transparent margin.
+*/
 .pf-cell-visual-mark {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: min(112px, 78%);
-  height: 48px;
+  width: 100%;
+  height: 100%;
   transition:
     opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
@@ -237,8 +243,8 @@ body.pf-page .footer-ref { padding-top: 24px; }
 
 .pf-cell-visual-mark img {
   display: block;
-  width: 100%;
-  height: 100%;
+  width: var(--logo-w, 42px);
+  height: auto;
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
@@ -260,75 +266,16 @@ body.pf-page .footer-ref { padding-top: 24px; }
   opacity: 0.95;
 }
 
+/* Screenshot fallback fills the slot instead of using the optical width */
 .pf-cell-visual-mark.is-screenshot img {
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
   filter: none;
   border-radius: 4px;
   opacity: 1;
-}
-
-/*
-  Text wordmarks (Bump, Pump, Yumiko): tight wide crops in the same
-  visual slot as other logos — slightly smaller than default icons.
-*/
-.pf-cell-visual-mark.is-wordmark {
-  width: min(108px, 74%);
-  height: 42px;
-}
-.pf-cell-visual-mark.is-wordmark.is-brand img,
-.pf-cell-visual-mark.is-wordmark img {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  object-fit: contain !important;
-  transform: none !important;
-}
-
-/* Yumiko — same modest scale as other wordmarks */
-.pf-cell-visual-mark.is-wordmark-wide {
-  width: min(112px, 76%);
-  height: 42px;
-}
-.pf-cell-visual-mark.is-wordmark-wide.is-brand img,
-.pf-cell-visual-mark.is-wordmark-wide img {
-  width: 100% !important;
-  height: auto !important;
-  max-height: 24px !important;
-  object-fit: contain !important;
-  transform: none !important;
-}
-
-/* Creatorships — light line mark needs a modest boost to match icon weight */
-.pf-cell-visual-mark.is-creatorships {
-  width: min(128px, 88%);
-  height: 52px;
-}
-.pf-cell-visual-mark.is-creatorships.is-brand img,
-.pf-cell-visual-mark.is-creatorships img {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  object-fit: contain !important;
-}
-
-/* Light line-art marks — slight bump only (Vital Ventures, Game of Creators) */
-.pf-cell-visual-mark.is-line-mark {
-  width: min(120px, 82%);
-  height: 50px;
-}
-.pf-cell-visual-mark.is-line-mark.is-brand img,
-.pf-cell-visual-mark.is-line-mark img {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  object-fit: contain !important;
 }
 
 .pf-cell:hover .pf-cell-visual-mark {
@@ -782,7 +729,8 @@ body.pf-page .footer-ref { padding-top: 24px; }
   max-height: 88px;
 }
 
-.pf-detail-media-fallback .pf-detail-logo-img:not(.is-remote) {
+/* Brand marks are full-colour, so only the monochrome ones get flipped. */
+.pf-detail-media-fallback .pf-detail-logo-img.is-invert {
   filter: brightness(0) invert(1);
 }
 

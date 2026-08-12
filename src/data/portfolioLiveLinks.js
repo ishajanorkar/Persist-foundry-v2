@@ -180,11 +180,11 @@ export const LIVE_PORTFOLIO_LINKS = {
       'VibesCoded is an AI-powered no-code platform that turns your ideas or sketches into fully deployed',
   },
   collabio: {
-    url: 'https://www.collabio.live/',
+    url: 'https://www.colabio.org/',
     pitchDeck: null,
     logo: '/assets/collabio.png',
     description:
-      'Collabio is an all-in-one workspace for streamlined project and team management offering time tracking, task insights, activity reports, and real-time collaboration from one intuitive dashboard.',
+      'Colabio is an all-in-one workspace for streamlined project and team management offering time tracking, task insights, activity reports, and real-time collaboration from one intuitive dashboard.',
   },
   'hey-ova': {
     url: 'https://heyova.com/',
